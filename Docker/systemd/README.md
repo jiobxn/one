@@ -15,6 +15,4 @@ Systemd
 
 ## GNOME
 
-    docker run -d --restart always --privileged --network host -v /sys/fs/cgroup:/sys/fs/cgroup:ro --hostname GNOME --name gnome gnome
-    docker exec -it gnome bash
-    [root@GNOME ~]# vncserver
+    docker run -d --restart always --privileged --network host -v /sys/fs/cgroup:/sys/fs/cgroup:ro -e VNC_PASS=123456 --name gnome gnome
