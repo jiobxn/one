@@ -12,9 +12,9 @@ chmod u+x /usr/local/sbin/scan.sh
 
 cat >/var/spool/cron/root <<-EOF
 MAILTO=' '
-58 23 * * * /usr/bin/yum update -y
-* * * * * /bin/bash /usr/local/sbin/scan.sh
-* * * * * /usr/bin/echo 3 > /proc/sys/vm/drop_caches
+58 23 * * * yum update -y
+* * * * * bash /usr/local/sbin/scan.sh
+* * * * * echo 3 > /proc/sys/vm/drop_caches
 EOF
 
 yum -y install python34-setuptools
