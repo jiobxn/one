@@ -9,9 +9,8 @@ if [ "$1" = 'catalina.sh' ]; then
 : ${HTTP_PORT:=8080}
 : ${HTTPS_PORT:=8443}
 : ${REDIS_PORT:=6379}
-: ${REDIS_DB:=0}
 : ${SESSION_TTL:=30}
-: ${MAX_MEM=$(($(free -m |grep Mem |awk '{print $2}')*70/100))}
+: ${MAX_MEM=$(($(free -m |grep Mem |awk '{print $2}')*50/100))}
 
   if [ -z "$(grep "redhat.xyz" /usr/local/tomcat/conf/server.xml)" ]; then
 	echo "Initialize tomcat"
@@ -61,7 +60,6 @@ if [ "$1" = 'catalina.sh' ]; then
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
 			version="1.0">
-
 			<role rolename="admin-gui"/>
 			<role rolename="manager-gui"/>
 			<role rolename="manager-script"/>
@@ -103,17 +101,15 @@ if [ "$1" = 'catalina.sh' ]; then
 	#Redis
 	if [ $REDIS_SERVER ]; then
 		cat >/tomcat-redis.txt <<-END
-		    <Valve className="com.orangefunction.tomcat.redissessions.RedisSessionHandlerValve" />
-		    <Manager className="com.orangefunction.tomcat.redissessions.RedisSessionManager"
-        	   host="$REDIS_SERVER"
-        	   port="$REDIS_PORT"
-        	   password="$REDIS_PASS"
-        	   database="$REDIS_DB" />
+        	   <Valve className="tomcat.request.session.redis.SessionHandlerValve" />
+        	   <Manager className="tomcat.request.session.redis.SessionManager" />
 		END
 
-		if [ -z "$REDIS_PASS" ]; then sed -i '/password/d' /tomcat-redis.txt; fi
 		sed -i '/<Context>/ r /tomcat-redis.txt' /usr/local/tomcat/conf/context.xml
-        fi
+		sed -i 's/=127.0.0.1:6379/='$REDIS_SERVER':'$REDIS_PORT'/' /usr/local/tomcat/conf/redis-data-cache.properties
+		if [ $REDIS_DB ]; then sed -i 's/#redis.database=0/redis.database='$REDIS_DB'/' /usr/local/tomcat/conf/redis-data-cache.properties; fi
+		if [ $REDIS_PASS ]; then sed -i 's/#redis.password=/redis.password='$REDIS_PASS'/' /usr/local/tomcat/conf/redis-data-cache.properties; fi
+	fi
 
         #Session TTL
         if [ "$SESSION_TTL" -ne 30 ]; then
