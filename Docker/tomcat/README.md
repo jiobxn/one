@@ -3,11 +3,11 @@ Tomcat
 
 ## Build Defult Parameter
 
-        TOMCAT="7"
-        JDK="7"
+        TOMCAT="8.5"
+        JDK="8"
 
-    #例如要构建一个tomcat8
-    docker build --build-arg TOMCAT=8 --build-arg JDK=8 -t tomcat .
+    #例如要构建一个tomcat7
+    docker build --build-arg TOMCAT=7.0 --build-arg JDK=7 -t tomcat .
 
 ## Example:
 
