@@ -24,7 +24,7 @@ set -e
 http_conf() {
 	echo "Initialize nginx"
 	if [ -f /key/server.crt -a -f /key/server.key ]; then
-		\cp /key/{server.crt,server.key} /usr/local/nginx/conf/
+		\cp /key/*.{crt,key} /usr/local/nginx/conf/
 	else
 		openssl genrsa -out /usr/local/nginx/conf/server.key 4096 2>/dev/null
 		openssl req -new -key /usr/local/nginx/conf/server.key -out /usr/local/nginx/conf/server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker" 2>/dev/null
