@@ -116,3 +116,29 @@ Nginx
 
     Internet选项-->高级-->安全-->对证书地址不匹配发出警告(取消勾选)
     Internet选项-->安全-->Internet-->自定义级别-->其他-->显示混合内容(启用)
+
+****
+
+### docker hub proxy
+
+**创建证书**
+
+    openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 365 -out ca.crt -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker"
+    openssl req -newkey rsa:4096 -nodes -sha256 -keyout auth.key -out auth.csr -subj "/C=CN/L=London/O=Company Ltd/CN=auth.docker.io"
+    openssl x509 -req -days 365 -in auth.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out auth.crt
+    openssl req -newkey rsa:4096 -nodes -sha256 -keyout dseasb33srnrn.key -out dseasb33srnrn.csr -subj "/C=CN/L=London/O=Company Ltd/CN=dseasb33srnrn.cloudfront.net"
+    openssl x509 -req -days 365 -in dseasb33srnrn.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out dseasb33srnrn.crt
+    openssl req -newkey rsa:4096 -nodes -sha256 -keyout registry-1.key -out registry-1.csr -subj "/C=CN/L=London/O=Company Ltd/CN=registry-1.docker.io"
+    openssl x509 -req -days 365 -in registry-1.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out registry-1.crt
+
+**proxy模式**
+
+    -e PROXY_SERVER= "auth.docker.io|auth.docker.io%backend_https=y,crt_key=auth.crt|auth.key;dseasb33srnrn.cloudfront.net|dseasb33srnrn.cloudfront.net%backend_https=y,crt_key=dseasb33srnrn.crt|dseasb33srnrn.key;registry-1.docker.io|registry-1.docker.io%backend_https=y,crt_key=registry-1.crt|registry-1.key"
+
+**客户端修改hosts**
+
+    echo "<ip-address> auth.docker.io registry-1.docker.io dseasb33srnrn.cloudfront.net" >>/etc/hosts
+
+**添加CA证书信任**
+
+    curl -s http://x.x.x.x/ca.crt >> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
