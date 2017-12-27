@@ -22,7 +22,7 @@ RUN cd /usr/local/src \
         && make -j8 PREFIX=/usr/local/redis \
         && make PREFIX=/usr/local/redis install \
         && cp *.conf /usr/local/redis/ \
-        && for i in $(find ./src/* -perm -755);do \cp $i /usr/local/redis/bin/;done \
+        && for i in $(find ./src/* -type f -perm -755);do \cp $i /usr/local/redis/bin/;done \
         && ln -s /usr/local/redis/bin/* /usr/local/bin/ \
         && rm -rf /usr/local/src/*
 
