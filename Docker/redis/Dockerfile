@@ -17,7 +17,6 @@ RUN cd /usr/local/src \
         && make -j8 && make install \
         && gem install json_pure \
         && gem update --system \
-        && gem install bundler \
         && gem install redis \
         && cd /usr/local/src/redis-* \
         && make -j8 PREFIX=/usr/local/redis \
