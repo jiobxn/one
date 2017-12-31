@@ -53,6 +53,7 @@ http_conf() {
 	    sendfile        on;
 	    tcp_nopush      on;
 	    keepalive_timeout  70;
+	    server_names_hash_bucket_size 512;
 
 	##acclog_off    access_log off;
 	##errlog_off    error_log off;
