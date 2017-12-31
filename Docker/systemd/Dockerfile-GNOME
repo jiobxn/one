@@ -2,7 +2,7 @@ FROM centos:latest
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ENV container docker
 RUN yum clean all; yum -y install epel-release; yum -y update
-RUN yum groups install -y gnome-desktop; yum -y install tigervnc-server expect python34-setuptools; yum clean all
+RUN yum groups install -y gnome-desktop; yum -y install tigervnc-server expect python34-setuptools aria2; yum clean all
 RUN easy_install-3.4 pip; pip install --upgrade youtube-dl you-get
 RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
     systemd-tmpfiles-setup.service ] || rm -f $i; done); \
