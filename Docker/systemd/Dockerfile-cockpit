@@ -5,7 +5,8 @@ ENV container docker
 
 RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN yum clean all; yum -y install epel-release; yum -y update
-RUN yum -y install cockpit bash-completion vim wget openssh-server openssh-clients initscripts iptables-services bind-utils net-tools cronie at; yum clean all
+RUN yum -y install cockpit bash-completion vim wget python34-setuptools aria2 openssh-server openssh-clients initscripts iptables-services bind-utils net-tools cronie at; yum clean all
+RUN easy_install-3.4 pip; pip install --upgrade youtube-dl you-get
 RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
 systemd-tmpfiles-setup.service ] || rm -f $i; done); \
 rm -f /lib/systemd/system/multi-user.target.wants/*;\
