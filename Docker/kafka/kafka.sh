@@ -98,7 +98,7 @@ else
 				-e KK_MEM=[1G] \\
 				-e KK_NET=[3] \\
 				-e KK_IO=[8] \\
-				-e KK_TIME=[168]
+				-e KK_LOG_TIME=[168]
 				-e KK_REBA_TIME=[0] \\
 				-e KK_SERVER=[ethX ip]
 				-e KK_ID=[0] \\
