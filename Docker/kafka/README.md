@@ -25,8 +25,9 @@ Kafka
 				-e KK_MEM=[1G] \\                                  默认内存大小1G
 				-e KK_NET=[3] \\                                   默认网络线程3个
 				-e KK_IO=[8] \\                                    默认存储线程8个
-				-e KK_TIME=[168]                                   默认日志储存时间7天
-				-e KK_SERVER=[ethX ip]                             默认取网关接口IP地址
+				-e KK_LOG_TIME=[168] \\                            默认日志储存时间7天
+				-e KK_REBA_TIME=[0] \\                             消费者重新平衡时间，默认为0，生产环境建议为3000(3s)
+				-e KK_SERVER=[ethX ip]                             默认取网关接口IP地址
 				-e KK_ID=[0] \\                                    默认ID是0，在一个集群环境每个节点的ID不能相同
 				-e KK_TOPIC=<test:1:1> \\                          创建一个topic，格式“topic:replication-factor:partitions"，要创建多个用逗号","分隔
 				-e ZK_SERVER=<"10.0.0.70:2181"> \\                 指定zookeeper地址和端口，要使用多台用逗号","分隔
@@ -52,3 +53,7 @@ Kafka一些概念：
     topic：一个话题，相当于一个漏斗名称
     replication-factor：topic副本数。例如一个3节点集群，test1:3:1，就表示将test1复制到三个节点，其中一个是节点是Leader，另外两个节点是Replicas
     partitions：分区数。例如一个3节点集群，test1:3:4，就表示将test1切分成四个分区后再复制到三个节点，每一个分区有一个Leader和2个Replicas
+
+服务器状态
+
+    bin/kafka-server-start.sh config/server.properties
