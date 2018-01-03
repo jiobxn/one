@@ -38,3 +38,22 @@ Zookeeper中角色：
     跟随者(Follwer)：Follower用于接收客户端的读写请求并向客户端返回结果，在选主过程中参与投票
     观察者（Observer）：观察者可以接收客户端的读写请求，并将写请求转发给Leader，但Observer节点不参与投票过程，只同步leader状态，Observer的目的是为了，扩展系统，提高读取速度。
     客户端(Client)： 执行读写请求的发起方
+
+**监控**
+
+	~]# echo mntr |nc 127.0.0.1 2181
+	zk_version	3.4.8--1, built on 02/06/2016 03:18 GMT     版本
+	zk_avg_latency	0                                           平均延迟，大于10报警
+	zk_max_latency	120                                     最大延迟
+	zk_min_latency	0                                       最小延迟
+	zk_packets_received	1095806                         收到的数据包
+	zk_packets_sent	1095807                                 发送的数据包
+	zk_num_alive_connections	2                           活动连接数，
+	zk_outstanding_requests	0                                   请求队列，大于10报警
+	zk_server_state	standalone                                  服务器角色
+	zk_znode_count	172                                     znodes的数量
+	zk_watch_count	22                                      watches的数量
+	zk_ephemerals_count	2                               ephemerals的数量
+	zk_approximate_data_size	12493                   approximate的数据大小
+	zk_open_file_descriptor_count	31                          打开文件数，大于%85报警
+	zk_max_file_descriptor_count	4096                    最大打开文件数
