@@ -44,8 +44,13 @@ if [ "$1" = 'bin/kafka-server-start.sh' ]; then
 	fi
 
 	#log time
-	if [ $KK_TIME ]; then
-		sed -i 's/hours=168/hours='$KK_TIME'/' /usr/local/kafka/config/server.properties
+	if [ $KK_LOG_TIME ]; then
+		sed -i 's/hours=168/hours='$KK_LOG_TIME'/' /usr/local/kafka/config/server.properties
+	fi
+	
+	#consumer rebalance time
+	if [ $KK_REBA_TIME ]; then
+		sed -i 's/delay.ms=0/delay.ms=3000/' /usr/local/kafka/config/server.properties
 	fi
 
 	#create topic
@@ -94,6 +99,7 @@ else
 				-e KK_NET=[3] \\
 				-e KK_IO=[8] \\
 				-e KK_TIME=[168]
+				-e KK_REBA_TIME=[0] \\
 				-e KK_SERVER=[ethX ip]
 				-e KK_ID=[0] \\
 				-e KK_TOPIC=<test:1:1> \\
