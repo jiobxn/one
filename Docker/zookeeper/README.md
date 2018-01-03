@@ -35,7 +35,7 @@ ZooKeeprt
 Zookeeper中角色：
 
     领导者(Leader)：领导者负责进行投票的发起和决议，更新系统状态，处理写请求
-    跟随者(Follwer)：Follower用于接收客户端的读写请求并向客户端返回结果，在选主过程中参与投票
+    追随者(Follwer)：Follower用于接收客户端的读写请求并向客户端返回结果，在选主过程中参与投票
     观察者（Observer）：观察者可以接收客户端的读写请求，并将写请求转发给Leader，但Observer节点不参与投票过程，只同步leader状态，Observer的目的是为了，扩展系统，提高读取速度。
     客户端(Client)： 执行读写请求的发起方
 
@@ -50,10 +50,13 @@ Zookeeper中角色：
 	zk_packets_sent	1095807                                 发送的数据包
 	zk_num_alive_connections	2                           活动连接数，
 	zk_outstanding_requests	0                                   请求队列，大于10报警
-	zk_server_state	standalone                                  服务器角色
+	zk_server_state	leader                                      服务器角色
 	zk_znode_count	172                                     znodes的数量
 	zk_watch_count	22                                      watches的数量
 	zk_ephemerals_count	2                               ephemerals的数量
 	zk_approximate_data_size	12493                   approximate的数据大小
 	zk_open_file_descriptor_count	31                          打开文件数，大于%85报警
-	zk_max_file_descriptor_count	4096                    最大打开文件数
+	zk_max_file_descriptor_count	65536                   最大打开文件数
+	zk_followers	2                                       追随者的数量
+	zk_synced_followers	2                               同步的追随者
+	zk_pending_syncs	0                                   等待同步，大于10报警
