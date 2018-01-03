@@ -20,7 +20,7 @@ if [ "$1" = 'bin/kafka-server-start.sh' ]; then
 		echo "advertised.host.name=$KK_SERVER" >>/usr/local/kafka/config/server.properties
 	else
 		DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
-		echo "advertised.host.name=$(ifconfig $DEV |awk '$3=="netmask"{print $2}')" >>/usr/local/kafka/config/server.properties
+		echo -e "\nadvertised.host.name=$(ifconfig $DEV |awk '$3=="netmask"{print $2}')" >>/usr/local/kafka/config/server.properties
 	fi
 
 	#broker id
