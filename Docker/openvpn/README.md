@@ -48,5 +48,5 @@ OpenVPN
 
 ### Windows Client:
 
-    1.下载并安装 http://swupdate.openvpn.org/community/releases/openvpn-install-xx-xx-xx.exe
+    1.下载并安装 http://swupdate.openvpn.org/community/releases/openvpn-install-x.x.x-I601.exe
     2.将ta.key、auth.txt和client.ovpn拷贝到"C:\Program Files\OpenVPN\config\"
