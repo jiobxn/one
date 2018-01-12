@@ -27,6 +27,7 @@ if [ ! -f ~/hosts.txt ]; then
 	exit 0
 fi
 
+
 ################################################# 第二部分 ###############################################
 #MARK:USER:IP:PORT:PASS
 
@@ -34,17 +35,18 @@ SSH() {
 sed -i '/expect.sh SSH/d' /var/spool/cron/$(users) 2>/dev/null
 
 #3.生成密钥对
-expect -c "
-set timeout 60
-spawn ssh-keygen -t rsa
-expect {   
-                \"Enter file in which to save the key *\" {send \"\r\"; exp_continue}
-                \"*y/n*\" {send \"y\r\"; exp_continue}
-                \"*passphrase*\" {send \"\r\"; exp_continue}
-                \"*passphrase*\" {send \"\r\";}
-}
-"
-
+if [ ! -f ~/.ssh/id_rsa -o ! -f ~/.ssh/id_rsa.pub ]; then
+	expect -c "
+	set timeout 60
+	spawn ssh-keygen -t rsa
+	expect {   
+	                \"Enter file in which to save the key *\" {send \"\r\"; exp_continue}
+	                \"*y/n*\" {send \"y\r\"; exp_continue}
+	                \"*passphrase*\" {send \"\r\"; exp_continue}
+	                \"*passphrase*\" {send \"\r\";}
+	}
+	"
+fi
 
 for i in $(cat ~/.hosts.txt); do
 	IP=$(echo "$i"|cut -f3 -d":")
@@ -65,6 +67,7 @@ for i in $(cat ~/.hosts.txt); do
 		}
 		"
 	fi
+	echo $IP >>~/.ssh/ssh_trust
 done
 }
 
@@ -92,6 +95,26 @@ for i in $(cat ~/.hosts.txt); do
 		#ssh -p $PORT $USER@$IP "rpm -e expect at && rm -f ~/.ssh/*"
 	fi
 done
+}
+
+
+CHECK() {
+for i in $(cat ~/.hosts.txt); do
+	IP=$(echo "$i"|cut -f3 -d":")
+	PORT=$(echo "$i"|cut -f4 -d":")
+
+	if [ "$ACMD" == "SSH" -a -f ~/.ssh/ssh_trust ]; then
+		[ -n "$(grep "\<$IP\>" ~/.ssh/ssh_trust)" ] && [ -n "$(grep "\<$IP\>" ~/.ssh/known_hosts)" ]  && sed -i '/:'$IP':/d' ~/.hosts.txt
+	fi
+
+	if [ "$ACMD" != "SSH" -a ! -f ~/.ssh/ssh_trust ]; then
+		echo -e "No SSH Trust, Nothing to do. \nYou must first Establish SSH Trust: $0 SSH" && \rm ~/.hosts.txt && exit 0
+	fi
+
+	if [ "$ACMD" != "SSH" -a -f ~/.ssh/ssh_trust ]; then
+		[ -z "$(grep "\<$IP\>" ~/.ssh/ssh_trust)" ] || [ -z "$(grep "\<$IP\>" ~/.ssh/known_hosts)" ]  && echo -e "\n$IP no SSH Trust, Nothing to do. \nYou must first Establish SSH Trust: $0 SSH\n" && sed -i '/:'$IP':/d' ~/.hosts.txt
+	fi
+done	
 }
 
 
@@ -133,7 +156,7 @@ for i in $(cat ~/.hosts.txt); do
 	PORT=$(echo "$i"|cut -f4 -d":")
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
-	
+
 	if [ -z "$(ip addr |grep $IP)" ]; then
 		echo "------------> $IP <-------------------"
 		ssh -p $PORT $USER@$IP "$CMD"
@@ -179,8 +202,11 @@ for i in $(cat ~/.hosts.txt); do
                 \"*# *\" {send \"rm -f ~/.ssh/* && exit \r\"; exp_continue}
 	}
 	"
+
+	sed -i '/'$IP'/d' ~/.ssh/ssh_trust
+	sed -i '/'$IP'/d' ~/.ssh/known_hosts
 done
-\rm ~/.ssh/*
+	#echo "\rm ~/.ssh/{id_rsa,id_rsa.pub,known_hosts,ssh_trust}"
 }
 
 
@@ -205,6 +231,7 @@ fi
 
 case $ACMD in
     SSH)
+            CHECK
             SSH
     ;;
 
@@ -213,18 +240,22 @@ case $ACMD in
     ;;
 
     COMM)
+            CHECK
             COMM
     ;;
 
     PKGS)
+            CHECK
             PKGS
     ;;
 
     PUSH)
+            CHECK
             PUSH
     ;;
 
     PULL)
+            CHECK
             PULL
     ;;
 
@@ -238,7 +269,7 @@ case $ACMD in
 	    SSH Trust: $0 SSH
 	    ALL SSH Trust: $0 SSHALL
 	    RUN Command: $0 [-m mark] COMM <'ls && crond'>
-	    Package management: $0 [-m mark] PKGS <'install openssh-clients -y'>
+	    Package management: $0 [-m mark] PKGS <'install openssh-clients cronie -y'>
 	    PUSH copy local file to remote user home: $0 [-m mark] PUSH <file.txt> [~/]
 	    PULL copy remote file to local user home: $0 [-m mark] PULL <file.txt> [~/]
 	    Clean SSH key: $0 [-m mark] CLEAN
