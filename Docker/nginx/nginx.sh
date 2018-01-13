@@ -425,7 +425,7 @@ http_other() {
 		if [ -n "$(echo $i |grep 'charset=')" ]; then
 			charset="$(echo $i |grep 'charset=' |awk -F= '{print $2}')"
 			
-			sed -i '/#alias#/ i \    charset '$charset';/' /usr/local/nginx/conf/vhost/${project_name}_$n.conf
+			sed -i '/#alias#/ i \    charset '$charset';' /usr/local/nginx/conf/vhost/${project_name}_$n.conf
 		fi
 		
 		#启用缓存
