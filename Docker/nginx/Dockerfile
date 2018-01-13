@@ -11,7 +11,7 @@ RUN cd /usr/local/src \
         && wget -c http://zlib.net/$(curl -s http://zlib.net/ |grep "\.tar.gz" |awk -F\" 'NR==1{print $2}') \
         && wget -c $(curl -s http://www.cpan.org/src/ |grep wget |awk -F\" '{print $2}') \
         && wget -c https://github.com$(curl -s https://github.com/acassen/keepalived/releases |grep tar.gz |awk -F\" 'NR==1{print $2}') \
-        && nginx_v=$(curl -s http://nginx.org/ |grep "td class" |awk -F'html' 'NR==1{print $2}' |grep -Po '(?<=\>)[^)]*(?=\<)') && wget -c http://nginx.org/download/$nginx_v.tar.gz
+        && nginx_v=$(curl -s http://nginx.org/ |awk -F'download.html">nginx-' '{print $2}' |grep -v ^$ |awk -F'<' 'NR==1{print $1}') && wget -c http://nginx.org/download/nginx-$nginx_v.tar.gz
         
 RUN cd /usr/local/src \
         && tar zxf nginx-*.tar.gz \
