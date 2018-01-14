@@ -8,11 +8,10 @@ if [ "$1" = 'openvpn' ]; then
 : ${TCP_UDP:=tcp}
 : ${TAP_TUN:=tun}
 : ${VPN_PASS:=$(pwmake 64)}
-: ${MAX_CLIENT:=5}
 : ${GATEWAY_VPN:=Y}
 : ${C_TO_C:=Y}
 : ${PROXY_PASS:=$(pwmake 64)}
-: ${PROXY_PORT:=80}
+: ${PROXY_PORT:=8080}
 : ${DNS1:=8.8.4.4}
 : ${DNS2:=8.8.8.8}
 
@@ -21,11 +20,11 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	# Get ip address
 	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
 	if [ -z $SERVER_IP ]; then
-		SERVER_IP=$(curl -s ip.cn |egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}')
+		SERVER_IP=$(curl -s https://httpbin.org/ip |awk -F\" 'NR==2{print $4}')
 	fi
 
 	if [ -z $SERVER_IP ]; then
-		SERVER_IP=$(curl -s myip.ipip.net |egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}')
+		SERVER_IP=$(curl -s https://showip.net/ |awk -F: '{print $NF}')
 	fi
 
 	if [ -z $SERVER_IP ]; then
@@ -33,14 +32,26 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	fi
 
 	echo "Initialize openvpn"
-	if [ "$(ls /key/ |egrep -c "ca.crt|ca.key|server.crt|server.key|client.crt|client.key|dh2048.pem")" -ne 7 ]; then
+	if [ "$(ls /key/ |egrep -w -c "ca.crt|server.crt|server.key|dh2048.pem|ta.key")" -ne 5 ]; then
 		#Create certificate
 		cd /etc/openvpn/easy-rsa/*
 		. ./vars &>/dev/null
 		./clean-all --batch 2>/dev/null
 		./build-ca --batch &>/dev/null
 		./build-key-server --batch server 2>/dev/null
-		./build-key --batch client 2>/dev/null
+		if [ $MAX_STATICIP ]; then
+			if [ $MAX_STATICIP -gt 63 ]; then
+				MAX_STATICIP=63
+			fi
+			
+			i=1
+			while [ $i -le "$MAX_STATICIP" ]; do
+				./build-key --batch client$i 2>/dev/null
+				let i++
+			done
+		else
+			./build-key --batch client 2>/dev/null
+		fi
 		./build-dh --batch 2>/dev/null
 		openvpn --genkey --secret /etc/openvpn/ta.key
 		
@@ -62,37 +73,50 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 	# server.conf configuration file
 	sed -i '1 i #redhat.xyz' /etc/openvpn/server.conf
-	sed -i "s/port 1194/port $VPN_PORT/g" /etc/openvpn/server.conf
-	sed -i "s/proto udp/proto $TCP_UDP/g" /etc/openvpn/server.conf
+	sed -i "s/port 1194/port $VPN_PORT/" /etc/openvpn/server.conf
+	sed -i "s/proto udp/proto $TCP_UDP/" /etc/openvpn/server.conf
 	# "dev tun" will create a routed IP tunnel. "dev tap" will create an ethernet tunnel,IOS
-	sed -i "s/^dev tun/dev $TAP_TUN/g" /etc/openvpn/server.conf
-	sed -i "s/server 10.8.0.0 255.255.255.0/server $IP_RANGE.0 255.255.255.0/g" /etc/openvpn/server.conf
+	sed -i "s/^dev tun/dev $TAP_TUN/" /etc/openvpn/server.conf
+	sed -i "s/server 10.8.0.0 255.255.255.0/server $IP_RANGE.0 255.255.255.0/" /etc/openvpn/server.conf
 	# Allow duplicate using a client certificate
-	sed -i "s/;duplicate-cn/duplicate-cn/g" /etc/openvpn/server.conf
-	sed -i "s/;max-clients 100/max-clients $MAX_CLIENT/g" /etc/openvpn/server.conf
+	if [ ! $MAX_STATICIP ]; then
+		sed -i "s/;duplicate-cn/duplicate-cn/" /etc/openvpn/server.conf
+	else
+		sed -i 's/;client-config-dir/client-config-dir/' /etc/openvpn/server.conf
+		sed -i 's/;route 10.9.0.0/route '$IP_RANGE'.0/' /etc/openvpn/server.conf
+		mkdir /etc/openvpn/ccd
+	fi
+	sed -i "s/;max-clients 100/max-clients 250/" /etc/openvpn/server.conf
 	# BUG, [UDP]Notify the client that when the server restarts so it can automatically reconnect
 	sed -i 's/explicit-exit-notify/;explicit-exit-notify/' /etc/openvpn/server.conf
 	# tls-auth
 	sed -i 's/;tls-auth ta.key 0/tls-auth ta.key 0/' /etc/openvpn/server.conf
 
 	if [ "$GATEWAY_VPN" = "Y" ]; then
-		sed -i 's/;push "redirect-gateway def1 bypass-dhcp"/push "redirect-gateway def1 bypass-dhcp"/g' /etc/openvpn/server.conf
+		sed -i 's/;push "redirect-gateway def1 bypass-dhcp"/push "redirect-gateway def1 bypass-dhcp"/' /etc/openvpn/server.conf
 	else
-		sed -i 's/;push "dhcp-option DNS 208.67.222.222"/push "dhcp-option DNS $DNS1"\npush "route $DNS1 255.255.255.255"/g' /etc/openvpn/server.conf
-		sed -i 's/;push "dhcp-option DNS 208.67.220.220"/push "dhcp-option DNS $DNS2"\npush "route $DNS2 255.255.255.255"/g' /etc/openvpn/server.conf
+		sed -i 's/;push "dhcp-option DNS 208.67.222.222"/push "dhcp-option DNS '$DNS1'"\npush "route '$DNS1' 255.255.255.255"/' /etc/openvpn/server.conf
+		sed -i 's/;push "dhcp-option DNS 208.67.220.220"/push "dhcp-option DNS '$DNS2'"\npush "route '$DNS2' 255.255.255.255"/' /etc/openvpn/server.conf
+	fi
+
+	if [ "$PUSH_ROUTE" ]; then
+		for i in $(echo $PUSH_ROUTE |sed 's/,/\n/g'); do
+			echo 'push "route '$PUSH_ROUTE'"' >>/etc/openvpn/server.conf
+		done
 	fi
 	
 	if [ "C_TO_C" = "Y" ]; then
-		sed -i "s/;client-to-client/client-to-client/g" /etc/openvpn/server.conf
+		sed -i "s/;client-to-client/client-to-client/" /etc/openvpn/server.conf
 	fi
 	
 
 	# client.conf configuration file
+	echo "auth-nocache" >>/etc/openvpn/client.conf
 	sed -i 's/;tls-auth ta.key 1/tls-auth ta.key 1/' /etc/openvpn/client.conf
-	echo "ns-cert-type server" >>/etc/openvpn/client.conf
-	sed -i "s/^dev tun/dev $TAP_TUN/g" /etc/openvpn/client.conf
-	sed -i "s/proto udp/proto $TCP_UDP/g" /etc/openvpn/client.conf
-	sed -i "s/remote my-server-1 1194/remote $SERVER_IP $VPN_PORT/g" /etc/openvpn/client.conf
+	echo "remote-cert-tls server" >>/etc/openvpn/client.conf
+	sed -i "s/^dev tun/dev $TAP_TUN/" /etc/openvpn/client.conf
+	sed -i "s/proto udp/proto $TCP_UDP/" /etc/openvpn/client.conf
+	sed -i "s/remote my-server-1 1194/remote $SERVER_IP $VPN_PORT/" /etc/openvpn/client.conf
 	# The certificates to the client.conf
 	sed -i 's/ca ca.crt/;ca ca.crt/' /etc/openvpn/client.conf
 	sed -i 's/cert client.crt/;cert client.crt/' /etc/openvpn/client.conf
@@ -101,10 +125,40 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	echo -e "# ta.key\n<tls-auth>\n</tls-auth>" >>/etc/openvpn/client.conf
 	sed -i '/<ca>/ r /etc/openvpn/ca.crt' /etc/openvpn/client.conf
 	sed -i '/<tls-auth>/ r /etc/openvpn/ta.key' /etc/openvpn/client.conf
+	echo -e "# client.crt\n<cert>\n</cert>" >>/etc/openvpn/client.conf
+	echo -e "# client.key\n<key>\n</key>" >>/etc/openvpn/client.conf
+	if [ $MAX_STATICIP ]; then
+		if [ $MAX_STATICIP -gt 63 ]; then
+			MAX_STATICIP=63
+		fi
+
+		i=1
+		n=5
+		m=6
+		while [ $i -le "$MAX_STATICIP" ]; do
+			echo "ifconfig-push $IP_RANGE.$n $IP_RANGE.$m" >/etc/openvpn/ccd/client$i
+			\rm /key/client.txt
+			echo "$IP_RANGE.$n user$i" >>/key/client.txt
+			n=$(($n+4))
+			m=$(($m+4))
+			
+			\cp /etc/openvpn/client.conf /etc/openvpn/client$i.conf
+			sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
+			sed -i '/<key>/ r /etc/openvpn/client'$i'.key' /etc/openvpn/client$i.conf
+			\cp /etc/openvpn/client$i.conf /key/client$i.ovpn
+			\cp /etc/openvpn/client$i.conf /key/client$i.conf
+			let i++
+		done
+	else
+		sed -i '/<cert>/ r /etc/openvpn/client.crt' /etc/openvpn/client.conf
+		sed -i '/<key>/ r /etc/openvpn/client.key' /etc/openvpn/client.conf
+		\cp /etc/openvpn/client.conf /key/client.ovpn
+		\cp /etc/openvpn/client.conf /key/client.conf
+	fi
 
 
 	if [ $VPN_USER ]; then
-		cat >/etc/openvpn/checkpsw.sh <<-END 
+		cat >/etc/openvpn/checkpsw.sh <<-END
 		#!/bin/sh
 		###########################################################
 		# checkpsw.sh (C) 2004 Mathias Sundman <mathias@openvpn.se>
@@ -146,26 +200,21 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		echo "$VPN_USER       $VPN_PASS" >> /etc/openvpn/psw-file
 		chmod 400 /etc/openvpn/psw-file
 	
-		cat >>/etc/openvpn/server.conf <<-END 
-		client-cert-not-required
+		cat >>/etc/openvpn/server.conf <<-END
+		
+		#verify-client-cert none|optional|require
+		verify-client-cert require
 		#use checkpaw.sh to verify the connection client username/password
 		auth-user-pass-verify /etc/openvpn/checkpsw.sh via-env
 		#The user name used to index
 		username-as-common-name
-		script-security 3 system
+		script-security 3
 		END
 
 		sed -i '/;key client.key/ a auth-user-pass' /etc/openvpn/client.conf
 		\cp /etc/openvpn/client.conf /key/client.ovpn
 		\cp /etc/openvpn/client.conf /key/client.conf
 		VPN_INFO="VPN user AND password: $VPN_USER  $VPN_PASS"
-	else
-		echo -e "# client.crt\n<cert>\n</cert>" >>/etc/openvpn/client.conf
-		echo -e "# client.key\n<key>\n</key>" >>/etc/openvpn/client.conf
-		sed -i '/<cert>/ r /etc/openvpn/client.crt' /etc/openvpn/client.conf
-		sed -i '/<key>/ r /etc/openvpn/client.key' /etc/openvpn/client.conf
-		\cp /etc/openvpn/client.conf /key/client.ovpn
-		\cp /etc/openvpn/client.conf /key/client.conf
 	fi
 
 
@@ -227,22 +276,23 @@ else
 			docker run -d --restart always --privileged \\
 			-v /docker/openvpn:/key \\
 			-p 1194:1194 \\
-			-p <80:80> \\
+			-p <8080:8080> \\
 			-e TCP_UDP=[tcp] \\
 			-e TAP_TUN=[tun] \\
 			-e VPN_PORT=[1194] \\
 			-e VPN_USER=<jiobxn> \\
 			-e VPN_PASS=<123456> \\
-			-e MAX_CLIENT=[5] \\
+			-e MAX_STATICIP=<63> \\
 			-e C_TO_C=[Y] \\
 			-e GATEWAY_VPN=[Y] \\
 			-e SERVER_IP=[SERVER_IP] \\
 			-e IP_RANGE=[10.8.0] \\
 			-e PROXY_USER=<jiobxn> \\
 			-e PROXY_PASS=<123456> \\
-			-e PROXY_PORT=<80> \\
+			-e PROXY_PORT=<8080> \\
 			-e DNS1=[8.8.4.4] \\
 			-e DNS2=[8.8.8.8] \\
+			-e PUSH_ROUTE=<"192.168.10.0 255.255.255.0,10.10.0.0 255.255.255.0">
 			--hostname openvpn \\
 			--name openvpn openvpn
 	"
@@ -250,13 +300,14 @@ fi
 
 #IOS Client:
 # Into the App Store is installed OpenVPN.
-# Use iTunes will ca.crt、client.crt、client.key、ta.key、auth.txt and client.ovpn import the to OpenVPN.
+# Use iTunes will client.ovpn、ta.key and auth.txt import the to OpenVPN.
 
 #Linux Client:
 # yum -y install openvpn
-# scp OpenVPN-Server-IP:/etc/openvpn/easy-rsa/2.0/keys/keys/{ca.crt,client.crt,client.key,ta.key,auth.txt,client.conf} /etc/openvpn/
+# scp OpenVPN-Server-IP:/etc/openvpn/easy-rsa/2.0/keys/keys/{client.conf,auth.txt} /etc/openvpn/
 # systemctl start openvpn@client.service
+# openvpn --writepid /var/run/openvpn-client/client.pid --cd /etc/openvpn/ --config /etc/openvpn/client.conf
 
 #Windows Client:
-# download install openvpn-install-xx-xx-xx.exe for http://swupdate.openvpn.org/community/releases/
-# Will ca.crt、client.crt、client.key、ta.key、auth.txt and client.ovpn import the to "C:\Program Files\OpenVPN\config\".
+# download install openvpn-install-x.x.x-I601.exe for https://openvpn.net/index.php/open-source/downloads.html
+# Will client.ovpn and auth.txt(If there is)  import the to "C:\Program Files\OpenVPN\config\".
