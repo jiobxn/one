@@ -28,6 +28,8 @@ RUN cd \
         && sed -i 's/alertee@address.somewhere/admin@xxxx.com/' /usr/local/smokeping/etc/config \
         && sed -i 's/my.mail.host/localhost.localdomain/' /usr/local/smokeping/etc/config \
         && sed -i 's/smokealert@company.xy/smokeping@localhost.localdomain/' /usr/local/smokeping/etc/config \
+        && sed -i 's/step     = 300/step     = 60/' /usr/local/smokeping/etc/config \
+        && sed -i 's/pings    = 20/pings    = 10/' /usr/local/smokeping/etc/config \
         && sed -i 's/The most interesting destinations/网络质量监控平台/' /usr/local/smokeping/etc/config \
         && sed -i 's/ Network Latency Grapher/网络质量监控平台/' /usr/local/smokeping/etc/config \
         && sed -i 's/Welcome to the SmokePing website of xxx Company./欢迎光临！/' /usr/local/smokeping/etc/config \
