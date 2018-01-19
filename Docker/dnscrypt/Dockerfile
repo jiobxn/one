@@ -9,14 +9,14 @@ RUN cd /usr/local/src \
         && wget -c $(curl -s http://libevent.org/ |grep stable.tar.gz |awk -F\" 'NR==1{print $4}') \
         && wget -c https://download.libsodium.org/libsodium/releases/LATEST.tar.gz -O libsodium.tar.gz \
         && git clone --recursive git://github.com/cofyc/dnscrypt-wrapper.git \
-        && wget -c https://download.dnscrypt.org/dnscrypt-proxy/LATEST.tar.gz -O dnscrypt-proxy.tar.gz \
+        && wget -c https://github.com/$(curl -s https://github.com/jedisct1/dnscrypt-proxy/releases |grep dnscrypt-proxy-linux_x86_64 |awk -F\" 'NR==1{print $2}') \
         && wget -c https://github.com/shadowsocks/ChinaDNS/releases/download/1.3.2/chinadns-1.3.2.tar.gz \
         && wget -c http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest -O /etc/delegated-apnic-latest
 
 RUN cd /usr/local/src \
         && tar zxf libevent-*.tar.gz \
         && tar zxf libsodium.tar.gz \
-        && tar zxf dnscrypt-proxy.tar.gz \
+        && tar zxf dnscrypt-proxy-*.tar.gz \
         && tar zxf chinadns-1.3.2.tar.gz \
         && \rm *.tar.gz \
         && cd /usr/local/src/libevent-* \
@@ -26,8 +26,8 @@ RUN cd /usr/local/src \
         && cd /usr/local/src/dnscrypt-wrapper \
         && make configure && ./configure && make install \
         && echo /usr/local/lib > /etc/ld.so.conf.d/usr_local_lib.conf && ldconfig \
-        && cd /usr/local/src/dnscrypt-proxy-* \
-        && ./configure && make -j8 && make install \
+        && mv /usr/local/src/linux-x86_64 /usr/local/dnscrypt-proxy \
+        && ln -s /usr/local/dnscrypt-proxy/dnscrypt-proxy /usr/local/bin/ \
         && cd /usr/local/src/chinadns-1.3.2 \
         && ./configure && make && cp src/chinadns /usr/local/bin/chinadns \
         && rm -rf /usr/local/src/*
