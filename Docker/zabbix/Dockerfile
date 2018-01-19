@@ -5,7 +5,7 @@ ARG LATEST="0"
 RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN rpm -ivh http://repo.mysql.com/$(curl -s "https://dev.mysql.com/downloads/repo/yum/" |grep "noarch.rpm" |head -1 |grep -Po '(?<=\()[^)]*(?=\))')
 RUN yum clean all; yum -y install epel-release; yum -y update \
-        && yum -y install httpd mod_ssl php php-mysql php-xml php-gd php-bcmath php-mbstring php-ldap net-tools bash-completion vim wget make gcc cronie \
+        && yum -y install httpd mod_ssl php php-mysql php-xml php-gd php-bcmath php-mbstring php-ldap python2-simplejson net-tools bash-completion vim wget make gcc cronie \
         && yum -y install OpenIPMI-devel libssh2-devel unixODBC-devel iksemel-devel net-snmp-devel mysql-community-devel mysql-community-client libxml2-devel curl-devel java-1.8.0-openjdk-devel openldap-devel fping wqy-zenhei-fonts libevent-devel \
         && yum clean all
 
