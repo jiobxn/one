@@ -48,7 +48,8 @@ RUN cd \
         && sed -i 's/T:probe/T:探测器/' /usr/local/smokeping/lib/Smokeping.pm \
         && sed -i 's/:end/:结束时间/' /usr/local/smokeping/lib/Smokeping.pm \
         && sed -i 's/Navigator Graph/导航图/' /usr/local/smokeping/lib/Smokeping.pm \
-        && sed -i 's/SmokeAlert/Smoke报警/' /usr/local/smokeping/lib/Smokeping.pm
+        && sed -i 's/SmokeAlert/Smoke报警/' /usr/local/smokeping/lib/Smokeping.pm \
+        && cp /usr/local/smokeping/etc/config /var/www/html/
 
 RUN curl -s https://raw.githubusercontent.com/jiobxn/one/master/Docker/smokeping/smokeping.conf >/etc/httpd/conf.d/smokeping.conf
 
@@ -67,4 +68,3 @@ CMD ["/usr/local/smokeping/bin/smokeping", "--nodaemon"]
 
 # docker build -t smokeping .
 # docker run -d -p 8080:80 -v /docker/smokeping:/usr/local/smokeping/data --name smoke smokeping
-# -v /docker/smokeping/config:/usr/local/smokeping/etc/config
