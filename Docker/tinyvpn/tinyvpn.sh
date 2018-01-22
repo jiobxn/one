@@ -28,7 +28,8 @@ else
 				docker run -d --restart always --privileged \\
 				-p 8000:8000/udp \\
 				-p TUN_DEV=[tun10] \\
-				-e VPN_PORT=[80] \\
+				-e VPN_PORT=[8000] \\
+				-e IP_RANGE=[10.12.0] \\
 				-e VPN_PASS=[2017126@Guo] \\
 				--name filemanager filemanager
 	"
