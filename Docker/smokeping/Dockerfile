@@ -50,7 +50,7 @@ RUN cd \
         && sed -i 's/Navigator Graph/导航图/' /usr/local/smokeping/lib/Smokeping.pm \
         && sed -i 's/SmokeAlert/Smoke报警/' /usr/local/smokeping/lib/Smokeping.pm
 
-RUN curl -s https://raw.githubusercontent.com/jiobxn/one/master/Docker/systemd/smokeping.conf >/etc/httpd/conf.d/smokeping.conf
+RUN curl -s https://raw.githubusercontent.com/jiobxn/one/master/Docker/smokeping/smokeping.conf >/etc/httpd/conf.d/smokeping.conf
 
 VOLUME /usr/local/smokeping/data
 
