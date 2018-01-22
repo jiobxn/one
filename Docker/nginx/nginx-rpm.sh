@@ -499,10 +499,12 @@ http_other() {
 		
 		#字符串替换
 		if [ -n "$(echo $i |grep 'filter=' |grep '|')" ]; then
-			sub_s="$(echo $i |grep 'filter=' |gawk -F= '{print $2}' |awk -F'|' '{print $1}')"
-			sub_d="$(echo $i |grep 'filter=' |gawk -F= '{print $2}' |awk -F'|' '{print $2}')"
+			for x in $(echo $i |grep 'filter=' |gawk -F= '{print $2}' |sed 's/&/\n/g'); do
+				sub_s="$(echo $x |awk -F'|' '{print $1}')"
+				sub_d="$(echo $x |awk -F'|' '{print $2}')"
 			
-			sed -i '/#sub_filter#/ a \        sub_filter '$sub_s'  '$sub_d';' /etc/nginx/conf.d/${project_name}_$n.conf
+				sed -i '/#sub_filter#/ a \        sub_filter '$sub_s'  '$sub_d';' /etc/nginx/conf.d/${project_name}_$n.conf
+			done
 		fi
 		
 		#日志
@@ -720,7 +722,7 @@ else
 				   tag=<9999> \\
 				   error=<https://www.bing.com> \\
 				   auth=<admin|passwd> \\
-				   filter=<.google.com|.fqhub.com> \\
+				   filter=<.google.com|.fqhub.com&.twitter.com|.fqhub.com> \\
 				   log=<N|Y> \\
 				--hostname nginx \\
 				--name nginx nginx
