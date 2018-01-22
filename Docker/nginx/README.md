@@ -95,7 +95,7 @@ Nginx
 		tag=<9999>							#域名混淆字符，用于DOMAIN模式
 		error=<https://www.bing.com>					#错误跳转，用于DOMAIN模式
 		auth=<admin|passwd>						#用户认证，用于PROXY和DOMAIN模式
-		filter=<.google.com|.fqhub.com>					#字符替换，用于PROXY和DOMAIN模式
+		filter=<.google.com|.fqhub.com&.twitter.com|.fqhubcom>		#字符替换，用于PROXY和DOMAIN模式
 		log=<N|Y>							#使用独立日志文件，或者关闭日志
 
 	#TCP/UDP 子选项
