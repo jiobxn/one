@@ -21,6 +21,7 @@ yum -y install python34-setuptools
 easy_install-3.4 pip
 pip install --upgrade youtube-dl you-get
 
+#yum-config-manager --enable rhui-REGION-rhel-server-extras    # amazon rhel
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
 yum -y install docker-ce
 systemctl enable docker
