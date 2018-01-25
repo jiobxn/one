@@ -1,4 +1,10 @@
 yum clean all; yum -y install epel-release; yum -y update
+
+if [ "$(grep -o -w "Red Hat" /etc/redhat-release)" ]; then
+    rpm -ivh http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/$(curl -s http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/ |grep epel-release |awk -F\" '{print $6}')
+    yum-config-manager --enable rhui-REGION-rhel-server-extras
+fi
+
 yum -y install bash-completion vim aria2 axel wget openssl-devel bind-utils iptables-services iftop nethogs net-tools ntp mtr nmap tcpdump pciutils setroubleshoot setools make gcc-c++ autoconf automake unzip bzip2 zip mailx bc at expect telnet git lrzsz lsof bridge-utils dos2unix
 
 systemctl disable NetworkManager firewalld
@@ -21,7 +27,6 @@ yum -y install python34-setuptools
 easy_install-3.4 pip
 pip install --upgrade youtube-dl you-get
 
-#yum-config-manager --enable rhui-REGION-rhel-server-extras    # amazon rhel
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
 yum -y install docker-ce
 systemctl enable docker
