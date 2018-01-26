@@ -36,3 +36,8 @@ VPS初始化
 ***
 ### clean_item.sh
 清除zabbix主机不支持的监控项(主要用于docker环境)
+### shc
+shell脚本加密
+
+    shc -r -f hello.sh -o hello
+***
