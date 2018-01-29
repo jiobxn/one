@@ -213,13 +213,13 @@ done
 ################################################# 第三部分 ###############################################
 
 if [ "${1:0:2}" == '-m' ]; then
-	awk -F: '{if($1~/'${2:0:99}'/) print}' ~/hosts.txt >~/.hosts.txt && chmod 600 ~/.hosts.txt
+	grep -v '^#' ~/hosts.txt |grep -v '^$' |awk -F: '{if($1~/'${2:0:99}'/) print}' >~/.hosts.txt && chmod 600 ~/.hosts.txt
 	ACMD="$3"
 	CMD=$4
 	FILE=$4
 	[ $5 ] && DEST=$5 || DEST=~/
 else
-	cat ~/hosts.txt >~/.hosts.txt
+	grep -v '^#' ~/hosts.txt |grep -v '^$' >~/.hosts.txt
 	ACMD="$1"
 	CMD=$2
 	FILE=$2
