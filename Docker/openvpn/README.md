@@ -25,6 +25,7 @@ OpenVPN
 			-e MAX_STATICIP=<63> \\  最大固定IP客户端数，/key/client.txt
 			-e C_TO_C=[Y] \\         允许客户端与客户端之间通信
 			-e GATEWAY_VPN=[Y] \\    默认VPN做网关
+			-e PUSH_ROUTE=<"192.168.10.0 255.255.255.0,10.10.0.0 255.255.255.0">    推送路由，用于GATEWAY_VPN=N
 			-e SERVER_IP=[SERVER_IP] \\  默认是服务器公网IP
 			-e IP_RANGE=[10.8.0] \\      分配的IP地址池
 			-e PROXY_USER=<jiobxn> \\    http代理用户名
