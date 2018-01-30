@@ -147,7 +147,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
 			sed -i '/<key>/ r /etc/openvpn/client'$i'.key' /etc/openvpn/client$i.conf
 
-			if [ ! -f /etc/openvpn/psw-file ]; then
+			if [ ! -f /key/psw-file ]; then
 				PASS=$(pwmake 64)
 				echo "client$i       $PASS" >> /etc/openvpn/psw-file
 			fi
