@@ -67,6 +67,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		\cp /key/*.key /etc/openvpn/
 		\cp /key/dh2048.pem /etc/openvpn/
 		\cp /key/ta.key /etc/openvpn/
+		[ -f /key/psw-file ] && \cp /key/psw-file /etc/openvpn/
 		echo "Certificate already exists, skip"
 	fi
 	
@@ -146,8 +147,10 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
 			sed -i '/<key>/ r /etc/openvpn/client'$i'.key' /etc/openvpn/client$i.conf
 
-			PASS=$(pwmake 64)
-			echo "client$i       $PASS" >> /etc/openvpn/psw-file
+			if [ ! -f /etc/openvpn/psw-file ]; then
+				PASS=$(pwmake 64)
+				echo "client$i       $PASS" >> /etc/openvpn/psw-file
+			fi
 
 			\cp /etc/openvpn/client$i.conf /etc/openvpn/client$i.ovpn
 			\cp /etc/openvpn/client$i.conf /key/client$i.ovpn
@@ -206,6 +209,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			echo "$VPN_USER       $VPN_PASS" >> /etc/openvpn/psw-file
 		fi
 		chmod 400 /etc/openvpn/psw-file
+		\cp /etc/openvpn/psw-file /key/
 	
 		cat >>/etc/openvpn/server.conf <<-END
 		
