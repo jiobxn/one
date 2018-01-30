@@ -108,7 +108,6 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	if [ "C_TO_C" = "Y" ]; then
 		sed -i "s/;client-to-client/client-to-client/" /etc/openvpn/server.conf
 	fi
-	
 
 	# client.conf configuration file
 	echo "auth-nocache" >>/etc/openvpn/client.conf
@@ -127,17 +126,18 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	sed -i '/<tls-auth>/ r /etc/openvpn/ta.key' /etc/openvpn/client.conf
 	echo -e "# client.crt\n<cert>\n</cert>" >>/etc/openvpn/client.conf
 	echo -e "# client.key\n<key>\n</key>" >>/etc/openvpn/client.conf
+
 	if [ $MAX_STATICIP ]; then
 		if [ $MAX_STATICIP -gt 63 ]; then
 			MAX_STATICIP=63
 		fi
 
+		echo >/key/client.txt
 		i=1
 		n=5
 		m=6
 		while [ $i -le "$MAX_STATICIP" ]; do
 			echo "ifconfig-push $IP_RANGE.$n $IP_RANGE.$m" >/etc/openvpn/ccd/client$i
-			\rm /key/client.txt
 			echo "$IP_RANGE.$n user$i" >>/key/client.txt
 			n=$(($n+4))
 			m=$(($m+4))
@@ -145,6 +145,11 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			\cp /etc/openvpn/client.conf /etc/openvpn/client$i.conf
 			sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
 			sed -i '/<key>/ r /etc/openvpn/client'$i'.key' /etc/openvpn/client$i.conf
+
+			PASS=$(pwmake 64)
+			echo "client$i       $PASS" >> /etc/openvpn/psw-file
+
+			\cp /etc/openvpn/client$i.conf /etc/openvpn/client$i.ovpn
 			\cp /etc/openvpn/client$i.conf /key/client$i.ovpn
 			\cp /etc/openvpn/client$i.conf /key/client$i.conf
 			let i++
@@ -197,7 +202,9 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	
 		chown nobody:nobody /etc/openvpn/checkpsw.sh
 		chmod u+x /etc/openvpn/checkpsw.sh
-		echo "$VPN_USER       $VPN_PASS" >> /etc/openvpn/psw-file
+		if [ ! -f /etc/openvpn/psw-file ]; then
+			echo "$VPN_USER       $VPN_PASS" >> /etc/openvpn/psw-file
+		fi
 		chmod 400 /etc/openvpn/psw-file
 	
 		cat >>/etc/openvpn/server.conf <<-END
@@ -211,10 +218,15 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		script-security 3
 		END
 
-		sed -i '/;key client.key/ a auth-user-pass' /etc/openvpn/client.conf
-		\cp /etc/openvpn/client.conf /key/client.ovpn
-		\cp /etc/openvpn/client.conf /key/client.conf
-		VPN_INFO="VPN user AND password: $VPN_USER  $VPN_PASS"
+		for i in $(find /etc/openvpn/ -name client*.conf); do
+			sed -i '/;key client.key/ a auth-user-pass' $i
+			\cp $i /key/
+		done
+
+		for i in $(find /etc/openvpn/ -name client*.ovpn); do
+			sed -i '/;key client.key/ a auth-user-pass' $i
+			\cp $i /key/
+		done
 	fi
 
 
@@ -228,21 +240,30 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		acl authuser proxy_auth REQUIRED 
 		http_access allow authuser
 		END
-	
+
 		sed -i '/# Recommended minimum configuration:/ r /squid-auth.txt' /etc/squid/squid.conf
 		echo "$PROXY_USER:$(openssl passwd -apr1 $PROXY_PASS)" > /etc/squid/passwd
-		SQUID_INFO="Squid user AND password: $PROXY_USER  $PROXY_PASS"
-		
-		sed -i "s/http_port 3128/http_port $PROXY_PORT/" /etc/squid/squid.conf
-
-		echo "http-proxy-retry" >>/etc/openvpn/client.conf
-		echo "http-proxy $SERVER_IP $PROXY_PORT auth.txt" >>/etc/openvpn/client.conf
-		#echo "http-proxy $SERVER_IP $PROXY_PORT stdin basic" >>/etc/openvpn/client.conf
-		sed -i "s/proto udp/proto $TCP_UDP/g" /etc/openvpn/server.conf
-		sed -i "s/remote $SERVER_IP/remote 127.0.0.1/g" /etc/openvpn/client.conf
 		echo -e "$PROXY_USER\n$PROXY_PASS" >/key/auth.txt
-		\cp /etc/openvpn/client.conf /key/client.ovpn
-		\cp /etc/openvpn/client.conf /key/client.conf
+		sed -i "s/http_port 3128/http_port $PROXY_PORT/" /etc/squid/squid.conf
+		sed -i "s/proto udp/proto $TCP_UDP/g" /etc/openvpn/server.conf
+
+		for i in $(find /etc/openvpn/ -name client*.conf); do
+			echo "http-proxy-retry" >>$i
+			echo "http-proxy $SERVER_IP $PROXY_PORT auth.txt" >>$i
+			#echo "http-proxy $SERVER_IP $PROXY_PORT stdin basic" >>$i
+			sed -i "s/remote $SERVER_IP/remote 127.0.0.1/g" $i
+			\cp $i /key/
+		done
+
+		for i in $(find /etc/openvpn/ -name client*.ovpn); do
+			echo "http-proxy-retry" >>$i
+			echo "http-proxy $SERVER_IP $PROXY_PORT auth.txt" >>$i
+			#echo "http-proxy $SERVER_IP $PROXY_PORT stdin basic" >>$i
+			sed -i "s/remote $SERVER_IP/remote 127.0.0.1/g" $i
+			\cp $i /key/
+		done
+
+		SQUID_INFO="Squid user AND password: $PROXY_USER  $PROXY_PASS"
 
 		echo "squid" >/iptables.sh
 		echo "iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PROXY_PORT -m comment --comment OPENVPN -j ACCEPT" >>/iptables.sh
@@ -261,7 +282,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	END
 
 	echo -e "$(openvpn --help |awk 'NR==1{print $1"-"$2}')" |tee /key/openvpn.log
-	echo $VPN_INFO |tee -a /key/openvpn.log
+	echo "VPN user AND password:" |tee /key/openvpn.log
+	cat /etc/openvpn/psw-file |tee -a /key/openvpn.log
 	echo $SQUID_INFO |tee -a /key/openvpn.log
 fi
 
