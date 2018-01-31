@@ -27,5 +27,6 @@ EXPOSE 80 67/udp 69/udp
 CMD ["/usr/sbin/init"]
 
 # docker build -t kickstart .
-# docker run -d --restart always --network host -v /docker/ks:/key -v /docker/os:/var/www/html/os --name kickstart kickstart
-# docker run -it --rm kickstart --help
+# docker run -d --restart always --network host -v /docker/ks:/key -v /docker/os:/var/www/html/os -e RANGE="192.168.80.200 192.168.80.210" -e BOOT=INSTALL --name kickstart kickstart
+# vim /docker/ks/ks.cfg
+# 删除容器后重新运行
