@@ -21,11 +21,11 @@ OpenVPN
 			-e TAP_TUN=[tun] \\    默认使用tun
 			-e VPN_PORT=[1194] \\  默认端口
 			-e VPN_USER=<jiobxn> \\  VPN用户名
-			-e VPN_PASS=<123456> \\  VPN密码，默认随机
-			-e MAX_STATICIP=<63> \\  最大固定IP客户端数，/key/client.txt
+			-e VPN_PASS=<123456> \\  VPN密码，默认随机，/docker/openvpn/openvpn.log
+			-e MAX_STATICIP=<63> \\  最大固定IP客户端数，/docker/openvpn/client.txt
 			-e C_TO_C=[Y] \\         允许客户端与客户端之间通信
 			-e GATEWAY_VPN=[Y] \\    默认VPN做网关
-			-e PUSH_ROUTE=<"192.168.10.0 255.255.255.0,10.10.0.0 255.255.255.0">    推送路由，用于GATEWAY_VPN=N
+			-e PUSH_ROUTE=<"192.168.0.0/255.255.0.0,172.16.0.0/255.240.0.0,10.0.0.0/255.255.255.0">    推送路由，适用于GATEWAY_VPN=N
 			-e SERVER_IP=[SERVER_IP] \\  默认是服务器公网IP
 			-e IP_RANGE=[10.8.0] \\      分配的IP地址池
 			-e PROXY_USER=<jiobxn> \\    http代理用户名
