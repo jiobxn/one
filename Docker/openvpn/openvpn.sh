@@ -102,7 +102,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 	if [ "$PUSH_ROUTE" ]; then
 		for i in $(echo $PUSH_ROUTE |sed 's/,/\n/g'); do
-			echo 'push "route '$PUSH_ROUTE'"' >>/etc/openvpn/server.conf
+			echo -e '\npush "route '$(echo $i |sed 's#/# #')'"' >>/etc/openvpn/server.conf
 		done
 	fi
 	
@@ -318,7 +318,7 @@ else
 			-e PROXY_PORT=<8080> \\
 			-e DNS1=[8.8.4.4] \\
 			-e DNS2=[8.8.8.8] \\
-			-e PUSH_ROUTE=<"192.168.10.0 255.255.255.0,10.10.0.0 255.255.255.0">
+			-e PUSH_ROUTE=<"192.168.0.0/255.255.0.0,172.16.0.0/255.240.0.0,10.0.0.0/255.255.255.0">
 			--hostname openvpn \\
 			--name openvpn openvpn
 	"
