@@ -1,5 +1,9 @@
 Tomcat
 ===
+## 简介
+* **Tomcat** 是由Apache软件基金会下属的Jakarta项目开发的一个Servlet容器，按照Sun Microsystems提供的技术规范，实现了对Servlet和JavaServer Page（JSP）的支持，并提供了作为Web服务器的一些特有功能，如Tomcat管理和控制平台、安全域管理和Tomcat阀等。由于Tomcat本身也内含了一个HTTP服务器，它也可以被视作一个单独的Web服务器。
+> * 官方站点：http://tomcat.apache.org/
+
 
 ## Build Defult Parameter
 
