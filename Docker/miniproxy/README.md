@@ -1,5 +1,9 @@
 miniProxy
 ===
+## 简介
+* **miniProxy** 一个简单的PHP Web代理。
+> * 项目地址：https://github.com/joshdick/miniProxy
+
 
 ## Example:
 
