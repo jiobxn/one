@@ -1,5 +1,8 @@
 PPTPD
 ===
+## 简介
+* 点对点隧道协议（Point to Point Tunneling Protocol，缩写为PPTP）是实现虚拟专用网（VPN）的方式之一。
+> * 项目地址：http://poptop.sourceforge.net/dox/
 
 ## Example:
 
