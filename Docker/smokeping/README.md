@@ -1,5 +1,7 @@
 SmokePing
 ===
+## 简介
+* **SmokePing** 跟踪您的网络延迟。
 
 ## Example:
 
