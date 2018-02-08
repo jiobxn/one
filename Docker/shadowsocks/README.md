@@ -1,5 +1,9 @@
 Shadowsocks
 ===
+## 简介
+* **shadowsocks** 是一种基于Socks5代理方式的网络数据加密传输包，并采用Apache许可证、GPL、MIT许可证等多种自由软件许可协议开放源代码。
+> * 项目地址：https://github.com/shadowsocks
+
 
 ## Example:
 
