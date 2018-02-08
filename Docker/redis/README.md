@@ -1,5 +1,8 @@
 Redis
 ===
+## 简介
+* Redis 是一个高性能的key-value数据库。
+> * 官方站点：https://redis.io/
 
 ## Example:
 
