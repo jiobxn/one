@@ -1,5 +1,9 @@
 Percona Xtradb Cluster
 ===
+## 简介
+* **Percona XtraDB Cluste** 是MySQL集群的主/主高可用性和高可扩展性开源解决方案。它将Percona Server和Percona XtraBackup与MySQL高可用性解决方案的Galera库库集成在一个软件包中，使您能够创建经济高效的MySQL高可用性群集。
+> * 官方站点：https://www.percona.com/software/mysql-database/percona-xtradb-cluster
+
 
 ## Example:
 
