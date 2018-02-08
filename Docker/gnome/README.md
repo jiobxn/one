@@ -1,5 +1,8 @@
 GNOME
 ===
+## 简介
+* Centos 7 GNOME Desktop
+
 
 ## Example:
 
