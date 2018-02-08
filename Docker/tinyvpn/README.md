@@ -1,5 +1,9 @@
 tinyFecVPN
 ===
+## 简介
+* **tinyFecVPN** 是一个工作在VPN方式的双边网络加速工具，可以加速全流量(TCP/UDP/ICMP)。
+> * 项目地址：https://github.com/wangyu-/tinyFecVPN
+
 
 ## Example:
 
