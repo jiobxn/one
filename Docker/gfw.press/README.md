@@ -1,6 +1,9 @@
 GFW.Press
 ===
-新一代军用级高强度加密抗干扰网络数据高速传输软件
+## 简介
+* **GFW.Press** 新一代军用级高强度加密抗干扰网络数据高速传输软件
+> * 项目地址：https://github.com/chinashiyu/gfw.press
+
 
 ## Example:
 
