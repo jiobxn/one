@@ -1,5 +1,9 @@
 Nginx
 ===
+## 简介
+* **nginx** 是一个HTTP和反向代理服务器，一个邮件代理服务器和一个通用的TCP/UDP代理服务器。
+> * 官方站点：https://nginx.org/en/
+
 
 ## Example:
 ### 七层
