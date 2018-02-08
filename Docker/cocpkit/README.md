@@ -1,5 +1,9 @@
 COCPKIT
 ===
+## 简介
+* **cocpkit** 是一个服务器管理器，可以很容易地通过网络浏览器来管理你的GNU/Linux服务器。
+> * 官方站点：http://cockpit-project.org/
+
 
 ## Example:
 
