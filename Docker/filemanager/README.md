@@ -1,5 +1,9 @@
 FileManager
 ===
+## 简介
+* **File Manager** 是简单好用的跨平台文件管理工具，支持英、法、日、中等语言。
+> * 项目地址：https://github.com/filebrowser/filebrowser
+
 
 ## Example:
 
