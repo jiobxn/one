@@ -1,6 +1,9 @@
 Nexus Repository Manager
 ===
+## 简介
+* **Nexus** 是一个强大的Maven仓库管理器，它极大地简化了自己内部仓库的维护和外部仓库的访问。
 > * 官方站点：https://support.sonatype.com/hc/en-us
+
 
 ## Example:
 
