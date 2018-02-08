@@ -1,5 +1,8 @@
 Registry Proxy
 ===
+## 简介
+* 一个用于Registry v2的nginx代理
+
 
 ## Example:
 
