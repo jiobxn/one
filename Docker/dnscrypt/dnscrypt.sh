@@ -18,7 +18,7 @@ if [ ! -f /usr/bin/dnscrypt ]; then
 		sed -i 's/127.0.0.1;/'$LISTEN'/' /etc/named.conf
 		sed -i 's/localhost;/'$ALLOW_QUERY'/' /etc/named.conf
 
-		[ "$FORWARDERS" ] && sed -i '/#jiobxn.com#/ a \\n\        forwarders   { '$FORWARDERS' };' /etc/named.conf
+		[ "$FORWARD" ] && sed -i '/#jiobxn.com#/ a \\n\        forwarders   { '$FORWARD' };' /etc/named.conf
 		sed -i '/#jiobxn.com#/ a \\n\        max-cache-size '$CACHE_SIZE';' /etc/named.conf
 		
 		if [ "$QUERY_LOG" ]; then
@@ -62,7 +62,7 @@ else
 				-e VERSION=["windows 2003 DNS"] \\
 				-e LISTEN=["any;"] \\
 				-e ALLOW_QUERY=["any;"] \\
-				-e FORWARDERS=<9.9.9.9;> \\
+				-e FORWARD=<9.9.9.9;> \\
 				-e CACHE_SIZE=[100m] \\
 				-e QUERY_LOG=<Y> \\
 				-e LOG_SIZE=[100m] \\
