@@ -40,7 +40,8 @@ if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
     echo "$uuid    swap    defaults        0 0" >>/etc/fstab
 fi
 
-audit2allow -a -M my certwatch
+audit2allow -a -M mycertwatch
 semodule -i mycertwatch.pp
+\rm mycertwatch*
 
 echo -e "\n-----> reboot"
