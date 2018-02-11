@@ -7,6 +7,8 @@ Percona Xtradb Cluster
 
 ## Example:
 
+    docker network create --driver bridge --gateway=10.0.0.1 --subnet=10.0.0.0/24 mynetwork
+
     #运行一个MySQL 5.7集群（集群的最少节点数，建议为3）
     docker run -d --restart always --network=mynetwork --ip=10.0.0.61 -v /docker/pxc1:/var/lib/mysql -e REPL_IPR=10.0.0.% -e MYSQL_ROOT_PASSWORD=newpass -e PXC_ADDRESS="10.0.0.61,10.0.0.62,10.0.0.63" -e XPC_INIT=Y --hostname pxc1 --name pxc1 mysql-pxc:5.7
     docker run -d --restart always --network=mynetwork --ip=10.0.0.62 -v /docker/pxc2:/var/lib/mysql -e PXC_ADDRESS="10.0.0.61,10.0.0.62,10.0.0.63" --hostname pxc2 --name pxc2 mysql-pxc:5.7
