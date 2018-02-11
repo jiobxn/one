@@ -213,6 +213,31 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 	}
 
 
+	##init other
+	init_other() {
+	#Backup Database
+	if [ "$MYSQL_BACK" ]; then
+	    [ -z "$MYSQL_ROOT_LOCAL_PASSWORD" ] && MYSQL_ROOT_LOCAL_PASSWORD=$(awk '{print $5}' /var/lib/mysql/mysql/local_info)
+		sed -i 's/newpass/'$MYSQL_ROOT_LOCAL_PASSWORD'/' /backup.sh
+		echo "0 4 * * * . /etc/profile;/bin/sh /backup.sh &>/dev/null" >>/var/spool/cron/root
+	fi
+	
+	#iptables, Need root authority "--privileged"
+	if [ $IPTABLES ]; then
+		cat > /iptables.sh <<-END
+		iptables -I INPUT -p tcp --dport 3306 -j DROP
+		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+		iptables -I INPUT -s $IPTABLES -p tcp -m state --state NEW -m tcp --dport 3306 -m comment --comment PXC -j ACCEPT
+		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 4567:4568 -m comment --comment PXC -j ACCEPT
+		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 4444 -m comment --comment PXC -j ACCEPT
+		END
+	fi
+	
+	[ -f /iptables.sh ] && [ -z "`iptables -S |grep PXC`" ] && . /iptables.sh
+	crond
+	}
+
+
 	##init pxc
 	init_pxc() {
 	echo
@@ -257,29 +282,7 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 			sleep 15
 		fi
 	fi
-	
-	init_other() {
-	#Backup Database
-	if [ "$MYSQL_BACK" ]; then
-	    [ -z "$MYSQL_ROOT_LOCAL_PASSWORD" ] && MYSQL_ROOT_LOCAL_PASSWORD=$(awk '{print $5}' /var/lib/mysql/mysql/local_info)
-		sed -i 's/newpass/'$MYSQL_ROOT_LOCAL_PASSWORD'/' /backup.sh
-		echo "0 4 * * * . /etc/profile;/bin/sh /backup.sh &>/dev/null" >>/var/spool/cron/root
-	fi
-	
-	#iptables, Need root authority "--privileged"
-	if [ $IPTABLES ]; then
-		cat > /iptables.sh <<-END
-		iptables -I INPUT -p tcp --dport 3306 -j DROP
-		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-		iptables -I INPUT -s $IPTABLES -p tcp -m state --state NEW -m tcp --dport 3306 -m comment --comment PXC -j ACCEPT
-		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 4567:4568 -m comment --comment PXC -j ACCEPT
-		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 4444 -m comment --comment PXC -j ACCEPT
-		END
-	fi
-	
-	[ -f /iptables.sh ] && [ -z "`iptables -S |grep PXC`" ] && . /iptables.sh
-	crond
-	}
+
 
 	echo "Start MYSQL ****"
 	init_other
