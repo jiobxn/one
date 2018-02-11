@@ -30,4 +30,17 @@ pip install --upgrade youtube-dl you-get
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
 yum -y install docker-ce
 systemctl enable docker
+
+if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
+    swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/490" |bc`
+    dd if=/dev/zero of=/swapfile bs="$swap"M count=1024
+    uuid=$(mkswap /swapfile |awk 'END{print $3}')
+    chmod 0600 /swapfile
+    swapon /swapfile
+    echo "$uuid    swap    defaults        0 0" >>/etc/fstab
+fi
+
+audit2allow -a -M my certwatch
+semodule -i mycertwatch.pp
+
 echo -e "\n-----> reboot"
