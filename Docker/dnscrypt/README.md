@@ -18,7 +18,7 @@ DNSCrypt
     ./dnscrypt-proxy.exe
 
     #测试
-    docker exec -it dns dig @27.0.0.1 -p 53 g.cn
+    docker exec -it dns dig @27.0.0.1 -p 53 g.cn
 
 
 ## Run Defult Parameter
