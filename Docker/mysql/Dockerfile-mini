@@ -9,7 +9,7 @@ RUN yum clean all; yum -y update; yum -y install net-tools bash-completion vim w
 RUN mysql_V=$(curl -s https://dev.mysql.com/downloads/mysql/$mysql_v.html#downloads |grep "<h1>" |awk '{print $4}') \
         && mysql_rpm=$(curl -s https://repo.mysql.com/yum/mysql-$mysql_v-community/docker/x86_64/ |grep server-minimal |grep $mysql_V |awk -F\" '{print $6}') \
         && yum install -y https://repo.mysql.com/yum/mysql-${mysql_v}-community/docker/x86_64/$mysql_rpm \
-        && rm -rf /var/cache/yum/*
+        && yum clean all
 
 RUN mkdir /docker-entrypoint-initdb.d
 
