@@ -48,3 +48,13 @@ Tomcat
 **关于日志记录客户端真实IP(nginx proxy)**
 
     sed -i 's/%h/%{X-Forwarded-For}i/g' /usr/local/tomcat/conf/server.xml
+
+****
+
+**关于连接数**  
+maxThreads: 最大请求处理线程数  
+minSpareThreads: 初始化的线程池大小  
+maxConnections: 处理的最大连接数  
+acceptCount: 最大队列长度  
+
+https://tomcat.apache.org/tomcat-8.0-doc/config/http.html
