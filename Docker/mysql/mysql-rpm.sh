@@ -7,12 +7,14 @@ if [ "$1" = 'mysqld' ]; then
     
 	if [ -d "$DATADIR/mysql" ]; then
 		echo "$DATADIR/mysql already exists, skip"
+		echo -e "lower_case_table_names=1\nopen_files_limit=100000" >>/etc/my.cnf
 
 		#Server ID
 		if [ -n "$SERVER_ID" -a -z "$(grep ^server-id /etc/my.cnf)" ]; then
 			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
 		fi
 	else
+		echo -e "lower_case_table_names=1\nopen_files_limit=100000" >>/etc/my.cnf
 		#Server ID
 		if [ "$SERVER_ID" ]; then
 			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
