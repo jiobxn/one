@@ -15,9 +15,9 @@ if [ "$1" = 'mysqld_safe' ]; then
 		fi
 	else
 		echo "Initialize MYSQL"
-		sed -i '1 i #redhat.xyz' /etc/my.cnf
 		#Initialize MYSQL
-		cp /usr/local/mysql/support-files/my-default.cnf /etc/my.cnf
+		\cp /usr/local/mysql/support-files/my-default.cnf /etc/my.cnf
+		echo -e "lower_case_table_names=1\nopen_files_limit=100000" >>/etc/my.cnf
 		[ ! -f /usr/local/mysql/tmp ] && mkdir /usr/local/mysql/tmp && chown mysql.mysql /usr/local/mysql/tmp
 
 		#Server ID
