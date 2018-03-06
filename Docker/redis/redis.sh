@@ -3,6 +3,7 @@ set -e
 
 if [ "$1" = 'redis-server' ]; then
 
+: ${REDIS_PORT:="6379"}
 : ${MASTER_NAME:="mymaster"}
 : ${SLAVE_QUORUM:="2"}
 : ${DOWN_TIME:="6000"}
@@ -13,6 +14,9 @@ if [ "$1" = 'redis-server' ]; then
 
 	#bind
 	sed -i 's/^bind 127.0.0.1/bind 0.0.0.0/' /usr/local/redis/redis.conf
+	
+	#port
+	sed -i 's/^port 6379/port '$REDIS_PORT'/' /usr/local/redis/redis.conf
 
 	#persistence
 	if [ $LOCAL_STROGE ]; then
@@ -36,7 +40,7 @@ if [ "$1" = 'redis-server' ]; then
 		port 26379
 		dir /tmp
 		protected-mode no
-		sentinel monitor $MASTER_NAME $REDIS_MASTER 6379 $SLAVE_QUORUM
+		sentinel monitor $MASTER_NAME $REDIS_MASTER $REDIS_PORT $SLAVE_QUORUM
 		sentinel down-after-milliseconds $MASTER_NAME $DOWN_TIME
 		sentinel parallel-syncs $MASTER_NAME 1
 		sentinel failover-timeout $MASTER_NAME 180000
@@ -90,9 +94,9 @@ if [ "$1" = 'redis-server' ]; then
 	#iptables, Need root authority "--privileged"
 	if [ $IPTABLES ]; then
 		cat > /iptables.sh <<-END
-		iptables -I INPUT -p tcp -m multiport --dport 6379,26379 -j DROP
+		iptables -I INPUT -p tcp -m multiport --dport $REDIS_PORT,26379 -j DROP
 		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-		iptables -I INPUT -s $IPTABLES -p tcp -m state --state NEW -m tcp --dport 6379 -m comment --comment REDIS -j ACCEPT
+		iptables -I INPUT -s $IPTABLES -p tcp -m state --state NEW -m tcp --dport $REDIS_PORT -m comment --comment REDIS -j ACCEPT
 		iptables -I INPUT -s $IPTABLES -p tcp -m state --state NEW -m tcp --dport 26379 -m comment --comment REDIS -j ACCEPT
 		END
 	fi
@@ -112,6 +116,7 @@ else
 					docker run -d --restart always [--privileged] \\
 					-v /docker/redis:/usr/local/redis/data \\
 					-p 6379:6379 \\
+					-e REDIS_PORT=[6379] \\
 					-e REDIS_PASS=<bigpass> \\
 					-e LOCAL_STROGE=<Y> \\
 					-e REDIS_MASTER=<10.0.0.91> \\
