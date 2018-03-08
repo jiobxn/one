@@ -29,6 +29,7 @@ RUN cd /tomcat/lib \
         && wget -c https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-catalina-jmx-remote/${tomcat_v}/tomcat-catalina-jmx-remote-${tomcat_v}.jar \
         && wget -c https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-catalina-ws/${tomcat_v}/tomcat-catalina-ws-${tomcat_v}.jar \
         && wget -c https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-juli/${tomcat_v}/tomcat-juli-${tomcat_v}.jar \
+        && wget -c https://repo1.maven.org/maven2/com/mchange/mchange-commons-java/0.2.10/mchange-commons-java-0.2.10.jar \
         && wget -c https://github.com/jiobxn/one/raw/master/Script/hello.jsp -O /mnt/webapps/ROOT/hello.jsp \
         && cp /mnt/webapps/ROOT/hello.jsp /tomcat/webapps/ROOT/ \
         && tar zxf mysql-connector-java-*.tar.gz \
