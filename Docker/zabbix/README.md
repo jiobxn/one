@@ -82,7 +82,8 @@ Zabbix
     wget -c https://github.com/monitoringartist/zabbix-docker-monitoring/raw/gh-pages/centos7/3.4/zabbix_module_docker.so
     chmod +x zabbix_module_docker.so
     mv zabbix_module_docker.so /usr/local/zabbix/lib/
-    echo -e "LoadModulePath=/usr/local/zabbix/lib\nLoadModule=zabbix_module_docker.so\nAllowRoot=1" >>/usr/local/zabbix/etc/zabbix_agentd.conf
+    echo -e "LoadModulePath=/usr/local/zabbix/lib\nLoadModule=zabbix_module_docker.so" >>/usr/local/zabbix/etc/zabbix_agentd.conf
+    usermod -aG docker,root zabbix    #需要添加权限，或者 echo AllowRoot=1 >>zabbix_agentd.conf
     /etc/init.d/zabbix_agentd restart
 
 **导入监控模板**  
