@@ -146,3 +146,6 @@ Nginx
 **添加CA证书信任**
 
     curl -s http://x.x.x.x/ca.crt >> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+
+
+注意：worker_processes数越大占用内存越多
