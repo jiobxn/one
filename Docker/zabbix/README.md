@@ -85,6 +85,12 @@ Zabbix
     echo -e "LoadModulePath=/usr/local/zabbix/lib\nLoadModule=zabbix_module_docker.so" >>/usr/local/zabbix/etc/zabbix_agentd.conf
     usermod -aG docker,root zabbix    #需要添加权限，或者 echo AllowRoot=1 >>zabbix_agentd.conf
     /etc/init.d/zabbix_agentd restart
+    
+    #SELinux
+    wget https://raw.githubusercontent.com/monitoringartist/zabbix-docker-monitoring/master/selinux/zabbix-docker.te
+    checkmodule -M -m -o zabbix-docker.mod zabbix-docker.te
+    semodule_package -o zabbix-docker.pp -m zabbix-docker.mod
+    semodule -i zabbix-docker.pp
 
 **导入监控模板**  
 [Zabbix-Template-App-Docker.xml](https://raw.githubusercontent.com/monitoringartist/zabbix-docker-monitoring/master/template/Zabbix-Template-App-Docker.xml) -标准(推荐)模板  
