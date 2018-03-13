@@ -77,6 +77,14 @@ Zabbix
 
 ****
 
+**添加到现有的zabbix 3.4**
+
+    wget -c https://github.com/monitoringartist/zabbix-docker-monitoring/raw/gh-pages/centos7/3.4/zabbix_module_docker.so
+    chmod +x zabbix_module_docker.so
+    mv zabbix_module_docker.so /usr/local/zabbix/lib/
+    echo -e "LoadModulePath=/usr/local/zabbix/lib\nLoadModule=zabbix_module_docker.so" >> /usr/local/zabbix/etc/zabbix_agentd.conf
+    /etc/init.d/zabbix_agentd restart
+
 **导入监控模板**  
 [Zabbix-Template-App-Docker.xml](https://raw.githubusercontent.com/monitoringartist/zabbix-docker-monitoring/master/template/Zabbix-Template-App-Docker.xml) -标准(推荐)模板  
 [Zabbix-Template-App-Docker-active.xml](https://raw.githubusercontent.com/monitoringartist/zabbix-docker-monitoring/master/template/Zabbix-Template-App-Docker-active.xml) -标准模板与自动发现
