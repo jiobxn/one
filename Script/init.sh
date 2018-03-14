@@ -31,6 +31,9 @@ curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repo
 yum -y install docker-ce
 systemctl enable docker
 
+curl -sL https://github.com/docker/compose/releases/download/$(curl -s https://github.com/docker/compose/tags |grep tag-name |grep -v rc |grep -Po '(?<=\>)[^)]*(?=\<)' |head -1)/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
     swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/490" |bc`
     dd if=/dev/zero of=/swapfile bs="$swap"M count=1024
