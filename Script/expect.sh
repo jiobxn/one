@@ -23,8 +23,7 @@ if [ "$(ls /usr/bin/ |egrep -c '^at$|^crontab$|^scp$|^expect$')"  -ne 4 ]; then
 fi
 
 if [ ! -f ~/hosts.txt ]; then
-	echo -e "You must first Add hosts.txt, Format: \"MARK:USER:IP:PORT:PASS\"\nExample: echo 'node5:root:10.0.0.5:22:password' >>~/hosts.txt"
-	exit 0
+	echo -e "\n1. You must first Add hosts.txt, Format: \"MARK:USER:IP:PORT:PASS\"\n	    Example: echo 'node5:root:10.0.0.5:22:password' >>~/hosts.txt\n"
 fi
 
 
@@ -211,21 +210,21 @@ done
 
 
 ################################################# 第三部分 ###############################################
-
-if [ "${1:0:2}" == '-m' ]; then
-	grep -v '^#' ~/hosts.txt |grep -v '^$' |awk -F: '{if($1~/'${2:0:99}'/) print}' >~/.hosts.txt && chmod 600 ~/.hosts.txt
-	ACMD="$3"
-	CMD=$4
-	FILE=$4
-	[ $5 ] && DEST=$5 || DEST=~/
-else
-	grep -v '^#' ~/hosts.txt |grep -v '^$' >~/.hosts.txt
-	ACMD="$1"
-	CMD=$2
-	FILE=$2
-	[ $3 ] && DEST=$3 || DEST=~/
+if [ -f ~/hosts.txt ]; then
+	if [ "${1:0:2}" == '-m' ]; then
+		grep -v '^#' ~/hosts.txt |grep -v '^$' |awk -F: '{if($1~/'${2:0:99}'/) print}' >~/.hosts.txt && chmod 600 ~/.hosts.txt
+		ACMD="$3"
+		CMD=$4
+		FILE=$4
+		[ $5 ] && DEST=$5 || DEST=~/
+	else
+		grep -v '^#' ~/hosts.txt |grep -v '^$' >~/.hosts.txt
+		ACMD="$1"
+		CMD=$2
+		FILE=$2
+		[ $3 ] && DEST=$3 || DEST=~/
+	fi
 fi
-
 
 #脚本控制程序
 
@@ -263,9 +262,8 @@ case $ACMD in
             CLEAN
     ;;
 
-       *)   echo -e "Usage: 
-	    File hosts.txt Format: \"MARK:USER:IP:PORT:PASS\". example: echo 'node5:root:10.0.0.5:22:password' >>~/hosts.txt
-	    You must first Establish SSH Trust: $0 SSH \nExample: 
+       *)   echo -e "2. Usage: 
+	    You must first Establish SSH Trust: $0 SSH \n\n3. Example: 
 	    SSH Trust: $0 SSH
 	    ALL SSH Trust: $0 SSHALL
 	    RUN Command: $0 [-m mark] COMM <'ls && crond'>
