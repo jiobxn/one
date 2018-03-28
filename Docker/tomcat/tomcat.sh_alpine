@@ -94,7 +94,7 @@ if [ "$1" = 'catalina.sh' ]; then
 
 	#JMX PORT
 	if [ $JMX_PORT ]; then
-		sed -i '/# OS/ i CATALINA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=$JMX_PORT"\n' /tomcat/bin/catalina.sh
+		sed -i '/# OS/ i CATALINA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port='$JMX_PORT'"\n' /tomcat/bin/catalina.sh
 	fi
 
 	#Redis
