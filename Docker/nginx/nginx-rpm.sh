@@ -13,6 +13,7 @@ set -e
 : ${CACHE_TIME:="10m"}
 : ${CACHE_SIZE:="2g"}
 : ${CACHE_MEM:="$(($(free -m |grep Mem |awk '{print $2}')*10/100))m"}
+: ${WORKER_PROC:="2"}
 
 
 
@@ -32,13 +33,13 @@ http_conf() {
 	cat >/etc/nginx/nginx.conf <<-END
 	#redhat.xyz
 	user  nginx;
-	worker_processes  $(nproc);
+	worker_processes  $WORKER_PROC;
 	
 	error_log  /var/log/nginx/error.log warn;
 	pid        /var/run/nginx.pid;
 
 	events {
-	    worker_connections  $((`nproc`*10240));
+	    worker_connections  $(($WORKER_PROC*10240));
 	}
 
 	http {
@@ -687,6 +688,7 @@ else
 				-v /docker/key:/key \\
 				-p 10080:80 \\
 				-p 10443:443 \\
+				-e WORKER_PROC=[2] \\
 				-e FCGI_SERVER=<php.jiobxn.com|192.17.0.5:9000[%<Other options>]> \\
 				-e JAVA_PHP_SERVER=<tomcat.jiobxn.com|192.17.0.6:8080[%<Other options>];apache.jiobxn.com|192.17.0.7[%<Other options>]> \\
 				-e PROXY_SERVER=<g.jiobxn.com|www.google.co.id%backend_https=Y> \\
