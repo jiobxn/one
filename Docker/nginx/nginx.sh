@@ -16,6 +16,7 @@ set -e
 : ${KP_ETH:="$(route -n |awk '$1=="0.0.0.0"{print $NF }')"}
 : ${KP_RID:="77"}
 : ${KP_PASS:="Newpa55"}
+: ${WORKER_PROC:="2"}
 
 
 
@@ -36,10 +37,10 @@ http_conf() {
 	mkdir /usr/local/nginx/conf/vhost
 	cat >/usr/local/nginx/conf/nginx.conf <<-END
 	#redhat.xyz
-	worker_processes  $(nproc);
+	worker_processes  $WORKER_PROC;
 
 	events {
-	    worker_connections  $((`nproc`*10240));
+	    worker_connections  $(($WORKER_PROC*10240));
 	}
 
 	pid /tmp/nginx.pid;
@@ -596,10 +597,10 @@ http_basic() {
 stream_conf() {
 	cat >/usr/local/nginx/conf/nginx.conf <<-END
 	#redhat.xyz
-	worker_processes  $(nproc);
+	worker_processes  $WORKER_PROC;
 
 	events {
-	    worker_connections  $((`nproc`*10240));
+	    worker_connections  $(($WORKER_PROC*10240));
 	}
 
 	stream {
@@ -826,6 +827,7 @@ else
 				-v /docker/key:/key \\
 				-p 10080:80 \\
 				-p 10443:443 \\
+				-e WORKER_PROC=[2] \\
 				-e FCGI_SERVER=<php.jiobxn.com|192.17.0.5:9000[%<Other options>]> \\
 				-e JAVA_PHP_SERVER=<tomcat.jiobxn.com|192.17.0.6:8080[%<Other options>];apache.jiobxn.com|192.17.0.7[%<Other options>]> \\
 				-e PROXY_SERVER=<g.jiobxn.com|www.google.co.id%backend_https=Y> \\
