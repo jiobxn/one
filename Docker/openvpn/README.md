@@ -2,7 +2,7 @@ OpenVPN
 ===
 ## 简介
 * **OpenVPN** 是一个基于 OpenSSL 库的应用层 VPN 实现。和传统 VPN 相比，它的优点是简单易用。
-> * 官方站点：https://openvpn.net/index.php/open-source.htmlhttps://openvpn.net/index.php/open-source.html
+> * 官方站点：https://openvpn.net/index.php/open-source.html
 
 
 ## Example:
