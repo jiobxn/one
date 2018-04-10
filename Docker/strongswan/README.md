@@ -7,7 +7,7 @@ Strongswan
 
 ## Example:
 
-    docker run -d --restart always --privileged -v /docker/strongswan:/key --network=host -e VPN_PASS=123456 --hostname strongswan --name strongswan jiobxn/strongsw
+    docker run -d --restart always --privileged -v /docker/strongswan:/key --network=host -e VPN_PASS=123456 --hostname strongswan --name strongswan jiobxn/strongswan
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
