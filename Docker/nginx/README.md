@@ -127,25 +127,34 @@ Nginx
 
 **创建证书**
 
+    #创建CA
     openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 365 -out ca.crt -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker"
+    
+    #docker.io
     openssl req -newkey rsa:4096 -nodes -sha256 -keyout auth.key -out auth.csr -subj "/C=CN/L=London/O=Company Ltd/CN=auth.docker.io"
     openssl x509 -req -days 365 -in auth.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out auth.crt
+    
     openssl req -newkey rsa:4096 -nodes -sha256 -keyout dseasb33srnrn.key -out dseasb33srnrn.csr -subj "/C=CN/L=London/O=Company Ltd/CN=dseasb33srnrn.cloudfront.net"
     openssl x509 -req -days 365 -in dseasb33srnrn.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out dseasb33srnrn.crt
+    
     openssl req -newkey rsa:4096 -nodes -sha256 -keyout registry-1.key -out registry-1.csr -subj "/C=CN/L=London/O=Company Ltd/CN=registry-1.docker.io"
     openssl x509 -req -days 365 -in registry-1.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out registry-1.crt
+    
+    #google cloud
+    openssl req -newkey rsa:4096 -nodes -sha256 -keyout gcr.key -out gcr.csr -subj "/C=CN/L=London/O=Company Ltd/CN=gcr.io"
+    openssl x509 -req -days 365 -in gcr.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out gcr.crt
 
 **proxy模式**
 
-    -e PROXY_SERVER= "auth.docker.io|auth.docker.io%backend_https=y,crt_key=auth.crt|auth.key;dseasb33srnrn.cloudfront.net|dseasb33srnrn.cloudfront.net%backend_https=y,crt_key=dseasb33srnrn.crt|dseasb33srnrn.key;registry-1.docker.io|registry-1.docker.io%backend_https=y,crt_key=registry-1.crt|registry-1.key"
+    -e PROXY_SERVER= "auth.docker.io|auth.docker.io%backend_https=y,crt_key=auth.crt|auth.key;dseasb33srnrn.cloudfront.net|dseasb33srnrn.cloudfront.net%backend_https=y,crt_key=dseasb33srnrn.crt|dseasb33srnrn.key;registry-1.docker.io|registry-1.docker.io%backend_https=y,crt_key=registry-1.crt|registry-1.key;gcr.io|gcr.io%backend_https=y,crt_key=gcr.crt|gcr.key"
 
 **客户端修改hosts**
 
-    echo "<ip-address> auth.docker.io registry-1.docker.io dseasb33srnrn.cloudfront.net" >>/etc/hosts
+    echo "<ip-address> auth.docker.io registry-1.docker.io dseasb33srnrn.cloudfront.net gcr.io" >>/etc/hosts
 
 **添加CA证书信任**
 
     curl -s http://x.x.x.x/ca.crt >> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
-
+    systemctl restart docker.service
 
 注意：worker_processes数越大占用内存越多
