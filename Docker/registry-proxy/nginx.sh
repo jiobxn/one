@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+: ${DOMAIN="img.io"}
 : ${NGX_PASS:="jiobxn.com"}
 : ${HTTP_PORT:="80"}
 : ${HTTPS_PORT:="443"}
@@ -18,13 +19,11 @@ if [ "$1" = 'nginx' ]; then
 		\cp /key/{server.crt,server.key} /etc/nginx/
 		\cp /key/ca.crt /var/lib/nginx/html/
 	else
-		DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
-		[ -z "$NGX_SERVER" ] && NGX_SERVER=$(ifconfig $DEV |awk -F: 'NR==2{print $2}' |awk '{print $1}')
-		openssl req -newkey rsa:4096 -nodes -sha256 -keyout /etc/nginx/ca.key -x509 -days 365 -out /etc/nginx/ca.crt -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker"
-		openssl req -newkey rsa:4096 -nodes -sha256 -keyout /etc/nginx/server.key -out /etc/nginx/server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=$NGX_SERVER"
-		openssl x509 -req -days 365 -in /etc/nginx/server.csr -CA /etc/nginx/ca.crt -CAkey /etc/nginx/ca.key -CAcreateserial -out /etc/nginx/server.crt
-		echo "subjectAltName = IP:$NGX_SERVER" > /etc/nginx/extfile.cnf
-		openssl x509 -req -days 365 -in /etc/nginx/server.csr -CA /etc/nginx/ca.crt -CAkey /etc/nginx/ca.key -CAcreateserial -extfile /etc/nginx/extfile.cnf -out /etc/nginx/server.crt
+		cd /etc/nginx/
+		openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 365 -out ca.crt -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker"
+		openssl req -newkey rsa:4096 -nodes -sha256 -keyout server.key -out server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=$DOMAIN"
+		openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+
 		\cp /etc/nginx/{server.crt,server.key,ca.crt} /key/
 		\cp /etc/nginx/ca.crt /var/lib/nginx/html/
 	fi
@@ -122,7 +121,7 @@ else
 				-p 443:443 \\
 				-e HTTP_PORT=[80] \\
 				-e HTTPS_PORT=[443] \\
-				-e NGX_SERVER=[local address] \\
+				-e DOMAIN=[img.io] \\
 				-e REG_SERVER=[127.0.0.1:5000] \\
 				-e NGX_USER=<nginx> \\
 				-e NGX_PASS=[jiobxn.com] \\
