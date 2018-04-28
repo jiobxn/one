@@ -34,11 +34,17 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	echo "Initialize openvpn"
 	if [ "$(ls /key/ |egrep -w -c "ca.crt|server.crt|server.key|dh2048.pem|ta.key")" -ne 5 ]; then
 		#Create certificate
-		cd /etc/openvpn/easy-rsa/*
-		. ./vars &>/dev/null
-		./clean-all --batch 2>/dev/null
-		./build-ca --batch &>/dev/null
-		./build-key-server --batch server 2>/dev/null
+		cd /etc/openvpn/server/3
+		./easyrsa init-pki &>/dev/null
+		echo | ./easyrsa gen-req server nopass &>/dev/null
+
+		cd /etc/openvpn/client/3
+		./easyrsa init-pki &>/dev/null
+		echo | ./easyrsa build-ca nopass &>/dev/null
+		echo | ./easyrsa import-req /etc/openvpn/server/3/pki/reqs/server.req server &>/dev/null
+		echo yes | ./easyrsa sign-req server server &>/dev/null
+		./easyrsa gen-dh &>/dev/null
+		
 		if [ $MAX_STATICIP ]; then
 			if [ $MAX_STATICIP -gt 63 ]; then
 				MAX_STATICIP=63
@@ -46,18 +52,21 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			
 			i=1
 			while [ $i -le "$MAX_STATICIP" ]; do
-				./build-key --batch client$i 2>/dev/null
+				echo | ./easyrsa gen-req client$i nopass &>/dev/null
+				echo yes | ./easyrsa sign-req client client$i &>/dev/null
 				let i++
 			done
 		else
 			./build-key --batch client 2>/dev/null
 		fi
-		./build-dh --batch 2>/dev/null
+		
 		openvpn --genkey --secret /etc/openvpn/ta.key
 		
-		\cp keys/*.crt /etc/openvpn/
-		\cp keys/*.key /etc/openvpn/
-		\cp keys/dh2048.pem /etc/openvpn/
+		\cp /etc/openvpn/client/3/pki/issued/* /etc/openvpn/
+		\cp /etc/openvpn/server/3/pki/private/* /etc/openvpn/
+		\cp /etc/openvpn/client/3/pki/private/* /etc/openvpn/
+		\cp /etc/openvpn/client/3/pki/ca.crt /etc/openvpn/
+		\cp /etc/openvpn/client/3/pki/dh.pem /etc/openvpn/dh2048.pem
 		\cp /etc/openvpn/*.crt /key/
 		\cp /etc/openvpn/*.key /key/
 		\cp /etc/openvpn/dh2048.pem /key/
@@ -287,7 +296,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 	echo -e "$(openvpn --help |awk 'NR==1{print $1"-"$2}')" |tee /key/openvpn.log
 	echo "VPN user AND password:" |tee /key/openvpn.log
-	cat /etc/openvpn/psw-file |tee -a /key/openvpn.log
+	[ -f /etc/openvpn/psw-file ] && cat /etc/openvpn/psw-file |tee -a /key/openvpn.log
 	echo $SQUID_INFO |tee -a /key/openvpn.log
 fi
 
