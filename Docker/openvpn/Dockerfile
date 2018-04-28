@@ -6,7 +6,8 @@ RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN yum clean all; yum -y install epel-release; yum -y update; yum install openvpn --downloadonly --downloaddir=/mnt/; yum -y install openvpn easy-rsa squid cronie iptables net-tools bash-completion vim wget \
         && yum clean all
 
-RUN \cp -R /usr/share/easy-rsa/ /etc/openvpn/ \
+RUN \cp -R /usr/share/easy-rsa/* /etc/openvpn/server/ \
+        && \cp -R /usr/share/easy-rsa/* /etc/openvpn/client/ \
         && cd /mnt && rpm2cpio openvpn-*.rpm |cpio -imd \
         && \cp /mnt/usr/share/doc/openvpn-*/sample/sample-config-files/{server.conf,client.conf} /etc/openvpn/ \
         && rm -rf /mnt/*
