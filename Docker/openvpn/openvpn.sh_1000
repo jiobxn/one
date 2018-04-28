@@ -35,15 +35,15 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	if [ "$(ls /key/ |egrep -w -c "ca.crt|server.crt|server.key|dh2048.pem|ta.key")" -ne 5 ]; then
 		#Create certificate
 		cd /etc/openvpn/server/3
-		./easyrsa init-pki 2>/dev/null
-		echo | ./easyrsa gen-req server nopass 2>/dev/null
+		./easyrsa init-pki &>/dev/null
+		echo | ./easyrsa gen-req server nopass &>/dev/null
 
 		cd /etc/openvpn/client/3
-		./easyrsa init-pki 2>/dev/null
-		echo | ./easyrsa build-ca nopass 2>/dev/null
-		echo | ./easyrsa import-req /etc/openvpn/server/3/pki/reqs/server.req server 2>/dev/null
-		echo yes | ./easyrsa sign-req server server 2>/dev/null
-		./easyrsa gen-dh 2>/dev/null
+		./easyrsa init-pki &>/dev/null
+		echo | ./easyrsa build-ca nopass &>/dev/null
+		echo | ./easyrsa import-req /etc/openvpn/server/3/pki/reqs/server.req server &>/dev/null
+		echo yes | ./easyrsa sign-req server server &>/dev/null
+		./easyrsa gen-dh &>/dev/null
 		
 		if [ $MAX_STATICIP ]; then
 			if [ $MAX_STATICIP -gt 1000 ]; then
@@ -52,8 +52,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			
 			i=1
 			while [ $i -le "$MAX_STATICIP" ]; do
-				echo | ./easyrsa gen-req client$i nopass 2>/dev/null
-				echo yes | ./easyrsa sign-req client client$i 2>/dev/null
+				echo | ./easyrsa gen-req client$i nopass &>/dev/null
+				echo yes | ./easyrsa sign-req client client$i &>/dev/null
 				let i++
 			done
 		else
