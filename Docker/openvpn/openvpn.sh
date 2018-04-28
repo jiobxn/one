@@ -57,7 +57,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 				let i++
 			done
 		else
-			./build-key --batch client 2>/dev/null
+				echo | ./easyrsa gen-req client$i nopass &>/dev/null
+				echo yes | ./easyrsa sign-req client client$i &>/dev/null
 		fi
 		
 		openvpn --genkey --secret /etc/openvpn/ta.key
