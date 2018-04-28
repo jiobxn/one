@@ -59,6 +59,8 @@ OpenVPN
     1.下载并安装 https://openvpn.net/index.php/open-source/downloads.html
     2.将client.ovpn和auth.txt(如果有)拷贝到"C:\Program Files\OpenVPN\config\"
 
+### 用户名+密码+证书 自动连接
+
     cd C:\Program Files\OpenVPN\bin
     openvpn.exe --config ../config/client.ovpn --auth-user-pass ../config/pwd.txt
-
+    # pwd.txt 第一行用户名，第二行密码
