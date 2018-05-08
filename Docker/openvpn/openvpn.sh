@@ -46,8 +46,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		./easyrsa gen-dh &>/dev/null
 		
 		if [ $MAX_STATICIP ]; then
-			if [ $MAX_STATICIP -gt 63 ]; then
-				MAX_STATICIP=63
+			if [ $MAX_STATICIP -gt 253 ]; then
+				MAX_STATICIP=253
 			fi
 			
 			i=1
@@ -139,19 +139,15 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	echo -e "# client.key\n<key>\n</key>" >>/etc/openvpn/client.conf
 
 	if [ $MAX_STATICIP ]; then
-		if [ $MAX_STATICIP -gt 63 ]; then
-			MAX_STATICIP=63
+		if [ $MAX_STATICIP -gt 253 ]; then
+			MAX_STATICIP=253
 		fi
 
 		echo >/key/client.txt
-		i=1
-		n=5
-		m=6
+		i=2
 		while [ $i -le "$MAX_STATICIP" ]; do
-			echo "ifconfig-push $IP_RANGE.$n $IP_RANGE.$m" >/etc/openvpn/ccd/client$i
-			echo "$IP_RANGE.$n user$i" >>/key/client.txt
-			n=$(($n+4))
-			m=$(($m+4))
+			echo "ifconfig-push $IP_RANGE.$i 255.255.255.0" >/etc/openvpn/ccd/client$i
+			echo "$IP_RANGE.$i user$i" >>/key/client.txt
 			
 			\cp /etc/openvpn/client.conf /etc/openvpn/client$i.conf
 			sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
@@ -241,6 +237,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			sed -i '/;key client.key/ a auth-user-pass' $i
 			\cp $i /key/
 		done
+	else
+		[ -f /etc/openvpn/psw-file ] && \rm /etc/openvpn/psw-file
 	fi
 
 
@@ -280,9 +278,9 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		SQUID_INFO="Squid user AND password: $PROXY_USER  $PROXY_PASS"
 
 		echo "squid" >/iptables.sh
-		echo "iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PROXY_PORT -m comment --comment OPENVPN -j ACCEPT" >>/iptables.sh
+		echo "iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PROXY_PORT -m comment --comment OPENVPN$PROXY_PORT -j ACCEPT" >>/iptables.sh
 	else	
-		echo "iptables -I INPUT -p $TCP_UDP -m state --state NEW -m $TCP_UDP --dport $VPN_PORT -m comment --comment OPENVPN -j ACCEPT" >/iptables.sh
+		echo "iptables -I INPUT -p $TCP_UDP -m state --state NEW -m $TCP_UDP --dport $VPN_PORT -m comment --comment OPENVPN$VPN_PORT -j ACCEPT" >/iptables.sh
 	fi
 
 
@@ -302,7 +300,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 fi
 
 	echo "Start ****"
-	[ -z "`iptables -S |grep OPENVPN`" ] && . /iptables.sh
+	[ -z "`iptables -S |grep "$(awk 'NR==1{print $17}' /iptables.sh)"`" ] && . /iptables.sh
 	exec "$@"
 
 else
@@ -318,7 +316,7 @@ else
 			-e VPN_PORT=[1194] \\
 			-e VPN_USER=<jiobxn> \\
 			-e VPN_PASS=<123456> \\
-			-e MAX_STATICIP=<63> \\
+			-e MAX_STATICIP=<253> \\
 			-e C_TO_C=[Y] \\
 			-e GATEWAY_VPN=[Y] \\
 			-e SERVER_IP=[SERVER_IP] \\
