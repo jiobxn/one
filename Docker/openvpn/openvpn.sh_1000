@@ -244,6 +244,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			sed -i '/;key client.key/ a auth-user-pass' $i
 			\cp $i /key/
 		done
+	else
+		[ -f /etc/openvpn/psw-file ] && \rm /etc/openvpn/psw-file
 	fi
 
 
@@ -283,9 +285,9 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		SQUID_INFO="Squid user AND password: $PROXY_USER  $PROXY_PASS"
 
 		echo "squid" >/iptables.sh
-		echo "iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PROXY_PORT -m comment --comment OPENVPN -j ACCEPT" >>/iptables.sh
+		echo "iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PROXY_PORT -m comment --comment OPENVPN$PROXY_PORT -j ACCEPT" >>/iptables.sh
 	else	
-		echo "iptables -I INPUT -p $TCP_UDP -m state --state NEW -m $TCP_UDP --dport $VPN_PORT -m comment --comment OPENVPN -j ACCEPT" >/iptables.sh
+		echo "iptables -I INPUT -p $TCP_UDP -m state --state NEW -m $TCP_UDP --dport $VPN_PORT -m comment --comment OPENVPN$VPN_PORT -j ACCEPT" >/iptables.sh
 	fi
 
 
@@ -305,7 +307,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 fi
 
 	echo "Start ****"
-	[ -z "`iptables -S |grep OPENVPN`" ] && . /iptables.sh
+	[ -z "`iptables -S |grep "$(awk 'NR==1{print $17}' /iptables.sh)"`" ] && . /iptables.sh
 	exec "$@"
 
 else
