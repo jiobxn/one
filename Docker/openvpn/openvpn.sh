@@ -94,7 +94,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		sed -i "s/;duplicate-cn/duplicate-cn/" /etc/openvpn/server.conf
 	else
 		sed -i 's/;client-config-dir/client-config-dir/' /etc/openvpn/server.conf
-		sed -i 's/;route 10.9.0.0/route '$IP_RANGE'.0/' /etc/openvpn/server.conf
+		sed -i 's/;route 10.9.0.0 255.255.255.252/route '$IP_RANGE'.0 255.255.255.0/' /etc/openvpn/server.conf
 		mkdir /etc/openvpn/ccd
 	fi
 	sed -i "s/;max-clients 100/max-clients 250/" /etc/openvpn/server.conf
