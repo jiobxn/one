@@ -39,8 +39,9 @@ OCSERV
 ### Linux Client:
 
     1. yum -y install openconnect
-    2. 使用证书登陆 openconnect -c ocserv.p12 https://Server-IP-Address:Port --no-cert-check --key-password=$P12_PASS -q &
-    3.用户名密码登陆 echo "$VPN_PASS" | openconnect https://Server-IP-Address:Port --no-cert-check --user=$VPN_USER --passwd-on-stdin -q &
+    2. 使用证书登陆 openconnect -c ocserv.p12 https://Server-IP-Address:Port --key-password=$P12_PASS -q &
+    3.用户名密码登陆 echo "$VPN_PASS" | openconnect https://Server-IP-Address:Port --user=$VPN_USER --passwd-on-stdin -q &
+    #老版本需要添加：--no-cert-check
 
 ### Windows Client:
 
