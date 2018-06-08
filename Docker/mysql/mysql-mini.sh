@@ -9,7 +9,6 @@ if [ "$1" = 'mysqld' ]; then
 	mysql_V="$(rpm -qa |awk -F- '$1"-"$2"-"$3=="mysql-community-server"{print $5}' |awk -F. '{print $1$2}')"
     
 	if [ -d "$DATADIR/mysql" ]; then
-echo 1
 		echo "$DATADIR/mysql already exists, skip"
 	  if [ -z "$(grep "redhat.xyz" /etc/my.cnf)" ]; then
 		echo "#redhat.xyz" >>/etc/my.cnf
@@ -38,7 +37,6 @@ echo 1
 			mysqld --initialize-insecure
 			mysql_ssl_rsa_setup 2>/dev/null
 			mysqld --skip-networking &
-			mysql_upgrade 2>/dev/null || echo
 			pid="$!"
 		elif [ "$mysql_V" -ge "57" ]; then
 			echo "Initializing MySQL $mysql_V"
@@ -219,6 +217,7 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 
 	echo "Start MYSQL ****"
 	[ -f /iptables.sh ] && [ -z "`iptables -S |grep MYSQL`" ] && . /iptables.sh
+	[ "$mysql_V" -ge "80" ] &&  atd && echo "mysql_upgrade -uroot -p$(awk '{print $4}' $DATADIR/root_info) && sed -i '/mysql_upgrade/d' /mysql.sh" |at now + 1 minutes
 	crond
 
 	exec "$@" 1>/dev/null
