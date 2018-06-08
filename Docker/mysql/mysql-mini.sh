@@ -4,17 +4,27 @@ set -e
 if [ "$1" = 'mysqld' ]; then
 	#Get data path
 	DATADIR="$("$@" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
+
+	#Initialize MYSQL
+	mysql_V="$(rpm -qa |awk -F- '$1"-"$2"-"$3=="mysql-community-server"{print $5}' |awk -F. '{print $1$2}')"
     
 	if [ -d "$DATADIR/mysql" ]; then
+echo 1
 		echo "$DATADIR/mysql already exists, skip"
+	  if [ -z "$(grep "redhat.xyz" /etc/my.cnf)" ]; then
+		echo "#redhat.xyz" >>/etc/my.cnf
 		echo -e "lower_case_table_names=1\nopen_files_limit=100000" >>/etc/my.cnf
+		[ "$mysql_V" -ge "80" ] && echo "default_authentication_plugin=mysql_native_password" >>/etc/my.cnf
 
 		#Server ID
 		if [ -n "$SERVER_ID" -a -z "$(grep ^server-id /etc/my.cnf)" ]; then
 			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
 		fi
+	  fi
 	else
+		echo "#redhat.xyz" >>/etc/my.cnf
 		echo -e "lower_case_table_names=1\nopen_files_limit=100000" >>/etc/my.cnf
+		[ "$mysql_V" -ge "80" ] && echo "default_authentication_plugin=mysql_native_password" >>/etc/my.cnf
 		#Server ID
 		if [ "$SERVER_ID" ]; then
 			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
@@ -23,26 +33,32 @@ if [ "$1" = 'mysqld' ]; then
 		#Initialize MYSQL
 		mysql_V="$(rpm -qa |awk -F- '$1"-"$2"-"$3=="mysql-community-server"{print $5}' |awk -F. '{print $1$2}')"
 
-		if [ "$mysql_V" -ge "57" ]; then
+		if [ "$mysql_V" -ge "80" ]; then
+			echo "Initializing MySQL $mysql_V"
+			mysqld --initialize-insecure
+			mysql_ssl_rsa_setup 2>/dev/null
+			mysqld --skip-networking &
+			mysql_upgrade 2>/dev/null || echo
+			pid="$!"
+		elif [ "$mysql_V" -ge "57" ]; then
 			echo "Initializing MySQL $mysql_V"
 			mysqld --initialize-insecure
 			mysql_ssl_rsa_setup 2>/dev/null
 			mysqld --skip-networking &
 			pid="$!"
+		elif [ "$mysql_V" -eq "56" ]; then
+			echo "Initializing MySQL $mysql_V"
+			mysql_install_db --rpm --keep-my-cnf &>/dev/null
+			mysqld --skip-networking &>/dev/null &
+			pid="$!"
+		elif [ "$mysql_V" -eq "55" ]; then
+			echo "Initializing MySQL $mysql_V"
+			mysql_install_db --rpm &>/dev/null
+			mysqld --skip-networking &>/dev/null &
+			pid="$!"
 		else
-			if [ "$mysql_V" -eq "56" ]; then
-				echo "Initializing MySQL $mysql_V"
-				mysql_install_db --rpm --keep-my-cnf &>/dev/null
-				mysqld --skip-networking &>/dev/null &
-				pid="$!"
-			fi
-			
-			if [ "$mysql_V" -eq "55" ]; then
-				echo "Initializing MySQL $mysql_V"
-				mysql_install_db --rpm &>/dev/null
-				mysqld --skip-networking &>/dev/null &
-				pid="$!"
-			fi
+			echo "Error, unknown version.."
+			exit 1
 		fi
 
 		#Login mysql Use socket
