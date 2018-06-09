@@ -9,7 +9,7 @@ set -e
 : ${SSL_CACHE:="10m"}
 : ${DOMAIN_TAG:="888"}
 : ${EOORO_JUMP:="https://cn.bing.com"}
-: ${NGX_DNS="8.8.8.8"}
+: ${NGX_DNS="9.9.9.9"}
 : ${CACHE_TIME:="10m"}
 : ${CACHE_SIZE:="2g"}
 : ${CACHE_MEM:="$(($(free -m |grep Mem |awk '{print $2}')*10/100))m"}
@@ -625,6 +625,7 @@ stream_server() {
 
 				for y in $(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
 					sed -i '/upstream backend-lb-'$n'/ a \        server '$y';' /usr/local/nginx/conf/nginx.conf
+					sed -i 's/&/ /' /usr/local/nginx/conf/nginx.conf
 				done
 				
 				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /usr/local/nginx/conf/nginx.conf
@@ -644,6 +645,7 @@ stream_server() {
 
 				for y in $(echo $i |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
 					sed -i '/upstream backend-lb-'$n'/ a \        server '$y';' /usr/local/nginx/conf/nginx.conf
+					sed -i 's/&/ /' /usr/local/nginx/conf/nginx.conf
 				done
 				
 				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /usr/local/nginx/conf/nginx.conf
@@ -842,7 +844,7 @@ else
 				-e SSL_CACHE=[10m] \\
 				-e DOMAIN_TAG=[888] \\
 				-e EOORO_JUMP=[https://cn.bing.com] \\
-				-e NGX_DNS=[8.8.8.8] \\
+				-e NGX_DNS=[9.9.9.9] \\
 				-e CACHE_TIME=[8h] \\
 				-e CACHE_SIZE=[4g] \\
 				-e CACHE_MEM=[server memory 10%] \\
@@ -865,7 +867,7 @@ else
 				   auth=<admin|passwd> \\
 				   filter=<.google.com|.fqhub.com&.twitter.com|.fqhub.com> \\
 				   log=<N|Y> \\
-				-e STREAM_SERVER=<3306|192.17.0.6:3306,192.17.0.7:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
+				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
 				   stream_lb=<hash|least_conn> \\
 				   conn_timeout=[1m] \\
 				   proxy_timeout=[10m] \\
