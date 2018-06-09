@@ -703,7 +703,7 @@ else
 				-e HTTPS_PORT=[443] \\
 				-e DOMAIN_TAG=[888] \\
 				-e EOORO_JUMP=[https://cn.bing.com] \\
-				-e NGX_DNS=[8.8.8.8] \\
+				-e NGX_DNS=[9.9.9.9] \\
 				-e CACHE_TIME=[8h] \\
 				-e CACHE_SIZE=[4g] \\
 				-e CACHE_MEM=[物理内存的%10] \\
