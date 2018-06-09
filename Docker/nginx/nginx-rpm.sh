@@ -9,7 +9,7 @@ set -e
 : ${SSL_CACHE:="10m"}
 : ${DOMAIN_TAG:="888"}
 : ${EOORO_JUMP:="https://cn.bing.com"}
-: ${NGX_DNS="8.8.8.8"}
+: ${NGX_DNS="9.9.9.9"}
 : ${CACHE_TIME:="10m"}
 : ${CACHE_SIZE:="2g"}
 : ${CACHE_MEM:="$(($(free -m |grep Mem |awk '{print $2}')*10/100))m"}
