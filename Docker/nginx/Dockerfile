@@ -3,7 +3,7 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
 RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-RUN yum clean all; yum -y update; yum -y install net-tools iproute bash-completion vim wget make gcc-c++ iptables cronie geoip-devel libxml2-devel libxslt-devel gd-devel; yum clean all
+RUN yum clean all; yum -y update; yum -y install net-tools iproute bash-completion vim wget autoreconf automake make gcc-c++ iptables cronie geoip-devel libxml2-devel libxslt-devel gd-devel; yum clean all
 
 RUN cd /usr/local/src \
         && pcre_down="https://sourceforge.net/projects/pcre/files/pcre/" && pcre_v=$(curl -s $pcre_down |grep "tr title" |awk -F\" 'NR==1{print $2}') && wget -c "$pcre_down$pcre_v/pcre-$pcre_v.tar.gz" \
@@ -12,7 +12,7 @@ RUN cd /usr/local/src \
         && wget -c $(curl -s http://www.cpan.org/src/ |grep wget |awk -F\" '{print $2}') \
         && wget -c https://github.com$(curl -s https://github.com/acassen/keepalived/releases |grep tar.gz |awk -F\" 'NR==1{print $2}') \
         && nginx_v=$(curl -s http://nginx.org/ |awk -F'download.html">nginx-' '{print $2}' |grep -v ^$ |awk -F'<' 'NR==1{print $1}') && wget -c http://nginx.org/download/nginx-$nginx_v.tar.gz
-        
+
 RUN cd /usr/local/src \
         && tar zxf nginx-*.tar.gz \
         && tar zxf pcre-*.tar.gz \
@@ -32,6 +32,7 @@ RUN cd /usr/local/src \
         && ./config --prefix=/usr/local zlib threads shared  && make -j8 && make install \
         && echo "/usr/local/lib64" >> /etc/ld.so.conf && ldconfig \
         && cd /usr/local/src/keepalived-* \
+        && ./build_setup \
         && ./configure --sysconf=/etc && make -j8 && make install \
         && cd /usr/local/src/nginx-* \
         && sed -i 's/\.openssl\/include/include/' auto/lib/openssl/conf \
