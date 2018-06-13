@@ -22,7 +22,7 @@ OpenVPN
 			-p 1194:1194 \\
 			-p <8080:8080> \\
 			-e TCP_UDP=[tcp] \\    默认使用TCP
-			-e TAP_TUN=[tun] \\    默认使用tun(IP/三层)；tap是以太网/二层
+			-e TAP_TUN=[tun] \\    默认使用tun(IP/三层)；tap是以太网/二层(windows 7)
 			-e VPN_PORT=[1194] \\  默认端口
 			-e VPN_USER=<jiobxn> \\  VPN用户名
 			-e VPN_PASS=<123456> \\  VPN密码，默认随机，/docker/openvpn/openvpn.log
