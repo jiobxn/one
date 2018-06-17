@@ -8,7 +8,7 @@ RUN yum clean all; yum -y install epel-release; yum -y update \
         && yum clean all
 
 RUN cd /usr/local/src \
-        && PHP_VERSION="$(curl -s http://php.net/downloads.php |grep tar.gz |awk -F\" 'NR==3{print $2}' |awk -F/ '{print $3}')" \
+        && PHP_VERSION="$(curl -s http://php.net/downloads.php |egrep php-5.6.*.tar.gz |awk -F/ '{print $3}')" \
         && wget -c http://php.net/distributions/${PHP_VERSION} \
         && wget -c https://github.com/phpredis/phpredis/archive/develop.zip \
         && wget -c http://downloads.zend.com/guard/7.0.0/zend-loader-php5.6-linux-x86_64.tar.gz \
