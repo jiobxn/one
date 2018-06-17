@@ -1,6 +1,8 @@
 FROM centos:latest
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
+ARG php_v="7.0"
+#7.0\7.1\7.2
 
 RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN yum clean all; yum -y install epel-release; yum -y update \
@@ -8,7 +10,7 @@ RUN yum clean all; yum -y install epel-release; yum -y update \
         && yum clean all
 
 RUN cd /usr/local/src \
-        && PHP_VERSION="$(curl -s http://php.net/downloads.php |grep tar.gz |awk -F\" 'NR==1{print $2}' |awk -F/ '{print $3}')" \
+        && PHP_VERSION="$(curl -s http://php.net/downloads.php |egrep php-${mysql_v}.*.tar.gz |awk -F/ '{print $3}')" \
         && wget -c http://php.net/distributions/${PHP_VERSION} \
         && wget -c https://github.com/phpredis/phpredis/archive/php7.zip \
         && wget -c "https://github.com$(curl -s https://github.com/php-memcached-dev/php-memcached/releases |grep tar.gz |awk -F\" 'NR==1{print $2}')" 
