@@ -42,3 +42,11 @@ shell脚本加密
 
     shc -r -f hello.sh -o hello
 ***
+### get_hub.sh
+Github项目.zip下载
+***
+### JDK下载
+get_jdk.sh
+***
+### MySQL导出导入
+mysql_export.sh
