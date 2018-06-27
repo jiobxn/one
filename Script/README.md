@@ -45,8 +45,8 @@ shell脚本加密
 ### get_hub.sh
 Github项目.zip下载
 ***
-### JDK下载
-get_jdk.sh
+### get_jdk.sh
+JDK下载
 ***
-### MySQL导出导入
-mysql_export.sh
+### mysql_export.sh
+MySQL导出导入
