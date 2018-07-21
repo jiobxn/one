@@ -63,4 +63,5 @@ OpenVPN
 
     cd C:\Program Files\OpenVPN\bin
     openvpn.exe --config ../config/client.ovpn --auth-user-pass ../config/pwd.txt
-    # pwd.txt 第一行用户名，第二行密码
+    # 或修改配置文件 auth-user-pass pwd.txt
+    # pwd.txt 第一行用户名，第二行密码
