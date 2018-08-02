@@ -5,3 +5,4 @@ Kickstart
 > * 官方文档：http://fedoraproject.org/wiki/Anaconda/Kickstart/zh-cn
 
 ## beta
+如果在进入图形化安装界面时报错，需要在容器中执行：\cp /var/www/html/os/isolinux/{initrd.img,vmlinuz,vesamenu.c32} /var/lib/tftpboot/
