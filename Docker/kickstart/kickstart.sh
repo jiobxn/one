@@ -36,6 +36,12 @@ if [ ! -f /etc/dhcp/dhcpd.conf ]; then
 		  option routers $GATEWAY;
 		  option broadcast-address $BROADCAST;
 		}
+		
+		#host apex {
+		#  option host-name "apex.example.com";
+		#  hardware ethernet 00:A0:78:8E:9E:AA;
+		#  fixed-address 192.168.1.4;
+		#}
 		END
 
 
