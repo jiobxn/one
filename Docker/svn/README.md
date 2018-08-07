@@ -63,3 +63,8 @@ SVN
 
 svn提交后会自动执行(如果存在)hooks/post-commit文件  
 参考：http://qicheng0211.blog.51cto.com/3958621/1563159
+
+**Windows svn 迁移到Linux**  
+
+1.将项目文件夹拷贝到/docker/svn/  
+2.执行 echo -e "4\nlayout sharded 1000" >/docker/svn/xxxx/db/format
