@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ "$1" = 'filemanager' ]; then
+if [ "$1" = 'filebrowser' ]; then
 
 : ${FM_PORT:="80"}
 
@@ -39,6 +39,6 @@ else
 				-p 80:80 \
 				-e FM_PORT=[80] \\
 				-e FM_AUTH=[Y] \\
-				--hostname filemanager --name filemanager filemanager
+				--hostname filebrowser --name filebrowser filebrowser
 	"
 fi
