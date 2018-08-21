@@ -116,7 +116,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		done
 	fi
 	
-	if [ "C_TO_C" = "Y" ]; then
+	if [ "$C_TO_C" = "Y" ]; then
 		sed -i "s/;client-to-client/client-to-client/" /etc/openvpn/server.conf
 	fi
 
