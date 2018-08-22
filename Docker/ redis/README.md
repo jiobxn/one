@@ -20,6 +20,7 @@ Redis
 					docker run -d --restart always [--privileged] \\
 					-v /docker/redis:/usr/local/redis/data \\
 					-p 16379:6379 \\
+					-e REDIS_PORT=[6379] \\
 					-e REDIS_PASS=<bigpass> \\            设置一个密码
 					-e LOCAL_STROGE=Y \\                  开启持久化
 					-e REDIS_MASTER=<10.0.0.91> \\        master ip addr
