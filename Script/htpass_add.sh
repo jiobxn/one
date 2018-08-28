@@ -1,7 +1,6 @@
 #!/bin/bash
-# echo "username  passworld" >user.txt
-
-F=user.txt
+F=txt
+[ ! -f $F ] && echo "admin 123456" |tee $F
 N=$(grep -v ^# $F |grep -v ^$ |wc -l txt |awk '{print $1}')
 
 i=1
