@@ -50,3 +50,6 @@ JDK下载
 ***
 ### mysql_export.sh
 MySQL导出导入
+***
+### htpass_add.sh
+批量创建htpasswd用户
