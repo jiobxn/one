@@ -35,7 +35,7 @@ curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repo
 yum -y install docker-ce
 systemctl enable docker
 
-curl -sL https://github.com/docker/compose/releases/download/$(curl -s https://github.com/docker/compose/tags |grep tag-name |grep -v rc |grep -Po '(?<=\>)[^)]*(?=\<)' |head -1)/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+curl -sL https://github.com/docker/compose/releases/download/$(curl -s https://github.com/docker/compose/tags |grep 'compose/releases/tag' |grep -v rc |awk -F/ 'NR==1{print $NF}' |awk -F\" '{print $1}')/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
