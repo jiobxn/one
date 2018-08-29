@@ -39,7 +39,7 @@ curl -sL https://github.com/docker/compose/releases/download/$(curl -s https://g
 chmod +x /usr/local/bin/docker-compose
 
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
-    swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/490" |bc`
+    swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/485" |bc`
     dd if=/dev/zero of=/swapfile bs="$swap"M count=1024
     uuid=$(mkswap /swapfile |awk 'END{print $3}')
     chmod 0600 /swapfile
