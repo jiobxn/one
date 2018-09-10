@@ -8,7 +8,7 @@ fi
 if [ "`hostname`" == "vultr.guest" ]; then
     yum -y install bash-completion vim aria2 wget bind-utils iptables-services iftop nethogs net-tools ntp mtr nmap tcpdump unzip bzip2 zip mailx bc at expect telnet git lrzsz lsof bridge-utils dos2unix certbot 
 else
-    yum -y install bash-completion vim aria2 wget bind-utils iptables-services iftop nethogs net-tools ntp mtr nmap tcpdump unzip bzip2 zip mailx bc at expect telnet git lrzsz lsof bridge-utils dos2unix certbot axel openssl-devel pciutils setroubleshoot setools make gcc-c++ autoconf automake nfs-utils 
+    yum -y install bash-completion vim aria2 wget bind-utils iptables-services iftop nethogs net-tools ntp mtr nmap tcpdump unzip bzip2 zip mailx bc at expect telnet git lrzsz lsof bridge-utils dos2unix certbot axel openssl-devel pciutils setroubleshoot setools make gcc-c++ autoconf automake testdisk gdisk nfs-utils 
 fi
 
 systemctl disable NetworkManager firewalld
