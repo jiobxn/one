@@ -32,7 +32,7 @@ RUN cd /usr/local/tomcat/lib \
         && wget -c https://github.com/jiobxn/one/raw/master/Script/hello.jsp -O /mnt/webapps/ROOT/hello.jsp \
         && cp /mnt/webapps/ROOT/hello.jsp /usr/local/tomcat/webapps/ROOT/ \
         && tar zxf mysql-connector-java-*.tar.gz \
-        && mv mysql-connector-java-*/mysql-connector-java-*-bin.jar new-mysql-connector-java-bin.jar \
+        && mv mysql-connector-java-*/mysql-connector-java-*.jar new-mysql-connector-java-bin.jar \
         && rm -rf mysql-connector-java-* \
         && mv new-mysql-connector-java-bin.jar mysql-connector-java-bin.jar
 
