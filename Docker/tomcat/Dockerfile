@@ -22,7 +22,7 @@ RUN cd /usr/local/src \
         && \cp -a /usr/local/tomcat/webapps /mnt/
 
 RUN cd /usr/local/tomcat/lib \
-        && wget -c http://cdn.mysql.com//Downloads/Connector-J/$(curl -s https://dev.mysql.com/downloads/connector/j/ |grep tar.gz |head -1 |grep -Po '(?<=\()[^)]*(?=\))') \
+        && wget -c https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-$(curl -s https://dev.mysql.com/downloads/connector/j/ |grep 'Connector/J' |awk 'END {print $2}').tar.gz \
         && jstl="https://repo1.maven.org/maven2/jstl/jstl/" && jstl_v=$(curl -s $jstl |grep "                   -" |awk -F\" 'END{print $2}' |awk -F/ '{print $1}') && wget -c "$jstl$jstl_v/jstl-$jstl_v.jar" \
         && c3p0="https://repo1.maven.org/maven2/com/mchange/c3p0/" && c3p0_v=$(curl -s $c3p0 |grep "                   -" |awk -F\" 'END{print $2}' |awk -F/ '{print $1}') && wget -c "$c3p0$c3p0_v/c3p0-$c3p0_v.jar" \
         && tomcat_v=$(version.sh |grep "Server version" |awk -F/ '{print $2}') \
