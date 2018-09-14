@@ -55,7 +55,7 @@ for i in $(cat ~/.hosts.txt); do
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 	
-	if [ -z "$(ip addr |grep $IP)" ]; then
+	if [ -z "$(ip addr |grep -w $IP)" ]; then
 		#4.批量ssh认证建立
 		expect -c "
 		set timeout 60
@@ -79,7 +79,7 @@ for i in $(cat ~/.hosts.txt); do
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 
-	if [ -z "$(ip addr |grep $IP)" ]; then
+	if [ -z "$(ip addr |grep -w $IP)" ]; then
 		#5.添加所有主机相互认证
 		scp -P $PORT $0 $USER@$IP:~/expect.sh
 		scp -P $PORT ~/hosts.txt $USER@$IP:~
@@ -124,7 +124,7 @@ for i in $(cat ~/.hosts.txt); do
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 	
-	if [ -z "$(ip addr |grep $IP)" ]; then
+	if [ -z "$(ip addr |grep -w $IP)" ]; then
 		echo "------------> $IP <-------------------"
 		scp -rpC -P $PORT $FILE $USER@$IP:$DEST
 		echo
@@ -140,7 +140,7 @@ for i in $(cat ~/.hosts.txt); do
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 	
-	if [ -z "$(ip addr |grep $IP)" ]; then
+	if [ -z "$(ip addr |grep -w $IP)" ]; then
 		echo "------------> $IP <-------------------"
 		scp -rpC -P $PORT $USER@$IP:$FILE $DEST
 		echo
@@ -156,7 +156,7 @@ for i in $(cat ~/.hosts.txt); do
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 
-	if [ -z "$(ip addr |grep $IP)" ]; then
+	if [ -z "$(ip addr |grep -w $IP)" ]; then
 		echo "------------> $IP <-------------------"
 		ssh -p $PORT $USER@$IP "$CMD"
 		echo
@@ -172,7 +172,7 @@ for i in $(cat ~/.hosts.txt); do
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 	
-	if [ -z "$(ip addr |grep $IP)" ]; then
+	if [ -z "$(ip addr |grep -w $IP)" ]; then
 		echo "------------> $IP <-------------------"
 		version="$(ssh $USER@$IP 'egrep -o "el[6-9]|fc2[2-9]|ubuntu" /proc/version')"
 		pkgs="$(ssh -p $PORT $USER@$IP "if [ "$version" = "ubuntu" ]; then echo 'sudo apt-get'; elif [ "$version" = "fc2*" ]; then echo 'dnf'; else echo 'yum'; fi")"
