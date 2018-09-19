@@ -5,11 +5,8 @@ if [ "$(grep -o -w "Red Hat" /etc/redhat-release)" ]; then
     yum-config-manager --enable rhui-REGION-rhel-server-extras
 fi
 
-if [ "`hostname`" == "vultr.guest" ]; then
-    yum -y install bash-completion vim aria2 wget bind-utils iptables-services iftop nethogs net-tools ntp mtr nmap tcpdump unzip bzip2 zip mailx bc at expect telnet git lrzsz lsof bridge-utils dos2unix certbot asciinema 
-else
-    yum -y install bash-completion vim aria2 wget bind-utils iptables-services iftop nethogs net-tools ntp mtr nmap tcpdump unzip bzip2 zip mailx bc at expect telnet git lrzsz lsof bridge-utils dos2unix certbot asciinema axel openssl-devel pciutils setroubleshoot setools make gcc-c++ autoconf automake testdisk gdisk nfs-utils 
-fi
+
+yum -y install bash-completion vim aria2 wget bind-utils iptables-services iftop nethogs net-tools ntp mtr nmap tcpdump unzip bzip2 zip mailx bc at expect telnet git lrzsz lsof bridge-utils dos2unix certbot asciinema tcping pciutils testdisk gdisk nfs-utils # axel openssl-devel setroubleshoot setools make gcc-c++ autoconf automake
 
 systemctl disable NetworkManager firewalld
 \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -35,8 +32,8 @@ curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repo
 yum -y install docker-ce
 systemctl enable docker
 
-curl -sL https://github.com/docker/compose/releases/download/$(curl -s https://github.com/docker/compose/tags |grep 'compose/releases/tag' |grep -v rc |awk -F/ 'NR==1{print $NF}' |awk -F\" '{print $1}')/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
+#curl -sL https://github.com/docker/compose/releases/download/$(curl -s https://github.com/docker/compose/tags |grep 'compose/releases/tag' |grep -v rc |awk -F/ 'NR==1{print $NF}' |awk -F\" '{print $1}')/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+#chmod +x /usr/local/bin/docker-compose
 
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
     swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/485" |bc`
@@ -56,8 +53,9 @@ if [ `ulimit -n` -eq 1024 ]; then
     sysctl -p
 fi
 
-audit2allow -a -M mycertwatch
-semodule -i mycertwatch.pp
-\rm mycertwatch*
+#audit2allow -a -M mycertwatch
+#semodule -i mycertwatch.pp
+#\rm mycertwatch*
+sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
 
 echo -e "\n-----> reboot"
