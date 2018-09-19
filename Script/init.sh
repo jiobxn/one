@@ -24,8 +24,8 @@ MAILTO=' '
 * * * * * echo 3 > /proc/sys/vm/drop_caches
 EOF
 
-yum -y install python34-setuptools
-easy_install-3.4 pip
+yum -y install python36-setuptools
+easy_install-3.6 pip
 pip install --upgrade youtube-dl you-get
 
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
