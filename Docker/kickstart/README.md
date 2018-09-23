@@ -23,4 +23,8 @@ Kickstart
 
 4.客户端网络启动
 
-如果在安装过程中左下角出现"Pane is dead"，需要在容器中执行：\cp /var/www/html/os/isolinux/{initrd.img,vmlinuz,vesamenu.c32} /var/lib/tftpboot/ ，然后重新网络启动。虚拟机测试，内存2G+。
+5.如果在安装过程中左下角出现"Pane is dead"，需要在容器中执行：
+
+    \cp /var/www/html/os/isolinux/{initrd.img,vmlinuz,vesamenu.c32} /var/lib/tftpboot/
+
+重新网络启动。虚拟机测试内存2G+。
