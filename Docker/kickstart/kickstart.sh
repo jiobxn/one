@@ -37,8 +37,10 @@ if [ ! -f /etc/dhcp/dhcpd.conf ]; then
 		  option broadcast-address $BROADCAST;
 		}
 		
-		#host apex {
-		#  option host-name "apex.example.com";
+		#host host4 {
+		#  next-server $IPADDR;
+		#  filename "pxelinux.0";
+		#  option host-name "host4.example.com";
 		#  hardware ethernet 00:A0:78:8E:9E:AA;
 		#  fixed-address 192.168.1.4;
 		#}
@@ -126,13 +128,16 @@ if [ ! -f /etc/dhcp/dhcpd.conf ]; then
 		# System timezone
 		timezone Asia/Shanghai --isUtc
 		# System bootloader configuration, 使用内核参数 net.ifnames=0 装完后网卡会是eth* ,系统引导安装到sda
-		bootloader --append="net.ifnames=0 crashkernel=auto" --location=mbr --boot-drive=sda
+		bootloader --append=" crashkernel=auto" --location=mbr --boot-drive=sda
 
 		# 初次安装或格式化重装(1)
-		clearpart --none --initlabel
+		#clearpart --none --initlabel
 		# 删除所有分区重装(2)
 		#clearpart --all --initlabel --drives=sda
 
+		# 使用GPT/GUID的磁盘必须有一个bios引导分区，用来安装引导程序。（磁盘空间大于2T）
+		#part biosboot --fstype=biosboot --size=1
+		
 		# 初次安装或删除所有分区重装(1,2),标准分区, --grow --size=1 会使用剩余所有磁盘空间
 		#part /boot --fstype="xfs" --ondisk=sda --size=1024
 		#part swap --fstype="swap" --ondisk=sda --size=2048
@@ -161,19 +166,13 @@ if [ ! -f /etc/dhcp/dhcpd.conf ]; then
 		@core
 		chrony
 		kexec-tools
-
+		%end
+		
+		%post
+		sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config
 		%end
 		END
 
-		if [ "$REPO" ]; then
-			if [ "$REPO" == "ALIYUN" ]; then
-				sed -i "s#http://$IPADDR:$PORT/os/#http://mirrors.aliyun.com/centos/7/os/x86_64/#" /var/www/html/ks/ks.cfg
-			elif [ "$REPO" == "163" ]; then
-				sed -i "s#http://$IPADDR:$PORT/os/#http://mirrors.163.com/centos/7/os/x86_64/#" /var/www/html/ks/ks.cfg
-			else
-				sed -i "s#http://$IPADDR:$PORT/os/#$REPO#" /var/www/html/ks/ks.cfg
-			fi
-		fi
 
 		\cp /etc/dhcp/dhcpd.conf /key/
 		\cp /var/lib/tftpboot/pxelinux.cfg/default /key/
@@ -185,23 +184,33 @@ if [ ! -f /etc/dhcp/dhcpd.conf ]; then
 	fi
 	echo -e "dhcpd -cf /etc/dhcp/dhcpd.conf\nxinetd -stayalive\nhttpd" >/start.sh
 	echo "for i in \$(netstat -tupnl |awk '{print \$NF}' |egrep 'httpd|dhcpd|xinetd' |awk -F/ '{print \$1}' |sort |uniq -c |awk '{print \$2}');do kill \$i; done" >/stop.sh
+
+	#iptables, Need root authority "--privileged"
+	if [ $IPTABLES ]; then
+		cat > /iptables.sh <<-END
+		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+		iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport $PORT -m comment --comment PXE -j ACCEPT
+		iptables -I INPUT -m state --state NEW -m udp -p udp --dport 67:69 -m comment --comment PXE -j ACCEPT
+		END
+	fi
 fi
 
 	echo "Start ****"
+	[ -f /iptables.sh ] && [ -z "`iptables -S |grep PXE`" ] && . /iptables.sh
 	. /start.sh
 	exec $@
 else
 	echo -e "
 	Example:
-				docker run -d --restart unless-stopped --network host \\
+				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
 				-v /docker/ks:/key \\
 				-v /docker/os:/var/www/html/os \\
 				-e NIC=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
 				-e DNS=[9.9.9.9] \\
 				-e PORT=[80] \\
 				-e BOOT=[LOCAL] \\
-				-e RANGE=<"192.168.80.200 192.168.80.210">
-				-e REPO=<163 | ALIYUN>
+				-e RANGE=<"192.168.80.200 192.168.80.210"> \\
+				-e IPTABLES=<Y> \\
 				--name kickstart kickstart
 	"
 fi
