@@ -12,7 +12,7 @@ RUN chmod +x /vsftpd.sh
 
 ENTRYPOINT ["/vsftpd.sh"]
 
-EXPOSE 20 21
+EXPOSE 21 25000:25100
 
 CMD ["/usr/sbin/init"]
 
