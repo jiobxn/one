@@ -1,0 +1,20 @@
+FROM centos:latest
+MAINTAINER "The CentOS Project" <admin@jiobxn.com>
+ARG LATEST="0"
+
+RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN yum clean all; yum -y update; yum -y install net-tools openssl iptables bc vsftpd; yum clean all
+
+VOLUME /home /key
+
+COPY vsftpd.sh /vsftpd.sh
+RUN chmod +x /vsftpd.sh
+
+ENTRYPOINT ["/vsftpd.sh"]
+
+EXPOSE 20 21
+
+CMD ["/usr/sbin/init"]
+
+# docker build -t vsftpd .
+# docker run -d --network host --cap-add=NET_ADMIN -v /docker/vsftpd:/home -v /docker/ftp:/key/ -e IPTABLES=Y --name vsftp vsftpd
