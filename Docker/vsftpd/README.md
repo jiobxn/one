@@ -7,7 +7,8 @@ VSFTPD
 
 ## Example:
 
-    docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN -v /docker/ftp:/key/ -v /docker/vsftpd:/home -e IPTABLES=Y --name vsftp vsftpd
+    docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN -v /docker/ftp:/key/ -v /docker/vsftpd:/home -e IPTABLES=Y --name vsftp jiobxn/vsftpd
+    cat /docker/ftp/ftp.log
 
 
 ## Run Defult Parameter
@@ -16,18 +17,19 @@ VSFTPD
 				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
 				-v /docker/vsftpd:/home \\
 				-v /docker/ftp:/key \\
-				-v FTP_PORT=[21] \\       监听端口
-				-v MIN_PORT=[25000] \\    数据端口(起始)
-				-v MAX_PORT=[25100] \\    数据端口(结束)
-				-v FTP_USER=[vsftpd] \\   管理员用户
-				-v FTP_PASS=[$(openssl rand -hex 10)] \\    随机密码
-				-v ANON_ROOT=[public] \\  匿名用户目录
-				-v ANON_CHMOD=[4] \\      匿名用户权限(只读)
-				-v MAX_CLINT=[0] \\       最大客户端
-				-v MAX_CONN=[0] \\        最大并发数(单IP)
-				-v ANON_MB=[0] \\         匿名用户传输速度
-				-v LOCAL_MB=[0] \\        本地用户传输速度
-				-v HI_FTP=["Serv-U FTP Server v16.0 ready"] \\    欢迎标语
+				-e FTP_PORT=[21] \\       监听端口
+				-e MIN_PORT=[25000] \\    数据端口(起始)
+				-e MAX_PORT=[25100] \\    数据端口(结束)
+				-e FTP_USER=[vsftpd] \\   管理员用户
+				-e FTP_PASS=[$(openssl rand -hex 10)] \\    随机密码
+				-e ANON_ROOT=[public] \\  匿名用户目录
+				-e ANON_CHMOD=[4] \\      匿名用户权限(只读)
+				-e MAX_CLINT=[0] \\       最大客户端
+				-e MAX_CONN=[0] \\        最大并发数(单IP)
+				-e ANON_MB=[0] \\         匿名用户传输速度
+				-e LOCAL_MB=[0] \\        本地用户传输速度
+				-e HI_FTP=["Serv-U FTP Server v16.0 ready"] \\    欢迎标语
+				-e FTP_SSL=<Y>            启用ssl加密
 				-e IPTABLES=<Y> \\
 				--name vsftpd vsftpd
 	
