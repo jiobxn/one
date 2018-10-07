@@ -460,18 +460,19 @@ HELP() {
 				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
 				-v /docker/vsftpd:/home \\
 				-v /docker/ftp:/key \\
-				-v FTP_PORT=[21] \\
-				-v MIN_PORT=[25000] \\
-				-v MAX_PORT=[25100] \\
-				-v FTP_USER=[vsftpd] \\
-				-v FTP_PASS=[$(openssl rand -hex 10)] \\
-				-v ANON_ROOT=[public] \\
-				-v ANON_CHMOD=[4] \\
-				-v MAX_CLINT=[0] \\
-				-v MAX_CONN=[0] \\
-				-v ANON_MB=[0] \\
-				-v LOCAL_MB=[0] \\
-				-v HI_FTP=["Serv-U FTP Server v16.0 ready"] \\
+				-e FTP_PORT=[21] \\
+				-e MIN_PORT=[25000] \\
+				-e MAX_PORT=[25100] \\
+				-e FTP_USER=[vsftpd] \\
+				-e FTP_PASS=[$(openssl rand -hex 10)] \\
+				-e ANON_ROOT=[public] \\
+				-e ANON_CHMOD=[4] \\
+				-e MAX_CLINT=[0] \\
+				-e MAX_CONN=[0] \\
+				-e ANON_MB=[0] \\
+				-e LOCAL_MB=[0] \\
+				-e HI_FTP=["Serv-U FTP Server v16.0 ready"] \\
+				-e FTP_SSL=<Y> \\
 				-e IPTABLES=<Y> \\
 				--name vsftpd vsftpd
 	
