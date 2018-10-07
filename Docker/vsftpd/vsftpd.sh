@@ -422,7 +422,7 @@ INIT_FTP() {
 	#ssl
 	if [ "$FTP_SSL" == "Y" ];then
 		if [ ! -f /key/vsftpd.pem ];then
-			openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/vsftpd/vsftpd.pem -out /etc/vsftpd/vsftpd.pem -subj "/C=CN/L=London/O=Company Ltd/CN=vsftpd-docker" 2>/dev/null
+			openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/vsftpd/vsftpd.pem -out /etc/vsftpd/vsftpd.pem -subj "/C=CN/L=London/O=Company Ltd/CN=vsftpd-docker" 2>/dev/null
 			\cp /etc/vsftpd/vsftpd.pem /key/vsftpd.pem 
 		else
 			\cp /key/vsftpd.pem /etc/vsftpd/vsftpd.pem
