@@ -322,6 +322,9 @@ INIT_FTP() {
 	sed -i 's/anonymous_enable=YES/anonymous_enable=NO/' /etc/vsftpd/vsftpd.conf
 	sed -i 's/listen=NO/listen=YES/' /etc/vsftpd/vsftpd.conf
 	sed -i 's/listen_ipv6=YES/listen_ipv6=NO/' /etc/vsftpd/vsftpd.conf
+	echo -e "$FTP_USER\n$FTP_PASS" > /etc/vsftpd/vuser.txt
+	echo "# -- user  -- passwd  -- chmod  -- root -- #" |tee /key/ftp.log
+	echo "$FTP_USER $FTP_PASS 15 /" |tee -a /key/ftp.log
 
 	#user
 	if [ -f /key/user.txt ];then
@@ -335,12 +338,10 @@ INIT_FTP() {
 			[ -z "$PASS" ] && PASS=$(openssl rand -hex 5)
 			[ -z "$CHMOD" ] && CHMOD=4
 			
+			USER_CHMOD
+			
 			echo -e "$USER\n$PASS" >> /etc/vsftpd/vuser.txt
 			mkdir -p /home/$FTP_USER/$ROOT
-			
-			USER_CHMOD
-			echo "# -- user  -- passwd  -- chmod  -- root -- #" |tee /key/ftp.log
-			echo "$FTP_USER $FTP_PASS 7 /" |tee -a /key/ftp.log
 			echo "$USER $PASS $CHMOD /$ROOT" |tee -a /key/ftp.log
 		fi
 	done
