@@ -245,7 +245,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	if [ "$PROXY_USER" ]; then
 		cat >>/squid-auth.txt <<-END
 		auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd 
-		auth_param basic children $MAX_CLIENT 
+		auth_param basic children 253 
 		auth_param basic realm Squid proxy-caching web server 
 		auth_param basic credentialsttl 2 hours 
 		auth_param basic casesensitive off 
