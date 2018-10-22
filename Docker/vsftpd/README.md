@@ -54,3 +54,11 @@ VSFTPD
 
 
 	echo -e '# -- user  -- passwd  -- chmod  -- root -- # \nadmin:123456:15:admin\npublic:123456:7:admin/public\nboss:123456:4:' |tee /docker/ftp/user.txt
+
+
+**windows 报错信息:**  
+打开 FTP 服务器上的文件夹时发生错误。请检查是否有权限访问该文件夹。  
+200 Switching to ASCII mode.  
+227 Entering Passive Mode (0,0,0,0,227,175).
+
+解决办法：在“Internet选项” -->【高级】这页，取消掉“使用被动FTP(用于防火墙和DSL调制解调器的兼容)”
