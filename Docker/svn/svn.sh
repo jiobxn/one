@@ -3,11 +3,15 @@ set -e
 
 if [ "$1" = 'httpd' ]; then
 
-: ${REPOS:=repos}
-: ${ADMIN:=admin}
-: ${USER:=user1}
-: ${ADMIN_PASS:=passwd0}
-: ${USER_PASS:=passwd1}
+: ${REPOS:="repos"}
+: ${ADMIN:="admin"}
+: ${USER:="user1"}
+: ${ADMIN_PASS:="$(openssl rand -hex 10)"}
+: ${USER_PASS:="$(openssl rand -hex 6)"}
+: ${SVN_PORT:="3690"}
+: ${HTTP_PORT:="80"}
+: ${HTTPS_PORT:="443"}
+
 
 if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	echo "Initialize httpd"
@@ -46,6 +50,23 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	  AuthzSVNAccessFile /home/svn/conf/authz
 	</Location>
 	END
+
+	#anon
+	if [ "$ANON" == "Y" ]; then
+		sed -i '/AuthzSVNAccessFile/ a \  Satisfy Any' /etc/httpd/conf/httpd.conf
+	fi
+
+	#port
+	echo "svnserve -d -r /home/svn --listen-port $SVN_PORT" >/usr/local/bin/svnd
+	chmod +x /usr/local/bin/svnd
+
+	if [ "$HTTP_PORT" != "80" ]; then
+		sed -i "s/80/$HTTP_PORT/g" /etc/httpd/conf/httpd.conf
+	fi
+	
+	if [ "$HTTPS_PORT" != "443" ]; then
+		sed -i "s/443/$HTTPS_PORT/g" /etc/httpd/conf.d/ssl.conf
+	fi
 
 	#svn
 	cat >/home/svnserve.conf.txt<<-END
@@ -110,24 +131,39 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 		fi
 		\cp /home/svnserve.conf.txt /home/svn/conf/svnserve.conf
 	fi
+
+	#iptables
+	if [ "$IPTABLES" == "Y" ]; then
+		cat > /iptables.sh <<-END
+		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+		iptables -I INPUT -p tcp -m state --state NEW -m multiport --dport $HTTP_PORT,$HTTPS_PORT,$SVN_PORT -m comment --comment SVN -j ACCEPT
+		END
+	fi
 fi
 	echo "Start ****"
+	[ -f /iptables.sh ] && [ -z "`iptables -S |grep SVN`" ] && . /iptables.sh
+	svnd
 	exec "$@"
 else
 
     echo -e "
 	Example:
-				docker run -d \\
+				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
 				-v /docker/svn:/home/svn \\
 				-v /docker/key:/key \\
 				-p 10080:80 \\
 				-p 10443:443 \\
+				-p 13690:3690 \\
+				-e SVN_PORT=[3690] \\
+				-e HTTP_PORT=[80] \\
+				-e HTTPS_PORT=[443] \\
 				-e REPOS=[repos] \\
 				-e ADMIN=[admin] \\
 				-e USER=[user1] \\
-				-e ADMIN_PASS=[passwd0] \\
-				-e USER_PASS=[passwd1] \\
-				--hostname svn \\
+				-e ANON=<Y> \\
+				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\
+				-e USER_PASS=[$(openssl rand -hex 6)] \\
+				-e IPTABLES=<Y> \\
 				--name svn svn
 
 	Or prepare /docker/svn/conf/authz and /docker/svn/conf/passwd files.
