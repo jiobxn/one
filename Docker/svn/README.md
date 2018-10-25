@@ -7,24 +7,30 @@ SVN
 
 ## Example:
 
-    docker run -d --restart always -p 10080:80 -p 10443:443 -v /docker/svn:/home/svn --hostname svn --name svn svn
+    docker run -d --restart unless-stopped -p 10080:80 -p 10443:443 -v /docker/svn:/home/svn --name svn jiobxn/svn
+    docker logs svn
 
-    #访问svn示例 http://redhat.xyz:10080/svn   用户名/密码：admin/passwd0  user1/paaswd1
+    #访问svn示例 http://redhat.xyz:10080/svn
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-        docker run -d --restart unless-stopped \\
+				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
 				-v /docker/svn:/home/svn \\
 				-v /docker/key:/key \\
 				-p 10080:80 \\
 				-p 10443:443 \\
+				-p 13690:3690 \\
+				-e SVN_PORT=[3690] \\
+				-e HTTP_PORT=[80] \\
+				-e HTTPS_PORT=[443] \\
 				-e REPOS=[repos] \\
 				-e ADMIN=[admin] \\
 				-e USER=[user1] \\
-				-e ADMIN_PASS=[passwd0] \\
-				-e USER_PASS=[passwd1] \\
-				--hostname svn \\
+				-e ANON=<Y> \\
+				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\
+				-e USER_PASS=[$(openssl rand -hex 6)] \\
+				-e IPTABLES=<Y> \\
 				--name svn svn
 
 提示：svn默认只创建两个用户和一个仓库，如果需要更复杂的权限和更多的用户，请提前准备好 authz、passwd 放入 svn/conf 目录。
