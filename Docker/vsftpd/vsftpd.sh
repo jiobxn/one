@@ -15,7 +15,6 @@ set -e
 : ${HI_FTP:="Serv-U FTP Server v16.0 ready"}
 
 
-
 USER_CHMOD() {
 	if [ "$CHMOD" -eq 1 ]; then
 		cat >> /etc/vsftpd/conf/$USER <<-END
@@ -156,7 +155,6 @@ USER_CHMOD() {
 		echo "chmod mask is not supported and should be 1-15"
 	fi
 }
-
 
 
 PUBLIC_CHMOD() {
@@ -316,7 +314,6 @@ PUBLIC_CHMOD() {
 }
 
 
-#init
 INIT_FTP() {
 	mkdir -p /etc/vsftpd/conf
 	sed -i 's/anonymous_enable=YES/anonymous_enable=NO/' /etc/vsftpd/vsftpd.conf
@@ -347,7 +344,6 @@ INIT_FTP() {
 	done
 	fi
 
-
 	#auth
 	db_load -T -t hash -f /etc/vsftpd/vuser.txt /etc/vsftpd/vuser.db
 	chmod 600 /etc/vsftpd/vuser.*
@@ -356,11 +352,9 @@ INIT_FTP() {
 	sed -i '3iaccount sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
 	chown -R vsftpd.vsftpd /home/$FTP_USER
 
-
 	#Download rate
 	[ "$ANON_MB" -gt 0 ] && ANON_MB=$(echo "$ANON_MB*1048576" |bc)
 	[ "$LOCAL_MB" -gt 0 ] && LOCAL_MB=$(echo "$LOCAL_MB*1048576" |bc)
-
 
 	#conf
 	cat >> /etc/vsftpd/vsftpd.conf <<-END
@@ -389,16 +383,15 @@ INIT_FTP() {
 	pasv_promiscuous=YES
 	END
 
-
 	#$FTP_USER
 	cat >> /etc/vsftpd/conf/$FTP_USER <<-END
 	anon_umask=0022
+	chown_upload_mode=0644
 	anon_upload_enable=YES
 	anon_mkdir_write_enable=YES
 	anon_other_write_enable=YES
 	local_root=/home/$FTP_USER
 	END
-
 
 	#ANON
 	if [ $ANON_CHMOD -ge 1 -a $ANON_CHMOD -le 15 ];then
@@ -415,9 +408,7 @@ INIT_FTP() {
 		PUBLIC_CHMOD
 		
 		chown -R vsftpd.vsftpd /home/$FTP_USER
-		chown ftp.ftp /home/$FTP_USER/$ANON_ROOT/pub
 	fi
-
 
 	#ssl
 	if [ "$FTP_SSL" == "Y" ];then
@@ -440,7 +431,6 @@ INIT_FTP() {
 		ssl_ciphers=HIGH
 		END
 	fi
-
 
 	#iptables
 	if [ "$IPTABLES" == "Y" ]; then
@@ -498,16 +488,14 @@ HELP() {
 }
 
 
-
+#start
 if [ "$1" = '/usr/sbin/init' ]; then
 	if [ ! -d /etc/vsftpd/conf ];then
 		INIT_FTP
 	fi
 
-	vsftpd
-
 	[ -f /iptables.sh ] && [ -z "`iptables -S |grep VSFTPD`" ] && . /iptables.sh
-
+	vsftpd
 	exec "$@"
 else
 	HELP
