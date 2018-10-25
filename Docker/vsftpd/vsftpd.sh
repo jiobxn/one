@@ -450,6 +450,8 @@ HELP() {
 				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
 				-v /docker/vsftpd:/home \\
 				-v /docker/ftp:/key \\
+				-p 21:21 \\
+				-p 25000-25100:25000-25100 \\
 				-e FTP_PORT=[21] \\
 				-e MIN_PORT=[25000] \\
 				-e MAX_PORT=[25100] \\
