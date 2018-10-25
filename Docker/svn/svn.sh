@@ -101,7 +101,8 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 
 		echo "$ADMIN:$(openssl passwd -apr1 $ADMIN_PASS)" > /home/svn/conf/htpasswd
 		echo "$USER:$(openssl passwd -apr1 $USER_PASS)" >> /home/svn/conf/htpasswd
-		echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS" |tee >/home/svn/conf/passwd
+		echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS" > /home/svn/conf/passwd
+		echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS"
 
 		\cp /home/svnserve.conf.txt /home/svn/conf/svnserve.conf
 		\cp /home/authz.txt /home/svn/conf/authz
@@ -122,12 +123,14 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 			for i in $(sed 's/ //g' /home/svn/conf/passwd); do
 				user=$(echo $i |awk -F= '{print $1}')
 				pass=$(echo $i |awk -F= '{print $2}')
-				echo "$user:$(openssl passwd -apr1 $pass)" >> /home/svn/conf/htpasswd && echo "$user = $pass"
+				echo "$user:$(openssl passwd -apr1 $pass)" >> /home/svn/conf/htpasswd
+				echo "$user = $pass"
 			done
 		else
 			echo "$ADMIN:$(openssl passwd -apr1 $ADMIN_PASS)" > /home/svn/conf/htpasswd
 			echo "$USER:$(openssl passwd -apr1 $USER_PASS)" >> /home/svn/conf/htpasswd
-			echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS" |tee >/home/svn/conf/passwd
+			echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS" > /home/svn/conf/passwd
+			echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS"
 		fi
 		\cp /home/svnserve.conf.txt /home/svn/conf/svnserve.conf
 	fi
