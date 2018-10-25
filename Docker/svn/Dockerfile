@@ -3,7 +3,7 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
 RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-RUN yum clean all; yum -y update; yum -y install httpd mod_ssl subversion mod_dav_svn net-tools bash-completion vim wget iptables cronie; yum clean all
+RUN yum clean all; yum -y update; yum -y install httpd mod_ssl subversion mod_dav_svn net-tools iptables; yum clean all
 
 VOLUME /home/svn
 
@@ -12,7 +12,7 @@ RUN chmod +x /svn.sh
 
 ENTRYPOINT ["/svn.sh"]
 
-EXPOSE 80 443
+EXPOSE 80 443 3690
 
 CMD ["httpd", "-DFOREGROUND"]
 
