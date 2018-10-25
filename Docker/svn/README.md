@@ -21,16 +21,16 @@ SVN
 				-p 10080:80 \\
 				-p 10443:443 \\
 				-p 13690:3690 \\
-				-e SVN_PORT=[3690] \\
-				-e HTTP_PORT=[80] \\
-				-e HTTPS_PORT=[443] \\
-				-e REPOS=[repos] \\
-				-e ADMIN=[admin] \\
-				-e USER=[user1] \\
-				-e ANON=<Y> \\
-				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\
-				-e USER_PASS=[$(openssl rand -hex 6)] \\
-				-e IPTABLES=<Y> \\
+				-e SVN_PORT=[3690] \\     #svn端口
+				-e HTTP_PORT=[80] \\      #http端口
+				-e HTTPS_PORT=[443] \\    #https端口
+				-e REPOS=[repos] \\       #默认仓库名
+				-e ADMIN=[admin] \\       #管理员用户
+				-e USER=[user1] \\        #普通用户
+				-e ANON=<Y> \\            #开启匿名用户，还需在authz配置 *=r
+				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\   #随机密码
+				-e USER_PASS=[$(openssl rand -hex 6)] \\     #随机密码
+				-e IPTABLES=<Y> \\        #防火墙
 				--name svn svn
 
 提示：svn默认只创建两个用户和一个仓库，如果需要更复杂的权限和更多的用户，请提前准备好 authz、passwd 放入 svn/conf 目录。
