@@ -16,7 +16,7 @@ VSFTPD
 **协定：** []是默参数，<>是自定义参数
 
 				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
-				-v /docker/vsftpd:/home \\
+				-v /docker:/home \\
 				-v /docker/ftp:/key \\
 				-p 21:21 \\
 				-p 25000-25100:25000-25100 \\
