@@ -4,6 +4,7 @@ set -e
 : ${FTP_PORT:="21"}
 : ${MIN_PORT:="25000"}
 : ${MAX_PORT:="25100"}
+: ${DATA_PORT:="20"}
 : ${FTP_USER:="vsftpd"}
 : ${FTP_PASS:="$(openssl rand -hex 10)"}
 : ${ANON_ROOT:="public"}
@@ -410,6 +411,15 @@ INIT_FTP() {
 		chown -R vsftpd.vsftpd /home/$FTP_USER
 	fi
 
+	#pasv disable
+	if [ "$PASV_DISABLE" == "Y" ];then
+		echo "pasv_enable=NO" >>/etc/vsftpd/vsftpd.conf
+		
+		if [ $DATA_PORT -ne 20 ];then
+			echo "ftp_data_port=$DATA_PORT" >>/etc/vsftpd/vsftpd.conf
+		fi
+	fi
+
 	#ssl
 	if [ "$FTP_SSL" == "Y" ];then
 		if [ ! -f /key/vsftpd.pem ];then
@@ -464,6 +474,8 @@ HELP() {
 				-e ANON_MB=[0] \\
 				-e LOCAL_MB=[0] \\
 				-e HI_FTP=["Serv-U FTP Server v16.0 ready"] \\
+				-e PASV_DISABLE=<Y> \\
+				-e DATA_PORT=[20] \\
 				-e FTP_SSL=<Y> \\
 				-e IPTABLES=<Y> \\
 				--name vsftpd vsftpd
