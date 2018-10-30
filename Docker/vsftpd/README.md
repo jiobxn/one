@@ -32,6 +32,8 @@ VSFTPD
 				-e ANON_MB=[0] \\         匿名用户传输速度
 				-e LOCAL_MB=[0] \\        本地用户传输速度
 				-e HI_FTP=["Serv-U FTP Server v16.0 ready"] \\    欢迎标语
+				-e PASV_DISABLE=<Y> \\    禁用被动模式，使用主动模式
+				-e DATA_PORT=[20] \\      主动模式数据端口
 				-e FTP_SSL=<Y>            启用ssl加密
 				-e IPTABLES=<Y> \\
 				--name vsftpd vsftpd
