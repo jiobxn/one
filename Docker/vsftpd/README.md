@@ -3,6 +3,7 @@ VSFTPD
 ## 简介
 * **vsftpd** 是一个GPL许可的FTP服务器用于UNIX系统，包括Linux。三大特征:安全、速度快、稳定。
 > * 下载站点：https://security.appspot.com/vsftpd.html
+> * 客户端下载：https://filezilla-project.org/download.php?type=client
 
 
 ## Example:
