@@ -43,6 +43,7 @@ Kafka
 查看topic状态：
 
     /usr/local/kafka/bin/kafka-topics.sh --describe --zookeeper 10.0.0.70:2181 --topic test1
+    /usr/local/kafka/bin/kafka-topics.sh --list --zookeeper 10.0.0.70:2181
 
 通过ZK查看
 
