@@ -20,7 +20,7 @@ VSFTPD
 				-v /docker/ftp:/key \\
 				-p 21:21 \\
 				-p 25000-25100:25000-25100 \\
-				-e FTP_PORT=[21] \\       监听端口
+				-e FTP_PORT=[21] \\       监听端口，被动模式下可修改
 				-e MIN_PORT=[25000] \\    数据端口(起始)
 				-e MAX_PORT=[25100] \\    数据端口(结束)
 				-e FTP_USER=[vsftpd] \\   管理员用户
