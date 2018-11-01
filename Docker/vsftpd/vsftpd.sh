@@ -416,7 +416,7 @@ INIT_FTP() {
 		echo "pasv_enable=NO" >>/etc/vsftpd/vsftpd.conf
 		
 		if [ $DATA_PORT -ne 20 ];then
-			echo "ftp_data_port=$DATA_PORT" >>/etc/vsftpd/vsftpd.conf
+			echo -e "ftp_data_port=$DATA_PORT\nport_promiscuous=YES" >>/etc/vsftpd/vsftpd.conf
 		fi
 	fi
 
