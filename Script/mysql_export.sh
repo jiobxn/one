@@ -17,3 +17,14 @@ in() {
   done
 }
 
+case $1 in
+  backup)
+    backup
+;;
+  restore)
+    restore
+;;
+  *)
+    echo -e "Usage: $0 {backup|restore}"
+;;
+esac
