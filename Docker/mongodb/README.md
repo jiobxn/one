@@ -35,3 +35,6 @@ MongoDB
 				-e IPTABLES=<"192.168.10.0/24,10.0.0.0/24"> \\    防火墙，需要 --privileged
 				--hostname mongodb \\
 				--name mongodb mongodb
+
+备份：mongodump -h <hostname><:port> -d dbname -o <path>  
+还原：mongorestore -h <hostname><:port> -d dbname <path>
