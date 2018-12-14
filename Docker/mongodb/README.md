@@ -36,5 +36,5 @@ MongoDB
 				--hostname mongodb \\
 				--name mongodb mongodb
 
-备份：mongodump -h <hostname><:port> -d dbname -o <path>  
-还原：mongorestore -h <hostname><:port> -d dbname <path>
+    备份：mongodump -h <hostname><:port> -d dbname -o <path>  
+    还原：mongorestore -h <hostname><:port> -d dbname <path>
