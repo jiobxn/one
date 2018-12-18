@@ -39,4 +39,4 @@ MongoDB
     备份库：mongodump -h <hostname><:port> -d dbname -o <directory-path>
     还原库：mongorestore -h <hostname><:port> -d dbname <directory-path>
     备份表：mongoexport -h <hostname><:port> -d dbname -c tabname -o <filename>
-    还原表：mongoimport -h <hostname><:port> -d dbname -c tabname <filename>
+    还原表：mongoimport -h <hostname><:port> -d dbname -c tabname --upsert <filename>
