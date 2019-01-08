@@ -12,7 +12,7 @@ FreeRadius
 
     #验证信息存MySQL
     docker run -d --restart unless-stopped --network host -e MYSQL_DATABASE=radius -e MYSQL_USER=radius -e MYSQL_PASSWORD=radpass --name mysql jiobxn/mysql:5.7
-    docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key -e MYSQL_HOST=127.0.0.1 --name freeradius jiobxn/freeradius
+    docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key -e MYSQL_HOST=127.0.0.1 -e IPADDR_SECRET="127.0.0.1,testing123;0.0.0.0/0,newpass123" -e USER_PASS="testing,password;admin,newpass" --name freeradius jiobxn/freeradius
 
 
 ## Run Defult Parameter
@@ -39,9 +39,22 @@ FreeRadius
 ### 查看用户
 
     mysql -uradius -pradpass -h127.0.0.1 -e "SELECT username FROM radius.radcheck;"
-    
+
+### 添加用户
+
+    mysql -uradius -pradpass -h127.0.0.1 -e "INSERT INTO radcheck (username, attribute, op, value) VALUES ('user1','Cleartext-Password',':=','passwd1');"
+
 ### 删除用户
 
     mysql -uradius -pradpass -h127.0.0.1 -e "delete from radius.radcheck where username = 'testing';"
 
+
+## centos7 pam_radius
+
+    yum -y install epel-release
+    yum -y install pam_radius
+    echo '10.10.10.10 newpass123 3' >>/etc/pam_radius.conf
+    sed -i '2 i auth  sufficient  /usr/lib64/security/pam_radius_auth.so' /etc/pam.d/sshd
+    useradd user1
     
+    ssh user1@10.10.1.111
