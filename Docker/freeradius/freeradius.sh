@@ -95,11 +95,12 @@ HELP() {
 				-p 1813:1813/udp \\
 				-e USER_PASS=[testing,password] \\
 				-e IPADDR_SECRET=[127.0.0.1,testing123] \\
-				-e MYSQL_HOST=<MYSQL IP ADDRESS> \\
+				-e MYSQL_HOST=<127.0.0.1> \\
 				-e MYSQL_PORT=[3306] \\
 				-e MYSQL_DB=[radius] \\
 				-e MYSQL_USER=[radius] \\
 				-e MYSQL_PASS=[radpass] \\
+				-e IPTABLES=<Y> \\
 				--name freeradius freeradius
 				"
 }
