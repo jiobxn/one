@@ -31,3 +31,17 @@ FreeRadius
 				-e MYSQL_PASS=[radpass] \\
 				-e IPTABLES=<Y> \\
 				--name freeradius freeradius
+
+### 测试
+
+    radtest testing password 127.0.0.1 0 testing123
+    
+### 查看用户
+
+    mysql -uradius -pradpass -h127.0.0.1 -e "SELECT username FROM radius.radcheck;"
+    
+### 删除用户
+
+    mysql -uradius -pradpass -h127.0.0.1 -e "delete from radius.radcheck where username = 'testing';"
+
+    
