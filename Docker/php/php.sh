@@ -9,6 +9,7 @@ if [ "$1" = 'php-fpm' ]; then
 : ${upload_max_filesize:=4G}
 : ${max_file_uploads:=50}
 : ${memory_limit:="$(($(free -m |grep Mem |awk '{print $2}')*60/100))M"}
+: ${php_port:=9000}
 
 
 if [ -z "$(grep "redhat.xyz" /usr/local/php/etc/php.ini)" ]; then
@@ -23,6 +24,7 @@ if [ -z "$(grep "redhat.xyz" /usr/local/php/etc/php.ini)" ]; then
 	sed -i 's/memory_limit = 128M/memory_limit = '$memory_limit'/' /usr/local/php/etc/php.ini
 	sed -i 's/max_execution_time = 30/max_execution_time = 300/' /usr/local/php/etc/php.ini
 	sed -i 's/max_input_time = 60/max_input_time = 300/' /usr/local/php/etc/php.ini
+	sed -i 's/9000/'$php_port'/' /usr/local/php/etc/php-fpm.conf
 	
 	#Redis
 	if [ $REDIS_SERVER ]; then
