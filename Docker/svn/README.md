@@ -64,6 +64,10 @@ SVN
 
     svn up --username admin --password passwd0
 
+查找
+
+    svn list -R --username admin --password passwd0 http://192.168.0.68/svn/repos/
+
 
 **自动构建与部署**
 
