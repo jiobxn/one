@@ -24,7 +24,7 @@ fi
 FILE="~/.router.txt"
 
 if [ ! -f $FILE ]; then
-	echo -e "Example: echo CISCO:IP:USER:PASS >$FILE"
+	echo -e "Example: echo \"CISCO IP USER PASS\" >$FILE"
 	exit 1
 fi
 
@@ -70,7 +70,7 @@ while [ $i -le $N ];do
 		dos2unix "$IP-$(date +%F)".txt 2>/dev/null
 		echo "$IP $(date +%F) Backup"
 	else
-		echo -e "True is: echo CISCO:IP:USER:PASS >$FILE"
+		echo -e "True is: echo \"CISCO IP USER PASS\" >$FILE"
 	fi
 let  i++
 done
