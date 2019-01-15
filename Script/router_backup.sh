@@ -18,7 +18,7 @@ fi
 
 #2.安装expect
 if [ "$(ls /usr/bin/ |egrep -c '^dos2unix$|^expect$')"  -ne 2 ]; then
-	$install expect at cronie openssh-clients
+	$install expect dos2unix
 fi
 
 FILE="~/.router.txt"
