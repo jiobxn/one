@@ -18,5 +18,5 @@ EXPOSE 1723
 CMD ["pptpd", "-f"]
 
 # docker build -t pptpd .
-# docker run -d --restart always --privileged --network host -e VPN_PASS=123456 --name pptpd pptpd
+# docker run -d --restart unless-stopped --privileged --network host -e VPN_PASS=123456 --name pptpd pptpd
 # docker logs pptpd
