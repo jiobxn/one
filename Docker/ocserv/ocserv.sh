@@ -3,15 +3,18 @@ set -e
 
 if [ "$1" = 'ocserv' ]; then
 
-: ${IP_RANGE:=10.10.0}
+: ${IP_RANGE:=10.10.0.0/24}
 : ${VPN_PORT:=443}
 : ${VPN_PASS:=$(pwmake 64)}
 : ${P12_PASS:=jiobxn.com}
 : ${MAX_CONN:=3}
-: ${MAX_CLIENT:=3}
+: ${MAX_CLIENT:=253}
 : ${CA_CN:="OpenConnect CA"}
 : ${CLIENT_CN:="AnyConnect VPN"}
 : ${GATEWAY_VPN:=Y}
+: ${DNS1:=9.9.9.9}
+: ${DNS2:=8.8.8.8}
+: ${RADIUS_SECRET:=testing123}
 
 
 if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
@@ -99,8 +102,8 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	sed -i "s/tcp-port = 443/tcp-port = ${VPN_PORT}/" /etc/ocserv/ocserv.conf
 	sed -i "s/udp-port = 443/udp-port = ${VPN_PORT}/" /etc/ocserv/ocserv.conf
 	sed -i "s/default-domain = example.com/#&/" /etc/ocserv/ocserv.conf
-	sed -i "s@#ipv4-network = 192.168.1.0/24@ipv4-network = $IP_RANGE.0/24@" /etc/ocserv/ocserv.conf
-	sed -i "s/#dns = 192.168.1.2/dns = 8.8.8.8\ndns = 8.8.4.4/" /etc/ocserv/ocserv.conf
+	sed -i "s@#ipv4-network = 192.168.1.0/24@ipv4-network = $IP_RANGE@" /etc/ocserv/ocserv.conf
+	sed -i "s/#dns = 192.168.1.2/dns = $DNS1\ndns = $DNS2/" /etc/ocserv/ocserv.conf
 	sed -i "s@user-profile = profile.xml@#user-profile = profile.xml@" /etc/ocserv/ocserv.conf
 
 	
@@ -114,15 +117,25 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	fi
 
 
-	if [ "$GATEWAY_VPN" = "Y" ]; then
-		sed -i "s@# 'default'.@route = default@g" /etc/ocserv/ocserv.conf
-	else
-		sed -i '/# the server/i route = 8.8.8.8/255.255.255.255\nroute = 8.8.4.4/255.255.255.255' /etc/ocserv/ocserv.conf
+	if [ $RADIUS_SERVER ];then
+		sed -i "s/localhost/$RADIUS_SERVER/g" /etc/radiusclient-ng/radiusclient.conf
+		echo "$RADIUS_SERVER  $RADIUS_SECRET" >>/etc/radiusclient-ng/servers
+		sed -i 's/^auth /#auth /' /etc/ocserv/ocserv.conf
+		sed -i '/#auth = "certificate"/ a #acct = "radius[config=/etc/radiusclient-ng/radiusclient.conf,groupconfig=true]"' /etc/ocserv/ocserv.conf
+		sed -i '/#auth = "certificate"/ a auth = "radius[config=/etc/radiusclient-ng/radiusclient.conf,groupconfig=true]"' /etc/ocserv/ocserv.conf
+		INFOU="Radius: $RADIUS_SERVER"
 	fi
 
 
+	if [ "$GATEWAY_VPN" = "Y" ]; then
+		sed -i "s@# 'default'.@route = default@g" /etc/ocserv/ocserv.conf
+	else
+		sed -i "/# the server/i route = $DNS1/255.255.255.255\nroute = $DNS2/255.255.255.255" /etc/ocserv/ocserv.conf
+	fi
+
+
+	sysctl -w net.ipv4.ip_forward=1
 	echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-	sysctl -p
 
 
 	# iptables
@@ -157,13 +170,16 @@ else
 			-e VPN_PASS=<123456> \\
 			-e P12_PASS=[jiobxn.com] \\
 			-e MAX_CONN=[3] \\
-			-e MAX_CLIENT=[3] \\
+			-e MAX_CLIENT=[253] \\
 			-e SERVER_CN=[SERVER_IP] \\
 			-e CLIENT_CN=["AnyConnect VPN"] \\
 			-e CA_CN=["OpenConnect CA"] \\
 			-e GATEWAY_VPN=[Y] \\
-			-e IP_RANGE=[10.10.0] \\
-			--hostname ocserv \\
+			-e IP_RANGE=[10.10.0.0/24] \\
+			-e DNS1:=[9.9.9.9] \\
+			-e DNS2:=[8.8.8.8] \\
+			-e RADIUS_SERVER:=<radius ip> \\
+			-e RADIUS_SECRET:=[testing123] \\
 			--name ocserv ocserv
 	"
 fi
