@@ -21,7 +21,7 @@ if [ "$(ls /usr/bin/ |egrep -c '^dos2unix$|^expect$')"  -ne 2 ]; then
 	$install expect dos2unix
 fi
 
-FILE="~/.router.txt"
+FILE=".router.txt"
 
 if [ ! -f $FILE ]; then
 	echo -e "Example: echo \"CISCO IP USER PASS\" >$FILE"
@@ -31,7 +31,7 @@ fi
 
 ################################################# 第二部分 ###############################################
 #3.自定义规则
-H3C() {
+SSH_H3C() {
 expect -c "
 set timeout 60
 spawn ssh $USER@$IP
@@ -42,7 +42,19 @@ expect \"*>\" {send \"quit\r\"; exit}
 "
 }
 
-CISCO() {
+TELNET_H3C() {
+expect -c "
+set timeout 60
+spawn telnet $IP
+expect \"login: \" {send \"$USER\r\"}
+expect \"Password: \" {send \"$PASS\r\"}
+expect \"*>\" {send \"screen-length disable\r\"}
+expect \"*>\" {send \"display current-configuration\r\"}
+expect \"*>\" {send \"quit\r\"; exit}
+"
+}
+
+SSH_CISCO() {
 expect -c "
 set timeout 60
 spawn ssh $USER@$IP
@@ -55,20 +67,36 @@ expect \"*#\" {send \"quit\r\"; exit}
 "
 }
 
+TELNET_CISCO() {
+expect -c "
+set timeout 60
+spawn telnet $IP
+expect \"Username: \" {send \"$USER\r\"}
+expect \"Password: \" {send \"$PASS\r\"}
+expect \"*>\" {send \"en\r\"}
+expect \"Password: \" {send \"$PASS\r\"}
+expect \"*#\" {send \"terminal length 0\r\"}
+expect \"*#\" {send \"show running-config\r\"}
+expect \"*#\" {send \"quit\r\"; exit}
+"
+}
+
 #4.执行动作
 N=$(grep -v ^# $FILE |grep -v ^$ |wc -l)
+[ $N -eq 0 ] && echo none && exit 0
 i=1
 while [ $i -le $N ];do
 	TYPE=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $1}')
 	IP=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $2}')
 	USER=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $3}')
 	PASS=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $4}')
-
 	if [ $IP -a $TYPE -a $USER -a $PASS ];then
-		[ "$TYPE" == "H3C" ] && H3C >"$IP-$(date +%F)".txt && sed -i '1,/>screen-length disable/d' "$IP-$(date +%F)".txt
-		[ "$TYPE" == "CISCO" ] && CISCO >"$IP-$(date +%F)".txt && sed -i '1,/#terminal length/d' "$IP-$(date +%F)".txt
+		[ "$TYPE" == "SSH_H3C" ] && SSH_H3C >"$IP-$(date +%F)".txt && sed -i '1,/>screen-length disable/d' "$IP-$(date +%F)".txt
+		[ "$TYPE" == "SSH_CISCO" ] && SSH_CISCO >"$IP-$(date +%F)".txt && sed -i '1,/#terminal length/d' "$IP-$(date +%F)".txt
+		[ "$TYPE" == "TELNET_H3C" ] && TELNET_H3C >"$IP-$(date +%F)".txt && sed -i '1,/>screen-length disable/d' "$IP-$(date +%F)".txt
+		[ "$TYPE" == "TELNET_CISCO" ] && TELNET_CISCO >"$IP-$(date +%F)".txt && sed -i '1,/#terminal length/d' "$IP-$(date +%F)".txt
 		dos2unix "$IP-$(date +%F)".txt 2>/dev/null
-		echo "$IP $(date +%F) Backup"
+		echo "`wc -l $IP-$(date +%F).txt`"
 	else
 		echo -e "True is: echo \"CISCO IP USER PASS\" >$FILE"
 	fi
