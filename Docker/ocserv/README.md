@@ -14,7 +14,7 @@ OCSERV
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-			docker run -d --restart always --privileged \\
+			docker run -d --restart unless-stopped --privileged \\
 			-v /docker/ocserv:/key \\
 			-p 443:443 \\
 			-e VPN_PORT=[443] \\       VPN端口
@@ -22,13 +22,16 @@ OCSERV
 			-e VPN_PASS=<123456> \\    VPN密码，默认随机
 			-e P12_PASS=[jiobxn.com] \\  p12证书密码
 			-e MAX_CONN=[3] \\           每个客户端的最大连接数
-			-e MAX_CLIENT=[3] \\         最大客户端数
+			-e MAX_CLIENT=[253] \\       最大客户端数
 			-e SERVER_CN=[SERVER_IP] \\  默认是服务器公网IP，不能填错
 			-e CLIENT_CN=["AnyConnect VPN"] \\   P12证书标识，便于在iphone上识别
 			-e CA_CN=["OpenConnect CA"] \\       CA证书标识
-			-e GATEWAY_VPN=[Y] \\                默认VPN做网关
-			-e IP_RANGE=[10.10.0] \\             分配的IP地址池
-			--hostname ocserv \\
+			-e GATEWAY_VPN=[Y]         \\        默认VPN做网关
+			-e IP_RANGE=[10.10.0.0/24] \\        分配的IP地址池
+			-e DNS1:=[9.9.9.9] \\
+			-e DNS2:=[8.8.8.8] \\
+			-e RADIUS_SERVER:=<radius ip> \\     radius 服务器
+			-e RADIUS_SECRET:=[testing123] \\    radius 共享密钥
 			--name ocserv ocserv
 
 ### IOS Client:
