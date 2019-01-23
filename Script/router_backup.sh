@@ -96,7 +96,7 @@ while [ $i -le $N ];do
 		[ "$TYPE" == "TELNET_H3C" ] && TELNET_H3C >"$IP-$(date +%F)".txt && sed -i '1,/>screen-length disable/d' "$IP-$(date +%F)".txt
 		[ "$TYPE" == "TELNET_CISCO" ] && TELNET_CISCO >"$IP-$(date +%F)".txt && sed -i '1,/#terminal length/d' "$IP-$(date +%F)".txt
 		dos2unix "$IP-$(date +%F)".txt 2>/dev/null
-		echo "`wc -l $IP-$(date +%F).txt`"
+		echo "`wc -l $IP-$(date +%F).txt`" |tee -a backup.log
 	else
 		echo -e "True is: echo \"CISCO IP USER PASS\" >$FILE"
 	fi
