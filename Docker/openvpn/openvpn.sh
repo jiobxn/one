@@ -218,6 +218,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	else
 		sed -i '/<cert>/ r /etc/openvpn/client.crt' /etc/openvpn/client.conf
 		sed -i '/<key>/ r /etc/openvpn/client.key' /etc/openvpn/client.conf
+		\cp /etc/openvpn/client.conf /etc/openvpn/client.ovpn
 		\cp /etc/openvpn/client.conf /key/client.ovpn
 		\cp /etc/openvpn/client.conf /key/client.conf
 	fi
