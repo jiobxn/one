@@ -58,8 +58,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 				let i++
 			done
 		else
-			echo | ./easyrsa gen-req client nopass 2>/dev/null
-			echo yes | ./easyrsa sign-req client client 2>/dev/null
+			echo | ./easyrsa gen-req client nopass &>/dev/null
+			echo yes | ./easyrsa sign-req client client &>/dev/null
 		fi
 	
 		openvpn --genkey --secret /etc/openvpn/ta.key
@@ -93,7 +93,8 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 	# Allow duplicate using a client certificate
 	if [ ! $MAX_STATICIP ]; then
-		sed -i "s/;duplicate-cn/duplicate-cn/" /etc/openvpn/server.conf
+		sed -i 's/;duplicate-cn/duplicate-cn/' /etc/openvpn/server.conf
+		sed -i 's/ifconfig-pool-persist/;ifconfig-pool-persist/' /etc/openvpn/server.conf
 	else
 		sed -i "s/;max-clients 100/max-clients $MAX_STATICIP/" /etc/openvpn/server.conf
 		sed -i 's/;route 10.9.0.0 255.255.255.252/route '$IP_RANGE'.0.0 255.255.255.252\nclient-config-dir ccd/' /etc/openvpn/server.conf
