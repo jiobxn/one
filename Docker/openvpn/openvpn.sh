@@ -337,7 +337,6 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		sed -i "s/proto udp/proto $TCP_UDP/g" /etc/openvpn/server.conf
 
 		for i in $(find /etc/openvpn/ -name client*.conf); do
-			echo "http-proxy-retry" >>$i
 			echo "http-proxy $SERVER_IP $PROXY_PORT auth.txt" >>$i
 			#echo "http-proxy $SERVER_IP $PROXY_PORT stdin basic" >>$i
 			sed -i "s/remote $SERVER_IP/remote 127.0.0.1/g" $i
@@ -345,7 +344,6 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		done
 
 		for i in $(find /etc/openvpn/ -name client*.ovpn); do
-			echo "http-proxy-retry" >>$i
 			echo "http-proxy $SERVER_IP $PROXY_PORT auth.txt" >>$i
 			#echo "http-proxy $SERVER_IP $PROXY_PORT stdin basic" >>$i
 			sed -i "s/remote $SERVER_IP/remote 127.0.0.1/g" $i
