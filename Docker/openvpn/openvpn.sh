@@ -34,7 +34,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 	echo "Initialize openvpn"
 	if [ "$(ls /key/ |egrep -w -c "ca.crt|server.crt|server.key|dh2048.pem|ta.key")" -ne 5 ]; then
-		#Create certificate
+		# Create certificate
 		cd /etc/openvpn/server/3
 		./easyrsa init-pki &>/dev/null
 		echo | ./easyrsa gen-req server nopass &>/dev/null
@@ -46,8 +46,9 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		echo yes | ./easyrsa sign-req server server &>/dev/null
 		./easyrsa gen-dh &>/dev/null
 	
-		if [ $MAX_STATICIP ]; then
-			if [ $MAX_STATICIP -gt 1000 ]; then
+		# Certificate or user
+		if [ "$MAX_STATICIP" -a ! $VPN_USER ]; then
+			if [ "$MAX_STATICIP" -gt 1000 ]; then
 				MAX_STATICIP=1000
 			fi
 		
@@ -149,12 +150,12 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	\rm /etc/keepalived/keepalived.conf
 
 	# Bind user and IP
-	if [ $MAX_STATICIP ]; then
-		if [ $MAX_STATICIP -gt 1000 ]; then
+	if [ "$MAX_STATICIP" ]; then
+		if [ "$MAX_STATICIP" -gt 1000 ]; then
 			MAX_STATICIP=1000
 		fi
 
-		if [ $NAT_RANGE ];then
+		if [ "$NAT_RANGE" ];then
 			cat >/etc/keepalived/keepalived.conf <<-END
 			! Configuration File for keepalived
 			vrrp_instance VPN_IP {
@@ -190,20 +191,25 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			echo "ifconfig-push $IP_RANGE.$x.$n $IP_RANGE.$x.$m" >/etc/openvpn/ccd/client$i
 			echo "$IP_RANGE.$x.$n user$i" >>/key/client.txt
 		
-			\cp /etc/openvpn/client.conf /etc/openvpn/client$i.conf
-			sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
-			sed -i '/<key>/ r /etc/openvpn/client'$i'.key' /etc/openvpn/client$i.conf
-		
-			if [ ! -f /key/psw-file ]; then
+			# Certificate or user
+			if [ "$VPN_USER" -a ! -f /key/psw-file ];then
 				PASS=$(pwmake 64)
 				echo "client$i       $PASS" >> /etc/openvpn/psw-file
-			fi
+				sed -i '/<cert>/ r /etc/openvpn/client.crt' /etc/openvpn/client.conf
+				sed -i '/<key>/ r /etc/openvpn/client.key' /etc/openvpn/client.conf
+				\cp /etc/openvpn/client.conf /etc/openvpn/client.ovpn
+				\cp /etc/openvpn/client.conf /key/client.ovpn
+				\cp /etc/openvpn/client.conf /key/client.conf
+			else
+				\cp /etc/openvpn/client.conf /etc/openvpn/client$i.conf
+				sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
+				sed -i '/<key>/ r /etc/openvpn/client'$i'.key' /etc/openvpn/client$i.conf
+				\cp /etc/openvpn/client$i.conf /etc/openvpn/client$i.ovpn
+				\cp /etc/openvpn/client$i.conf /key/client$i.ovpn
+				\cp /etc/openvpn/client$i.conf /key/client$i.conf
+			fi		
 		
-			\cp /etc/openvpn/client$i.conf /etc/openvpn/client$i.ovpn
-			\cp /etc/openvpn/client$i.conf /key/client$i.ovpn
-			\cp /etc/openvpn/client$i.conf /key/client$i.conf
-		
-			if [ $NAT_RANGE ];then
+			if [ "$NAT_RANGE" ];then
 				[ $y3 -gt 256 ] && y3=$(($y3-256))
 				y4=$(($y2+$i/256))
 				sed -i "/virtual_ipaddress/a \        $y1.$y4.$y3" /etc/keepalived/keepalived.conf
@@ -225,7 +231,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 
 	# user
-	if [ $VPN_USER ]; then
+	if [ "$VPN_USER" ]; then
 		cat >/etc/openvpn/checkpsw.sh <<-END
 		#!/bin/sh
 		###########################################################
@@ -299,7 +305,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 
 	# Redius
-	if [ $RADIUS_SERVER ];then
+	if [ "$RADIUS_SERVER" ];then
 		cat >/etc/openvpn/checkpsw.sh <<-END
 		#!/bin/sh
 		LOG_FILE="/key/openvpn-password.log"
@@ -360,7 +366,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 
 	# iptables
-	if [ $NAT_RANGE ];then
+	if [ "$NAT_RANGE" ];then
 		cat >> /iptables.sh <<-END
 		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 		iptables -I FORWARD -s $IP_RANGE.0.0/16 -j ACCEPT
@@ -377,7 +383,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 	echo -e "$(openvpn --help |awk 'NR==1{print $1"-"$2}')" |tee /key/openvpn.log
 
-	if [ $RADIUS_SERVER ];then
+	if [ "$RADIUS_SERVER" ];then
 		echo "Radiud $RADIUS_SERVER" |tee -a /key/openvpn.log
 	else
 		[ -f /etc/openvpn/psw-file ] && echo "VPN user AND password:" |tee -a /key/openvpn.log && cat /etc/openvpn/psw-file |tee -a /key/openvpn.log
