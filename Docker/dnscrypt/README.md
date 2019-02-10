@@ -14,6 +14,9 @@ DNSCrypt
     #运行一个dnscrypt服务器
     docker run -d --restart unless-stopped -p 53:53/udp -e DNSCRYPT=Y --name dns jiobxn/dnscrypt
 
+    #运行一个chinadns服务器
+    docker run -d --restart unless-stopped -p 53:53/udp -e CHINADNS=Y --name dns jiobxn/dnscrypt
+
     #在Windows上运行一个dnscrypt客户端，连接到公共DNS服务器(将本地DNS改为127.0.0.1)
     ./dnscrypt-proxy.exe
 
