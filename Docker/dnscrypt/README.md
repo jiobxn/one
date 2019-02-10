@@ -27,13 +27,15 @@ DNSCrypt
 				docker run -d --restart unless-stopped \\
 				-p 53:53/udp \\
 				-e VERSION=["windows 2003 DNS"] \\   DNS版本描使 [bind]
-				-e BIND_ADDR=[0.0.0.0] \\            监听地址
-				-e BIND_PORT=[53] \\                 监听端口
-				-e DNS=<9.9.9.9;8.8.8.8;> \\         转发DNS，注意有";" [bind]
-				-e DNS_ONLY=<Y> \\                   只使用转发DNS [bind]
+				-e LISTEN_ADDR=[0.0.0.0] \\          监听地址
+				-e LISTEN_PORT=[53] \\               监听端口
+				-e BIND_DNS=<9.9.9.9;8.8.8.8> \\     转发DNS，";"分隔 [bind]
+				-e FORWARD_ONLY=<Y> \\               只使用转发DNS [bind]
 				-e CACHE_SIZE=[256] \\               dns缓存大小 M
 				-e QUERY_LOG=<Y> \\                  记录解析日记
-				-e LOG_SIZE=[100m] \\                日志文件大小 M
+				-e LOG_SIZE=[100] \\                 日志文件大小 M
 				-e DNSCRYPT=<Y> \\                   使用无污染的公共DNS [dnscrypt]
 				-e MAX_CLIENT=[250] \\               最大并发数 [dnscrypt]
+				-e CHINADNS=<Y> \\                   CHINADNS智能解析 [chinadns]
+				-e CHINA_DNS=[127.0.0.1:55,114.114.114.114] \\  127.0.0.1:55是dnscrypt公共DNS，114.114.114.114是大陆DNS，";"分隔 [chinadns]
 				--name dns dnscrypt
