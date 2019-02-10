@@ -37,8 +37,8 @@ DNSCrypt
 				-e CACHE_SIZE=[256] \\               dns缓存大小 M
 				-e QUERY_LOG=<Y> \\                  记录解析日记
 				-e LOG_SIZE=[100] \\                 日志文件大小 M
-				-e DNSCRYPT=<Y> \\                   使用无污染的公共DNS [dnscrypt]
+				-e DNSCRYPT=<Y> \\                   使用无污染的公共DNS
 				-e MAX_CLIENT=[250] \\               最大并发数 [dnscrypt]
-				-e CHINADNS=<Y> \\                   无污染的智能解析 [chinadns]
-				-e CHINA_DNS=[127.0.0.1:55,114.114.114.114] \\  127.0.0.1:55是dnscrypt公共DNS，114.114.114.114是大陆DNS，";"分隔 [chinadns]
+				-e CHINADNS=<Y> \\                   智能解析。不准确，应该定义两组DNS(内\外)，解析有chnroute.txt IP的以"内"为准，解析非chnroute.txt IP的以"外"为准
+				-e CHINA_DNS=[127.0.0.1:55,114.114.114.114] \\  127.0.0.1:55是dnscrypt公共DNS，114.114.114.114是大陆DNS，","分隔 [chinadns]
 				--name dns dnscrypt
