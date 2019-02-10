@@ -26,12 +26,14 @@ DNSCrypt
 
 				docker run -d --restart unless-stopped \\
 				-p 53:53/udp \\
-				-e VERSION=["windows 2003 DNS"] \\
-				-e LISTEN=["any;"] \\                监听地址，注意有";"
-				-e ALLOW_QUERY=["any;"] \\           允许所有客户端地址查询，注意有";"
-				-e FORWARD=<9.9.9.9;> \\             转发DNS，不能有端口号，注意有";"
-				-e CACHE_SIZE=[100m] \\              dns缓存大小
+				-e VERSION=["windows 2003 DNS"] \\   DNS版本描使 [bind]
+				-e BIND_ADDR=[0.0.0.0] \\            监听地址
+				-e BIND_PORT=[53] \\                 监听端口
+				-e DNS=<9.9.9.9;8.8.8.8;> \\         转发DNS，注意有";" [bind]
+				-e DNS_ONLY=<Y> \\                   只使用转发DNS [bind]
+				-e CACHE_SIZE=[256] \\               dns缓存大小 M
 				-e QUERY_LOG=<Y> \\                  记录解析日记
-				-e LOG_SIZE=[100m] \\                日志文件大小
-				-e DNSCRYPT=<Y> \\                   使用dnscrypt公共DNS
+				-e LOG_SIZE=[100m] \\                日志文件大小 M
+				-e DNSCRYPT=<Y> \\                   使用无污染的公共DNS [dnscrypt]
+				-e MAX_CLIENT=[250] \\               最大并发数 [dnscrypt]
 				--name dns dnscrypt
