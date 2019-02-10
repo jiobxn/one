@@ -39,6 +39,6 @@ DNSCrypt
 				-e LOG_SIZE=[100] \\                 日志文件大小 M
 				-e DNSCRYPT=<Y> \\                   使用无污染的公共DNS [dnscrypt]
 				-e MAX_CLIENT=[250] \\               最大并发数 [dnscrypt]
-				-e CHINADNS=<Y> \\                   CHINADNS智能解析 [chinadns]
+				-e CHINADNS=<Y> \\                   无污染的智能解析 [chinadns]
 				-e CHINA_DNS=[127.0.0.1:55,114.114.114.114] \\  127.0.0.1:55是dnscrypt公共DNS，114.114.114.114是大陆DNS，";"分隔 [chinadns]
 				--name dns dnscrypt
