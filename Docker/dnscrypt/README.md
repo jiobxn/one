@@ -28,6 +28,7 @@ DNSCrypt
 **协定：** []是默参数，<>是自定义参数
 
 				docker run -d --restart unless-stopped \\
+				-v /docker/dns:/var/named/data \\
 				-p 53:53/udp \\
 				-e VERSION=["windows 2003 DNS"] \\   DNS版本描使 [bind]
 				-e LISTEN_ADDR=[0.0.0.0] \\          监听地址
@@ -39,6 +40,6 @@ DNSCrypt
 				-e LOG_SIZE=[100] \\                 日志文件大小 M
 				-e DNSCRYPT=<Y> \\                   使用无污染的公共DNS
 				-e MAX_CLIENT=[250] \\               最大并发数 [dnscrypt]
-				-e CHINADNS=<Y> \\                   智能解析。不准确，应该定义两组DNS(内\外)，解析有chnroute.txt IP的以"内"为准，解析非chnroute.txt IP的以"外"为准
+				-e CHINADNS=<Y> \\                   智能解析。不准确，应该定义两组DNS(内\外)，解析有chnroute.txt IP的以"内"为准，非chnroute.txt IP的以"外"为准
 				-e CHINA_DNS=[127.0.0.1:55,114.114.114.114] \\  127.0.0.1:55是dnscrypt公共DNS，114.114.114.114是大陆DNS，","分隔 [chinadns]
 				--name dns dnscrypt
