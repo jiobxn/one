@@ -8,7 +8,7 @@ VSFTPD
 
 ## Example:
 
-    docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN -v /docker/ftp:/key/ -v /docker/vsftpd:/home -e IPTABLES=Y --name vsftp jiobxn/vsftpd
+    docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN -v /docker/ftp:/key/ -v /docker:/home -e IPTABLES=Y --name vsftp jiobxn/vsftpd
     cat /docker/ftp/ftp.log
 
 
