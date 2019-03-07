@@ -68,6 +68,15 @@ SVN
 
     svn list -R --username admin --password passwd0 http://192.168.0.68/svn/repos/
 
+检出空目录
+
+    svn co http://192.168.0.68/svn/repos/ --depth empty --username admin --password passwd0 --non-interactive
+
+递归更新空目录
+
+    svn up --set-depth infinity --username admin --password passwd0
+
+
 
 **自动构建与部署**
 
