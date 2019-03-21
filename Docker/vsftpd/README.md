@@ -5,6 +5,18 @@ VSFTPD
 > * 下载站点：https://security.appspot.com/vsftpd.html
 > * 客户端下载：https://filezilla-project.org/download.php?type=client
 
+**FTP连接方式**  
+控制连接：标准端口为21，命令通道  
+数据连接：标准端口为20，数据通道  
+
+    主动FTP：
+         命令：client> 1023  - > server 21  
+         data：client> 1023 < -  server 20  
+
+     被动FTP：  
+         命令：client> 1023  - > server 21  
+         data：client> 1024  - > server> 1023  
+
 
 ## Example:
 
