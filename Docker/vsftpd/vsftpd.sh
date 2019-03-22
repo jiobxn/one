@@ -348,7 +348,7 @@ INIT_FTP() {
 	#auth
 	db_load -T -t hash -f /etc/vsftpd/vuser.txt /etc/vsftpd/vuser.db
 	chmod 600 /etc/vsftpd/vuser.*
-	useradd -s /sbin/nologin vsftpd
+	useradd -s /sbin/nologin $FTP_USER
 	sed -i '2iauth sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
 	sed -i '3iaccount sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
 	chown -R vsftpd.vsftpd /home/$FTP_USER
