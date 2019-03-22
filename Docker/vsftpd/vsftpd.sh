@@ -351,7 +351,7 @@ INIT_FTP() {
 	useradd -s /sbin/nologin $FTP_USER
 	sed -i '2iauth sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
 	sed -i '3iaccount sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
-	chown -R vsftpd.vsftpd /home/$FTP_USER
+	chown -R $FTP_USER.$FTP_USER /home/$FTP_USER
 
 	#Download rate
 	[ "$ANON_MB" -gt 0 ] && ANON_MB=$(echo "$ANON_MB*1048576" |bc)
