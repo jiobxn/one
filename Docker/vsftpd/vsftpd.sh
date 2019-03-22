@@ -408,7 +408,7 @@ INIT_FTP() {
 		
 		PUBLIC_CHMOD
 		
-		chown -R vsftpd.vsftpd /home/$FTP_USER
+		chown -R $FTP_USER.$FTP_USER /home/$FTP_USER
 	fi
 
 	#pasv disable
