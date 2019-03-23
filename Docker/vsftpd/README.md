@@ -32,7 +32,7 @@ VSFTPD
 				-v /docker/ftp:/key \\
 				-p 21:21 \\
 				-p 25000-25100:25000-25100 \\
-				-e FTP_PORT=[21] \\       监听端口，被动模式下可修改
+				-e FTP_PORT=[21] \\       监听端口
 				-e PASV_PORT=[25000:25100]    被动模式数据端口范围
 				-e FTP_USER=[vsftpd] \\   管理员用户
 				-e FTP_PASS=[$(openssl rand -hex 10)] \\    随机密码
