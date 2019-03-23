@@ -18,11 +18,11 @@ MYSQL() {
 		[ $? -eq 1 ] && echo "MySQL import failed .." && exit 1
 		sed -i 's/driver = "rlm_sql_null"/driver = "rlm_sql_mysql"/' /etc/raddb/mods-available/sql
 		sed -i 's/dialect = "sqlite"/dialect = "mysql"/' /etc/raddb/mods-available/sql
-		sed -i '/dialect = "mysql"/a \        server = "127.0.0.1"' /etc/raddb/mods-available/sql
-		sed -i '/dialect = "mysql"/a \        port = 3306' /etc/raddb/mods-available/sql
-		sed -i '/dialect = "mysql"/a \        login = "radius"' /etc/raddb/mods-available/sql
-		sed -i '/dialect = "mysql"/a \        password = "radpass"' /etc/raddb/mods-available/sql
-		sed -i 's/radius_db = "radius"/radius_db = "radius"/' /etc/raddb/mods-available/sql
+		sed -i '/dialect = "mysql"/a \        server = "'$MYSQL_HOST'"' /etc/raddb/mods-available/sql
+		sed -i '/dialect = "mysql"/a \        port = "'$MYSQL_PORT'"' /etc/raddb/mods-available/sql
+		sed -i '/dialect = "mysql"/a \        login = "'$MYSQL_USER'"' /etc/raddb/mods-available/sql
+		sed -i '/dialect = "mysql"/a \        password = "'$MYSQL_PASS'"' /etc/raddb/mods-available/sql
+		sed -i 's/radius_db = "radius"/radius_db = "'$MYSQL_DB'"/' /etc/raddb/mods-available/sql
 		ln -s /etc/raddb/mods-available/sql /etc/raddb/mods-enabled/
 		chgrp -h radiusd /etc/raddb/mods-enabled/sql
 	fi
@@ -82,6 +82,7 @@ AUTHOR() {
 			fi
 		fi
 	fi
+echo author
 }
 
 
@@ -109,28 +110,32 @@ HELP() {
 #init
 if [ "$1" = 'radiusd' ]; then
 	if [ -z "$(grep "redhat.xyz" /etc/raddb/clients.conf)" ]; then
-		if [ ! -f /key/user_pass.txt ];then
-			AUTHEN
-		fi
-
 		#authentication
 		if [ $MYSQL_HOST ];then
 			MYSQL
 
-			N=$(grep -v ^# /key/user_pass.txt |grep -v ^$ |wc -l)
+			cat >/key/add_user_mysql.sh <<-END
+			#!/bin/bash
+			N=\$(grep -v ^# user_pass.txt |grep -v ^$ |wc -l)
 			i=1
-			while [ $i -le $N ];do
-				USER=$(grep -v ^# /key/user_pass.txt |grep -v ^$ |sed -n ''$i'p' |awk '{print $1}')
-				PASS=$(grep -v ^# /key/user_pass.txt |grep -v ^$ |sed -n ''$i'p' |awk '{print $2}')
-				if [ -z "$(mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -e "SELECT username FROM $MYSQL_DB.radcheck;" |awk 'NR!=1' |grep -w $USER)" ];then
-					mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -e "INSERT INTO $MYSQL_DB.radcheck (username, attribute, op, value) VALUES ('$USER','Cleartext-Password',':=','$PASS');"
-					echo "$USER $PASS"
+			while [ \$i -le \$N ];do
+				USER=\$(grep -v ^# user_pass.txt |grep -v ^$ |sed -n ''\$i'p' |awk '{print \$1}')
+				PASS=\$(grep -v ^# user_pass.txt |grep -v ^$ |sed -n ''\$i'p' |awk '{print \$2}')
+				if [ -z "\$(mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -e "SELECT username FROM $MYSQL_DB.radcheck;" |awk 'NR!=1' |grep -w \$USER)" ];then
+					mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -e "INSERT INTO $MYSQL_DB.radcheck (username, attribute, op, value) VALUES ('\$USER','Cleartext-Password',':=','\$PASS');"
+					echo "\$USER \$PASS"
 				else
-					echo "user '$USER' already exists"
+					echo "user '\$USER' already exists"
 				fi
 				let  i++
 			done
+			END
+			chmod +x /key/add_user_mysql.sh
 		else
+			if [ ! -f /key/user_pass.txt ];then
+				AUTHEN
+			fi
+
 			if [ ! -f /key/authorize ];then
 				N=$(grep -v ^# /key/user_pass.txt |grep -v ^$ |wc -l)
 				i=1
@@ -147,13 +152,12 @@ if [ "$1" = 'radiusd' ]; then
 				\cp /key/authorize /etc/raddb/mods-config/files/
 			fi
 		fi
-
-
+		
 		if [ ! -f /key/ipaddr_secret.txt ];then
 			AUTHOR
 		fi
+		
 		echo "#redhat.xyz" >/etc/raddb/clients.conf
-
 		#authorization
 		if [ ! -f /key/clients.conf ];then
 			N=$(grep -v ^# /key/ipaddr_secret.txt |grep -v ^$ |wc -l)
