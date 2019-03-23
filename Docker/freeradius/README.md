@@ -48,6 +48,12 @@ FreeRadius
 
     mysql -uradius -pradpass -h127.0.0.1 -e "delete from radius.radcheck where username = 'testing';"
 
+### 添加sql字段
+
+    #给用户表添加字段
+    alter table `radcheck` add column `realname` varchar(64) NOT NULL DEFAULT '';
+    #删除字段
+    alter table radcheck drop column realname;
 
 ## centos7 pam_radius
 
