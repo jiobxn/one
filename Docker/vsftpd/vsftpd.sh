@@ -2,8 +2,7 @@
 set -e
 
 : ${FTP_PORT:="21"}
-: ${MIN_PORT:="25000"}
-: ${MAX_PORT:="25100"}
+: ${PASV_PORT:="25000:25100"}
 : ${DATA_PORT:="20"}
 : ${FTP_USER:="vsftpd"}
 : ${FTP_PASS:="$(openssl rand -hex 10)"}
@@ -379,8 +378,8 @@ INIT_FTP() {
 	dual_log_enable=YES
 	xferlog_file=/var/log/xferlog           
 	vsftpd_log_file=/var/log/vsftpd.log
-	pasv_min_port=$MIN_PORT
-	pasv_max_port=$MAX_PORT
+	pasv_min_port=$(echo $PASV_PORT |awk -F: '{print $1}')
+	pasv_max_port=$(echo $PASV_PORT |awk -F: '{print $2}')
 	pasv_promiscuous=YES
 	END
 
@@ -413,11 +412,13 @@ INIT_FTP() {
 
 	#pasv disable
 	if [ "$PASV_DISABLE" == "Y" ];then
-		echo "pasv_enable=NO" >>/etc/vsftpd/vsftpd.conf
+		echo -e "pasv_enable=NO\nport_enable=YES" >>/etc/vsftpd/vsftpd.conf
 		
-		if [ $DATA_PORT -ne 20 ];then
+		if [ "$DATA_PORT" -ne 20 ];then
 			echo -e "ftp_data_port=$DATA_PORT\nport_promiscuous=YES" >>/etc/vsftpd/vsftpd.conf
 		fi
+	else
+		echo -e "pasv_enable=YES\nport_enable=NO" >>/etc/vsftpd/vsftpd.conf
 	fi
 
 	#ssl
@@ -447,7 +448,7 @@ INIT_FTP() {
 		cat > /iptables.sh <<-END
 		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $FTP_PORT -m comment --comment VSFTPD -j ACCEPT
-		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $MIN_PORT:$MAX_PORT -m comment --comment VSFTPD -j ACCEPT
+		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PASV_PORT -m comment --comment VSFTPD -j ACCEPT
 		END
 	fi
 }
@@ -463,8 +464,7 @@ HELP() {
 				-p 21:21 \\
 				-p 25000-25100:25000-25100 \\
 				-e FTP_PORT=[21] \\
-				-e MIN_PORT=[25000] \\
-				-e MAX_PORT=[25100] \\
+				-e PASV_PORT=[25000:25100] \\
 				-e FTP_USER=[vsftpd] \\
 				-e FTP_PASS=[$(openssl rand -hex 10)] \\
 				-e ANON_ROOT=[public] \\
