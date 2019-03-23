@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+: ${RADIUS_PORT:="1812"}
 : ${MYSQL_PORT:="3306"}
 : ${MYSQL_DB:="radius"}
 : ${MYSQL_USER:="radius"}
@@ -94,6 +95,7 @@ HELP() {
 				-v /docker/freeradius:/key \\
 				-p 1812:1812/udp \\
 				-p 1813:1813/udp \\
+				-e RADIUS_PORT=[1812]
 				-e USER_PASS=[testing,password] \\
 				-e IPADDR_SECRET=[127.0.0.1,testing123] \\
 				-e MYSQL_HOST=<127.0.0.1> \\
@@ -177,11 +179,17 @@ if [ "$1" = 'radiusd' ]; then
 			\cp /key/clients.conf /etc/raddb/
 		fi
 		
+		#port
+		if [ "$RADIUS_PORT" -ne "1812" ];then
+			sed -i "s@1812/@$RADIUS_PORT/@g" /etc/services
+			sed -i "s@1813/@$(($RADIUS_PORT+1))/@g" /etc/services
+		fi	
+
 		#iptables
 		if [ "$IPTABLES" == "Y" ]; then
 			cat > /iptables.sh <<-END
 			iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-			iptables -I INPUT -p udp -m state --state NEW -m udp --dport 1812:1813 -m comment --comment RADIUS -j ACCEPT
+			iptables -I INPUT -p udp -m state --state NEW -m udp --dport $RADIUS_PORT:$(($RADIUS_PORT+1)) -m comment --comment RADIUS -j ACCEPT
 			END
 		fi
 	fi
