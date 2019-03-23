@@ -33,8 +33,7 @@ VSFTPD
 				-p 21:21 \\
 				-p 25000-25100:25000-25100 \\
 				-e FTP_PORT=[21] \\       监听端口，被动模式下可修改
-				-e MIN_PORT=[25000] \\    数据端口(起始)
-				-e MAX_PORT=[25100] \\    数据端口(结束)
+				-e PASV_PORT=[25000:25100]    被动模式数据端口范围
 				-e FTP_USER=[vsftpd] \\   管理员用户
 				-e FTP_PASS=[$(openssl rand -hex 10)] \\    随机密码
 				-e ANON_ROOT=[public] \\  匿名用户目录
@@ -73,9 +72,7 @@ VSFTPD
 	echo -e '# -- user  -- passwd  -- chmod  -- root -- # \nadmin:123456:15:admin\npublic:123456:7:admin/public\nboss:123456:4:' |tee /docker/ftp/user.txt
 
 
-**windows 报错信息:**  
-打开 FTP 服务器上的文件夹时发生错误。请检查是否有权限访问该文件夹。  
+**windows 使用ftp://x.x.x.x访问**  
 200 Switching to ASCII mode.  
-227 Entering Passive Mode (0,0,0,0,227,175).
-
-解决办法：在“Internet选项” -->【高级】这页，取消掉“使用被动FTP(用于防火墙和DSL调制解调器的兼容)”
+550 Permission denied  
+解决办法：打开IE浏览器-->【Internet选项】-->【高级】-->【使用被动FTP(用于防火墙和DSL调制解调器的兼容)】使用被动模式需要勾选、使用主动模式需要取消勾选
