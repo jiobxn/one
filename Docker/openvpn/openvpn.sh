@@ -47,7 +47,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		./easyrsa gen-dh &>/dev/null
 	
 		# Certificate or user
-		if [ "$MAX_STATICIP" -a ! $VPN_USER ]; then
+		if [ "$MAX_STATICIP" -a ! "$VPN_USER" ]; then
 			if [ "$MAX_STATICIP" -gt 1000 ]; then
 				MAX_STATICIP=1000
 			fi
@@ -93,7 +93,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	sed -i "s/server 10.8.0.0 255.255.255.0/server $IP_RANGE.0.0 255.255.0.0/" /etc/openvpn/server.conf
 
 	# Allow duplicate using a client certificate
-	if [ ! $MAX_STATICIP ]; then
+	if [ ! "$MAX_STATICIP" ]; then
 		sed -i 's/;duplicate-cn/duplicate-cn/' /etc/openvpn/server.conf
 		sed -i 's/ifconfig-pool-persist/;ifconfig-pool-persist/' /etc/openvpn/server.conf
 	else
@@ -102,7 +102,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		mkdir /etc/openvpn/ccd
 	fi
 
-	# BUG, [UDP]Notify the client that when the server restarts so it can automatically reconnect
+	# [UDP]Notify the client that when the server restarts so it can automatically reconnect
 	sed -i 's/explicit-exit-notify/;explicit-exit-notify/' /etc/openvpn/server.conf
 
 	# tls-auth
@@ -180,7 +180,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			[ -z $y3 ] && y3=1
 		fi
 	
-		echo >/key/client.txt
+		[ -f /key/client.txt ] && \rm /key/client.txt
 		i=1
 		n=5
 		m=6
@@ -191,16 +191,14 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			echo "ifconfig-push $IP_RANGE.$x.$n $IP_RANGE.$x.$m" >/etc/openvpn/ccd/client$i
 			echo "$IP_RANGE.$x.$n user$i" >>/key/client.txt
 		
-			# Certificate or user
+			# add user
 			if [ "$VPN_USER" -a ! -f /key/psw-file ];then
 				PASS=$(pwmake 64)
 				echo "client$i       $PASS" >> /etc/openvpn/psw-file
-				sed -i '/<cert>/ r /etc/openvpn/client.crt' /etc/openvpn/client.conf
-				sed -i '/<key>/ r /etc/openvpn/client.key' /etc/openvpn/client.conf
-				\cp /etc/openvpn/client.conf /etc/openvpn/client.ovpn
-				\cp /etc/openvpn/client.conf /key/client.ovpn
-				\cp /etc/openvpn/client.conf /key/client.conf
-			else
+			fi
+			
+			# add Certificate
+			if [ -z "$VPN_USER" ];then
 				\cp /etc/openvpn/client.conf /etc/openvpn/client$i.conf
 				sed -i '/<cert>/ r /etc/openvpn/client'$i'.crt' /etc/openvpn/client$i.conf
 				sed -i '/<key>/ r /etc/openvpn/client'$i'.key' /etc/openvpn/client$i.conf
@@ -290,6 +288,14 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		script-security 3
 		END
 
+		if [ "$MAX_STATICIP" ]; then
+			sed -i '/<cert>/ r /etc/openvpn/client.crt' /etc/openvpn/client.conf
+			sed -i '/<key>/ r /etc/openvpn/client.key' /etc/openvpn/client.conf
+			\cp /etc/openvpn/client.conf /etc/openvpn/client.ovpn
+			\cp /etc/openvpn/client.conf /key/client.ovpn
+			\cp /etc/openvpn/client.conf /key/client.conf
+		fi
+
 		for i in $(find /etc/openvpn/ -name client*.conf); do
 			sed -i '/;key client.key/ a auth-user-pass' $i
 			\cp $i /key/
@@ -321,6 +327,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		  exit 1
 		fi
 		END
+		[ -f /key/psw-file ] && \rm /key/psw-file
 	fi
 
 
