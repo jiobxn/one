@@ -95,7 +95,7 @@ HELP() {
 				-v /docker/freeradius:/key \\
 				-p 1812:1812/udp \\
 				-p 1813:1813/udp \\
-				-e RADIUS_PORT=[1812]
+				-e RADIUS_PORT=[1812] \\
 				-e USER_PASS=[testing,password] \\
 				-e IPADDR_SECRET=[127.0.0.1,testing123] \\
 				-e MYSQL_HOST=<127.0.0.1> \\
