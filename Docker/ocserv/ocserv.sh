@@ -14,6 +14,7 @@ if [ "$1" = 'ocserv' ]; then
 : ${GATEWAY_VPN:=Y}
 : ${DNS1:=9.9.9.9}
 : ${DNS2:=8.8.8.8}
+: ${RADIUS_PORT:="1812"}
 : ${RADIUS_SECRET:=testing123}
 
 
@@ -124,6 +125,12 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 		sed -i '/#auth = "certificate"/ a #acct = "radius[config=/etc/radiusclient-ng/radiusclient.conf,groupconfig=true]"' /etc/ocserv/ocserv.conf
 		sed -i '/#auth = "certificate"/ a auth = "radius[config=/etc/radiusclient-ng/radiusclient.conf,groupconfig=true]"' /etc/ocserv/ocserv.conf
 		INFOU="Radius: $RADIUS_SERVER"
+		
+		# port
+		if [ "$RADIUS_PORT" -ne "1812" ];then
+			sed -i "s@1812/@$RADIUS_PORT/@g" /etc/services
+			sed -i "s@1813/@$(($RADIUS_PORT+1))/@g" /etc/services
+		fi
 	fi
 
 
@@ -178,6 +185,7 @@ else
 			-e IP_RANGE=[10.10.0.0/24] \\
 			-e DNS1:=[9.9.9.9] \\
 			-e DNS2:=[8.8.8.8] \\
+			-e RADIUS_PORT=[1812] \\
 			-e RADIUS_SERVER:=<radius ip> \\
 			-e RADIUS_SECRET:=[testing123] \\
 			--name ocserv ocserv
