@@ -30,6 +30,7 @@ OCSERV
 			-e IP_RANGE=[10.10.0.0/24] \\        分配的IP地址池
 			-e DNS1:=[9.9.9.9] \\
 			-e DNS2:=[8.8.8.8] \\
+			-e RADIUS_PORT=[1812] \\             radius 端口
 			-e RADIUS_SERVER:=<radius ip> \\     radius 服务器
 			-e RADIUS_SECRET:=[testing123] \\    radius 共享密钥
 			--name ocserv ocserv
