@@ -8,6 +8,7 @@ if [ "$1" = 'pptpd' ]; then
 : ${VPN_PASS:=$(pwmake 64)}
 : ${DNS1:=9.9.9.9}
 : ${DNS2:=8.8.8.8}
+: ${RADIUS_PORT:="1812"}
 : ${RADIUS_SECRET:=testing123}
 
 
@@ -42,6 +43,12 @@ if [ -z "$(grep "redhat.xyz" /etc/ppp/options.pptpd)" ]; then
 		echo "INCLUDE /usr/share/radiusclient-ng/dictionary.merit" >>/usr/share/radiusclient-ng/dictionary
 		echo "INCLUDE /usr/share/radiusclient-ng/dictionary.microsoft" >>/usr/share/radiusclient-ng/dictionary
 		echo "Radiud $RADIUS_SERVER" |tee /key/pptpd.log
+		
+		# port
+		if [ "$RADIUS_PORT" -ne "1812" ];then
+			sed -i "s@1812/@$RADIUS_PORT/@g" /etc/services
+			sed -i "s@1813/@$(($RADIUS_PORT+1))/@g" /etc/services
+		fi
 	else
 		echo "$VPN_USER       pptpd      $VPN_PASS          *" >> /etc/ppp/chap-secrets
 		echo -e "
@@ -81,6 +88,7 @@ else
 			-e VPN_PASS=<123456> \\
 			-e DNS1:=[9.9.9.9] \\
 			-e DNS2:=[8.8.8.8] \\
+			-e RADIUS_PORT=[1812] \\
 			-e RADIUS_SERVER:=<radius ip> \\
 			-e RADIUS_SECRET:=[testing123] \\
 			--name pptpd pptpd"
