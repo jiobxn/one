@@ -117,22 +117,24 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 			[ ! -d /home/svn/$REPOS ] && svnadmin create /home/svn/$REPOS && chown -R apache.apache /home/svn/$REPOS && echo "create default repository"
 		fi
 	
-		if [ -f /home/svn/conf/passwd ]; then
-			echo "passwd exist"
-			\rm /home/svn/conf/htpasswd 2>/dev/null || echo
-			for i in $(sed 's/ //g' /home/svn/conf/passwd); do
-				user=$(echo $i |awk -F= '{print $1}')
-				pass=$(echo $i |awk -F= '{print $2}')
-				echo "$user:$(openssl passwd -apr1 $pass)" >> /home/svn/conf/htpasswd
-				echo "$user = $pass"
-			done
+		if [ ! -f /home/svn/conf/htpasswd ]; then
+			if [ -f /home/svn/conf/passwd ]; then
+				for i in $(sed 's/ //g' /home/svn/conf/passwd); do
+					user=$(echo $i |awk -F= '{print $1}')
+					pass=$(echo $i |awk -F= '{print $2}')
+					echo "$user:$(openssl passwd -apr1 $pass)" >> /home/svn/conf/htpasswd
+					echo "$user = $pass"
+				done
+			else
+				echo "$ADMIN:$(openssl passwd -apr1 $ADMIN_PASS)" > /home/svn/conf/htpasswd
+				echo "$USER:$(openssl passwd -apr1 $USER_PASS)" >> /home/svn/conf/htpasswd
+				echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS" > /home/svn/conf/passwd
+				echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS"
+			fi
 		else
-			echo "$ADMIN:$(openssl passwd -apr1 $ADMIN_PASS)" > /home/svn/conf/htpasswd
-			echo "$USER:$(openssl passwd -apr1 $USER_PASS)" >> /home/svn/conf/htpasswd
-			echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS" > /home/svn/conf/passwd
-			echo -e "$ADMIN = $ADMIN_PASS\n$USER = $USER_PASS"
+			echo "htpasswd exist"
 		fi
-		\cp /home/svnserve.conf.txt /home/svn/conf/svnserve.conf
+		[ ! -f /home/svn/conf/svnserve.conf ] && cp /home/svnserve.conf.txt /home/svn/conf/svnserve.conf
 	fi
 
 	#iptables
