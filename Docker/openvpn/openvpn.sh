@@ -208,7 +208,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			fi		
 		
 			if [ "$NAT_RANGE" ];then
-				[ $y3 -gt 256 ] && y3=$(($y3-256))
+				[ $y3 -eq 256 ] && y3=$(($y3-256))
 				y4=$(($y2+$i/256))
 				sed -i "/virtual_ipaddress/a \        $y1.$y4.$y3" /etc/keepalived/keepalived.conf
 				echo "iptables -t nat -A POSTROUTING -s $IP_RANGE.$x.$n/32 -o $DEV -m comment --comment user$i -j SNAT --to-source $y1.$y4.$y3" >>/iptables.sh
