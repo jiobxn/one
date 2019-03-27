@@ -174,10 +174,10 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			END
 
 			y1=$(echo $NAT_RANGE |awk -F. '{print $1"."$2}')
-			y2=$(echo $NAT_RANGE |awk -F. '{print $3}')
-			y3=$(echo $NAT_RANGE |awk -F. '{print $4}')
-			[ -z $y2 ] && y2=0
-			[ -z $y3 ] && y3=1
+			y3=$(echo $NAT_RANGE |awk -F. '{print $3}')
+			y4=$(echo $NAT_RANGE |awk -F. '{print $4}')
+			[ -z $y3 ] && y3=0
+			[ -z $y4 ] && y4=1
 		fi
 	
 		[ -f /key/client.txt ] && \rm /key/client.txt
@@ -208,11 +208,11 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			fi		
 		
 			if [ "$NAT_RANGE" ];then
-				[ $y3 -eq 256 ] && y3=$(($y3-256))
-				y4=$(($y2+$i/256))
-				sed -i "/virtual_ipaddress/a \        $y1.$y4.$y3" /etc/keepalived/keepalived.conf
-				echo "iptables -t nat -A POSTROUTING -s $IP_RANGE.$x.$n/32 -o $DEV -m comment --comment user$i -j SNAT --to-source $y1.$y4.$y3" >>/iptables.sh
-				let y3++
+				y3=$(($y3+$y4/256))
+				[ $y4 -eq 256 ] && y4=$(($y4-256))
+				sed -i "/virtual_ipaddress/a \        $y1.$y3.$y4" /etc/keepalived/keepalived.conf
+				echo "iptables -t nat -A POSTROUTING -s $IP_RANGE.$x.$n/32 -o $DEV -m comment --comment user$i -j SNAT --to-source $y1.$y3.$y4" >>/iptables.sh
+				y4=`expr $y4 + 1`  #Using "let y4++" will have an error
 			fi
 		
 			n=$(($n+4))
@@ -430,7 +430,7 @@ else
 			-e PUSH_ROUTE=<"172.31.10.0/255.255.0.0,10.10.0.0/255.255.0.0">
 			-e RADIUS_SERVER=<radius ip> \\
 			-e RADIUS_SECRET=[testing123] \\
-			-e NAT_RANGE=<10.10.81> \\
+			-e NAT_RANGE=<10.10 | 10.10.100 | 10.10.100.100> \\
 			--name openvpn openvpn
 	"
 fi
