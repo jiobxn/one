@@ -54,6 +54,8 @@ FreeRadius
     alter table `radcheck` add column `realname` varchar(64) NOT NULL DEFAULT '';
     #删除字段
     alter table radcheck drop column realname;
+    #清空用户表，还原主键ID
+    truncate radcheck;
 
 ## centos7 pam_radius
 
