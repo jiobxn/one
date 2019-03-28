@@ -430,7 +430,7 @@ else
 			-e PUSH_ROUTE=<"172.31.10.0/255.255.0.0,10.10.0.0/255.255.0.0">
 			-e RADIUS_SERVER=<radius ip> \\
 			-e RADIUS_SECRET=[testing123] \\
-			-e NAT_RANGE=<10.10 | 10.10.100 | 10.10.100.100> \\
+			-e NAT_RANGE=<10.10.100 | 10.10.100.100> \\
 			--name openvpn openvpn
 	"
 fi
