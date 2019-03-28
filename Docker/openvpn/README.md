@@ -39,7 +39,7 @@ OpenVPN
 			-e DNS2=[8.8.8.8] \\
 			-e RADIUS_SERVER=<radius ip> \\    radius 服务器
 			-e RADIUS_SECRET=[testing123] \\   radius 共享密钥
-			-e NAT_RANGE=<10.10.81> \\         NAT的IP地址池
+			-e NAT_RANGE=<10.10.100 | 10.10.100.100> \\         NAT的IP地址池
 			--name openvpn openvpn
 
 ### IOS Client:
