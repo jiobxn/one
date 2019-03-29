@@ -319,13 +319,13 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		
 		echo "User-Name=\${username},User-Password=\${password}" |radclient $RADIUS_SERVER auth $RADIUS_SECRET -q -r 1
 		
-		if [ $? -eq 0 ];then
+		if [ \$? -eq 0 ];then
 		  echo "\${TIME_STAMP}: Successful authentication: username=\"\${username}\"." >> \${LOG_FILE}
 		  exit 0
-		else
-		  echo "\${TIME_STAMP}: Incorrect password: username=\"${username}\", password=\"\${password}\"." >> \${LOG_FILE}
-		  exit 1
 		fi
+		
+		echo "\${TIME_STAMP}: Incorrect password: username=\"${username}\", password=\"\${password}\"." >> \${LOG_FILE}
+		exit 1
 		END
 		[ -f /key/psw-file ] && \rm /key/psw-file
 	fi
