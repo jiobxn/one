@@ -8,6 +8,15 @@ if [ "$1" = '/usr/sbin/init' ]; then
 : ${BOOT:=LOCAL}
 
 if [ ! -f /etc/dhcp/dhcpd.conf ]; then
+	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+	if [ -d /var/www/html/os/isolinux ]; then
+		\cp /var/www/html/os/isolinux/{initrd.img,vmlinuz,vesamenu.c32} /var/lib/tftpboot/
+	else
+		echo -e "No installation media. \nUse: mount /media/CentOS-7-x86_64-Minimal-xxxx.iso /docker/os/ -o loop"
+		exit 1
+	fi
+
 	if [ ! -f /key/dhcpd.conf -a ! -f /key/default -a ! -f /key/ks.cfg ]; then
 		[ -z "$NIC" ] && NIC=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
 		IPADDR=$(ifconfig $NIC |awk 'NR=="2"{print $2}')
