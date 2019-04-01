@@ -324,7 +324,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		  exit 0
 		fi
 		
-		echo "\${TIME_STAMP}: Incorrect password: username=\"${username}\", password=\"\${password}\"." >> \${LOG_FILE}
+		echo "\${TIME_STAMP}: Incorrect password: username=\"\${username}\", password=\"\${password}\"." >> \${LOG_FILE}
 		exit 1
 		END
 		[ -f /key/psw-file ] && \rm /key/psw-file
