@@ -24,16 +24,13 @@ MAILTO=' '
 * * * * * echo 3 > /proc/sys/vm/drop_caches
 EOF
 
-yum -y install python34-setuptools
-easy_install-3.4 pip
+yum -y install python36-setuptools
+easy_install-3.6 pip
 pip install --upgrade youtube-dl you-get
 
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
-yum -y install docker-ce
+yum -y install docker-ce docker-compose
 systemctl enable docker
-
-#curl -sL https://github.com/docker/compose/releases/download/$(curl -s https://github.com/docker/compose/tags |grep 'compose/releases/tag' |grep -v rc |awk -F/ 'NR==1{print $NF}' |awk -F\" '{print $1}')/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-#chmod +x /usr/local/bin/docker-compose
 
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
     swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/485" |bc`
@@ -56,6 +53,6 @@ fi
 #audit2allow -a -M mycertwatch
 #semodule -i mycertwatch.pp
 #\rm mycertwatch*
-sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+#sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
 
 echo -e "\n-----> reboot"
