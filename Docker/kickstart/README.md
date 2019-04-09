@@ -21,10 +21,9 @@ Kickstart
     
     docker cp /docker/ks/ks.cfg kickstart:/var/www/html/ks/ks.cfg
 
-4.客户端网络启动
+4.设置服务器从网络启动，虚拟机内存不能少于2G
 
-5.如果在安装过程中左下角出现"Pane is dead"，需要在容器中执行：
+#### 使用IPMI工具让服务器下一次从pxe模式启动
 
-    \cp /var/www/html/os/isolinux/{initrd.img,vmlinuz,vesamenu.c32} /var/lib/tftpboot/
-
-重新网络启动。虚拟机测试内存2G+。
+    ipmitool chassis bootdev pxe
+    ipmitool power reset
