@@ -164,7 +164,7 @@ fi
 	echo "Start ****"
 	[ -z "`iptables -S |grep OCSERV`" ] && . /iptables.sh
 
-	exec "$@" &>/dev/null
+	exec "$@"
 
 else
 	echo -e "
