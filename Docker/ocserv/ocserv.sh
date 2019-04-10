@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = 'ocserv' ]; then
 
-: ${IP_RANGE:=10.10.0.0/24}
+: ${IP_RANGE:=10.10.0}
 : ${VPN_PORT:=443}
 : ${VPN_PASS:=$(pwmake 64)}
 : ${P12_PASS:=jiobxn.com}
@@ -182,7 +182,7 @@ else
 			-e CLIENT_CN=["AnyConnect VPN"] \\
 			-e CA_CN=["OpenConnect CA"] \\
 			-e GATEWAY_VPN=[Y] \\
-			-e IP_RANGE=[10.10.0.0/24] \\
+			-e IP_RANGE=[10.10.0] \\
 			-e DNS1:=[9.9.9.9] \\
 			-e DNS2:=[8.8.8.8] \\
 			-e RADIUS_PORT=[1812] \\
