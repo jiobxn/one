@@ -8,7 +8,7 @@ OCSERV
 ## Example:
 
     #推荐使用证书连接
-    docker run -d --restart always --privileged -v /docker/ocserv:/key -p 443:443 --hostname ocserv --name ocserv jiobxn/ocserv
+    docker run -d --restart unless-stopped --privileged -v /docker/ocserv:/key -p 443:443 --name ocserv jiobxn/ocserv
 
 
 ## Run Defult Parameter
