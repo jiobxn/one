@@ -22,7 +22,7 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	# Get ip address
 	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
 	if [ -z $SERVER_CN ]; then
-		SERVER_CN=$(curl -s https://httpbin.org/ip |awk -F\" 'NR==2{print $4}')
+		SERVER_CN=$(curl -s http://ip.sb/)
 	fi
 
 	if [ -z $SERVER_CN ]; then
