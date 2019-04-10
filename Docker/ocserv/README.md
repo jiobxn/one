@@ -27,7 +27,7 @@ OCSERV
 			-e CLIENT_CN=["AnyConnect VPN"] \\   P12证书标识，便于在iphone上识别
 			-e CA_CN=["OpenConnect CA"] \\       CA证书标识
 			-e GATEWAY_VPN=[Y]         \\        默认VPN做网关
-			-e IP_RANGE=[10.10.0.0/24] \\        分配的IP地址池
+			-e IP_RANGE=[10.10.0] \\        分配的IP地址池
 			-e DNS1:=[9.9.9.9] \\
 			-e DNS2:=[8.8.8.8] \\
 			-e RADIUS_PORT=[1812] \\             radius 端口
