@@ -103,7 +103,7 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	sed -i "s/tcp-port = 443/tcp-port = ${VPN_PORT}/" /etc/ocserv/ocserv.conf
 	sed -i "s/udp-port = 443/udp-port = ${VPN_PORT}/" /etc/ocserv/ocserv.conf
 	sed -i "s/default-domain = example.com/#&/" /etc/ocserv/ocserv.conf
-	sed -i "s@#ipv4-network = 192.168.1.0/24@ipv4-network = $IP_RANGE@" /etc/ocserv/ocserv.conf
+	sed -i "s@#ipv4-network = 192.168.1.0/24@ipv4-network = $IP_RANGE.0/24@" /etc/ocserv/ocserv.conf
 	sed -i "s/#dns = 192.168.1.2/dns = $DNS1\ndns = $DNS2/" /etc/ocserv/ocserv.conf
 	sed -i "s@user-profile = profile.xml@#user-profile = profile.xml@" /etc/ocserv/ocserv.conf
 
