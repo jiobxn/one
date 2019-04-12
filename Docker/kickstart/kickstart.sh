@@ -21,8 +21,8 @@ if [ ! -f /etc/dhcp/dhcpd.conf ]; then
 		[ -z "$NIC" ] && NIC=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
 		IPADDR=$(ifconfig $NIC |awk 'NR=="2"{print $2}')
 		NETMASK=$(ifconfig $NIC |awk 'NR=="2"{print $4}')
-		SUBNET=$(route -n |grep $NIC |grep $NETMASK |grep -v ^169.254 |awk 'NR==1{print $1}') 
-		GATEWAY=$(route -n |grep $NIC |grep UG |awk 'NR==1{print $2}')
+		SUBNET=$(ip route |grep $IPADDR |awk -F/ '{print $1}') 
+		GATEWAY=$(ip route |egrep ^'default|0.0.0.0/0' |awk '{print $3}')
 		BROADCAST=$(ifconfig $NIC |awk 'NR=="2"{print $6}')
 		[ -z "$GATEWAY" ] && GATEWAY=$IPADDR
 
