@@ -23,6 +23,22 @@ Kickstart
 
 4.设置服务器从网络启动，虚拟机内存不能少于2G
 
+
+## Run Defult Parameter
+**协定：** []是默参数，<>是自定义参数
+
+				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
+				-v /docker/ks:/key \\                配置文件目录
+				-v /docker/os:/var/www/html/os \\    ISO挂载目录
+				-e NIC=$(route -n |awk '$1=="0.0.0.0"{print $NF }')    网卡名称
+				-e DNS=[9.9.9.9] \\   DNS
+				-e PORT=[80] \\       HTTP端口
+				-e BOOT=[LOCAL] \\    默认从硬盘启动，其他参数 INSTALL、RESCUE
+				-e RANGE=<"192.168.80.200 192.168.80.210"> \\    分配地址池
+				-e IPTABLES=<Y> \\    防火墙，需要 --cap-add=NET_ADMIN
+				--name kickstart kickstart
+
+
 #### 使用IPMI工具让服务器下一次从pxe模式启动
 
     ipmitool chassis bootdev pxe
