@@ -48,7 +48,8 @@ VSFTPD
 				-e FTP_SSL=<Y>            启用ssl加密
 				-e IPTABLES=<Y> \\
 				--name vsftpd vsftpd
-	
+
+注意：PASV_DISABLE和FTP_PORT不能同时使用
 
 ### 用户权限掩码(chmod)
   
