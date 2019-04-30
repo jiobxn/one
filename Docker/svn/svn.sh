@@ -14,6 +14,7 @@ if [ "$1" = 'httpd' ]; then
 
 
 if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
+	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	echo "Initialize httpd"
 	#key
 	if [ -f /key/server.crt -a -f /key/server.key ]; then
