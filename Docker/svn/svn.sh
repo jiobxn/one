@@ -137,6 +137,23 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 		[ ! -f /home/svn/conf/svnserve.conf ] && cp /home/svnserve.conf.txt /home/svn/conf/svnserve.conf
 	fi
 
+	#svnadmin
+	if [ "$SVNADMIN" == "Y" ]; then
+		find /var/www/html/svnadmin/ -type f -print0 | xargs -0 chmod 0644
+		find /var/www/html/svnadmin/ -type d -print0 | xargs -0 chmod 0755
+		chown apache.apache /var/www/html/svnadmin -R
+		chown apache.apache /home/svn -R
+		chmod 755 /root
+		echo
+		echo "iF.SVNAdmin:
+		SVNAuthFile=/home/svn/conf/authz
+		SVNUserFile=/home/svn/conf/htpasswd
+		SVNParentPath=/home/svn
+		SvnExecutable=/usr/bin/svn
+		SvnAdminExecutable=/usr/bin/svnadmin
+		"
+	fi
+
 	#iptables
 	if [ "$IPTABLES" == "Y" ]; then
 		cat > /iptables.sh <<-END
@@ -168,6 +185,7 @@ else
 				-e ANON=<Y> \\
 				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\
 				-e USER_PASS=[$(openssl rand -hex 6)] \\
+				-e SVNADMIN=<Y> \\
 				-e IPTABLES=<Y> \\
 				--name svn svn
 
