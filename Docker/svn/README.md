@@ -30,6 +30,7 @@ SVN
 				-e ANON=<Y> \\            #开启匿名用户，还需在authz配置 *=r
 				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\   #随机密码
 				-e USER_PASS=[$(openssl rand -hex 6)] \\     #随机密码
+				-e SVNADMIN=<Y> \\        #启用iF.SVNAdmin
 				-e IPTABLES=<Y> \\        #防火墙
 				--name svn svn
 
