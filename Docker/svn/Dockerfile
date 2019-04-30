@@ -2,7 +2,6 @@ FROM centos:latest
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN yum clean all; yum -y update; yum -y install httpd mod_ssl subversion mod_dav_svn php wget unzip net-tools iptables; yum clean all
 
 RUN cd /mnt \
