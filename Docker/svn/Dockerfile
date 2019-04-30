@@ -3,7 +3,13 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
 RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-RUN yum clean all; yum -y update; yum -y install httpd mod_ssl subversion mod_dav_svn net-tools iptables; yum clean all
+RUN yum clean all; yum -y update; yum -y install httpd mod_ssl subversion mod_dav_svn php wget unzip net-tools iptables; yum clean all
+
+RUN cd /mnt \
+    && wget -c https://github.com/mfreiholz/iF.SVNAdmin/archive/master.zip \
+    && unzip master.zip \
+    && mv iF.SVNAdmin-master /var/www/html/svnadmin \
+    && \rm *
 
 VOLUME /home/svn
 
