@@ -29,7 +29,7 @@ easy_install-3.6 pip
 pip install --upgrade youtube-dl you-get
 
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
-yum -y install docker-ce docker-compose
+yum -y install docker-ce docker-compose podman buildah skopeo
 systemctl enable docker
 
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
