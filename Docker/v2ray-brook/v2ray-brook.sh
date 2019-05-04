@@ -18,14 +18,14 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 		echo -e "mode: v2ray \nport: $PORT \nUUID: $UUID"
 		echo "v2ray -config /v2ray/vpoint_vmess_freedom.json" >/usr/bin/v2ray-brook
 	else
-		if [ $HTTP ]; then
+		if [ "$HTTP" ]; then
 			HTTP="--http"
 			TYPE="http"
 		else
 			TYPE="socks5"
 		fi
 		
-		if [ $SERVER ]; then
+		if [ "$SERVER" ]; then
 			echo -e "mode: $MODE \nport: $PORT \ntype: $TYPE"
 			echo "brook $MODE -l :$PORT -i 0.0.0.0 -s $SERVER -p $PASS $HTTP" >/usr/bin/v2ray-brook
 		else
@@ -41,15 +41,15 @@ fi
 else
 	echo -e "
 	Example:
-				docker run -d --restart always \\
+				docker run -d --restart unless-stopped \\
 				-p 19443:19443 \
 				-e PASS=[Random] \\
 				-e PORT=[19443] \\
-				-e MODE=[server] \\ <v2ray| [server|streamserver|ssserver] | [client|streamclient|ssclient]>
+				-e MODE=[server] \\ <v2ray| [server|ssserver] | [client|ssclient]>
 				-e UUID=[Random] \\
 				-e LOG=[none] \\ <debug|info|warning|error|none>
 				-e HTTP=<Y> \\
 				-e SERVER=<server_address:port> \\
-				--hostname v2ray-brook --name v2ray-brook v2ray-brook
+				--name v2ray-brook v2ray-brook
 	"
 fi
