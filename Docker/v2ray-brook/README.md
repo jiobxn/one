@@ -20,7 +20,7 @@ v2ray-brook
 				-p 19443:19443 \
 				-e PASS=[Random] \\    #随机密码
 				-e PORT=[19443] \\     #监听端口
-				-e MODE=[server] \\ <v2ray| [server|ssserver] | [client|ssclient]>    #运行模式：v2ray服务器(默认)、brook服务器、brook客户端
+				-e MODE=[server] \\ <v2ray| [server|ssserver] | [client|ssclient]>    #运行模式：v2ray服务器、brook服务器(默认)、brook客户端
 				-e UUID=[Random] \\    #随机UUID，v2ray
 				-e LOG=[none] \\ <debug|info|warning|error|none>    #记录日志，v2ray
 				-e HTTP=<Y> \\         #客户端启动http代理。 默认socks5
