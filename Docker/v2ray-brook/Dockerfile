@@ -9,7 +9,7 @@ RUN cd /mnt \
         && wget -c https://github.com/$(curl -s https://github.com/txthinking/brook/releases |grep '/brook" rel' |awk -F\" 'NR==1{print $2}') \
         && wget -c https://github.com/$(curl -s https://github.com/v2ray/v2ray-core/releases |grep v2ray-linux-64.zip |awk -F\" 'NR==1{print $2}') \
         && unzip v2ray-linux-64.zip \
-        && mv brook_linux_386 /usr/local/bin/brook \
+        && mv brook /usr/local/bin/ \
         && mv v2ray /usr/local/bin/ \
         && chmod +x /usr/local/bin/brook \
         && chmod +x /usr/local/bin/v2ray \
