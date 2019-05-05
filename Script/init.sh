@@ -14,6 +14,8 @@ systemctl enable iptables ntpd
 
 sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config
 
+[ -z "$(grep termencoding /etc/vimrc)" ] && echo -e "set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936\nset termencoding=utf-8\nset encoding=utf-8" >>/etc/vimrc
+
 wget https://github.com/jiobxn/one/raw/master/Script/scan.sh -O /usr/local/sbin/scan.sh
 chmod u+x /usr/local/sbin/scan.sh
 
