@@ -2,9 +2,8 @@ FROM centos:latest
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-RUN sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf; sed -i 's/plugins=1/plugins=0/' /etc/yum.conf
-RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install nginx net-tools iproute bash-completion vim wget iptables cronie; yum clean all
+RUN rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install nginx keepalived net-tools iproute iptables cronie; yum clean all
 
 VOLUME /usr/share/nginx/html /key /var/log/nginx
 
@@ -18,5 +17,5 @@ EXPOSE 80 443
 CMD ["nginx"]
 
 # docker build -t nginx-rpm .
-# docker run -d --restart always -p 80:80 -p 443:443 -v /docker/www:/www -v /docker/nginx:/key -e DOMAIN_PROXY="fqhub.com%backend_https=y" -e PROXY_SERVER="jiobxn.com,www.jiobxn.com|jiobxn.wordpress.com%backend_https=y,alias=/down|/www" --hostname nginx --name test-nginx nginx-rpm
+# docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/www:/www -v /docker/nginx:/key -e DOMAIN_PROXY="fqhub.com%backend_https=y" -e PROXY_SERVER="jiobxn.com,www.jiobxn.com|jiobxn.wordpress.com%backend_https=y,alias=/down|/www" --name wordpress-nginx jiobxn/nginx-rpm
 # docker run -it --rm nginx-rpm --help
