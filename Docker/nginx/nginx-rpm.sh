@@ -13,6 +13,9 @@ set -e
 : ${CACHE_TIME:="10m"}
 : ${CACHE_SIZE:="2g"}
 : ${CACHE_MEM:="$(($(free -m |grep Mem |awk '{print $2}')*10/100))m"}
+: ${KP_ETH:="$(route -n |awk '$1=="0.0.0.0"{print $NF }')"}
+: ${KP_RID:="77"}
+: ${KP_PASS:="Newpa55"}
 : ${WORKER_PROC:="2"}
 
 
@@ -37,48 +40,47 @@ http_conf() {
 	
 	error_log  /var/log/nginx/error.log warn;
 	pid        /var/run/nginx.pid;
-
+	
 	events {
 	    worker_connections  $(($WORKER_PROC*10240));
 	}
-
+	
 	http {
 	    include       mime.types;
 	    default_type  application/octet-stream;
-
+		
 	    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
 	        '\$status \$body_bytes_sent "\$http_referer" '
 	        '"\$http_user_agent" "\$http_x_forwarded_for"';
 	    access_log  /var/log/nginx/access.log  main;
-
+		
 	    sendfile        on;
 	    tcp_nopush      on;
 	    keepalive_timeout  70;
 	    server_names_hash_bucket_size 512;
-
+		
 	##acclog_off    access_log off;
 	##errlog_off    error_log off;
 		
 	    charset $NGX_CHARSET;
-
 	    client_max_body_size 0;
 	    autoindex on;
 	    server_tokens off;
-
+		
 	    proxy_cache_path /tmp/proxy_cache levels=1:2 keys_zone=cache1:$CACHE_MEM inactive=$CACHE_TIME max_size=$CACHE_SIZE;
 	    fastcgi_cache_path /tmp/fastcgi_cache levels=1:2 keys_zone=cache2:$CACHE_MEM inactive=$CACHE_TIME max_size=$CACHE_SIZE;
-
-	    gunzip on;
+	    
+		gunzip on;
 	    gzip  on;
 	    gzip_comp_level 6;
 	    gzip_proxied any;
 	    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/x-httpd-php image/jpeg image/gif image/png;
 	    gzip_vary on;
-
+		
 	    #upstream#
-
+		
 	    include /etc/nginx/conf.d/*.conf;
-
+		
 	##default_server    server {
 	##default_server            listen       $HTTP_PORT  default_server;
 	##default_server            server_name  _;
@@ -95,7 +97,7 @@ http_conf() {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
 	    server_name localhost;
-
+		
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
@@ -103,12 +105,12 @@ http_conf() {
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
-
+		
 	    location / {
 	        root   html;
 	        index  index.html index.htm;
 	    }
-
+		
 	##nginx_status    location ~ /basic_status {
 	##nginx_status        stub_status;
 	##nginx_status        auth_basic           "Nginx Stats";
@@ -126,9 +128,9 @@ fcgi_server() {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
 	    #server_name#
-
+		
 	##full_https    if (\$scheme = http) { return 301 https://\$host\$request_uri;}
-
+	    
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
@@ -136,15 +138,15 @@ fcgi_server() {
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
-
+		
 	    location / {
 	        root   html;
 	        index  index.php index.html index.htm;
 	        try_files \$uri \$uri/ /index.php?q=\$uri&\$args;
 	    }
-
+		
 	    #alias#
-
+		
 	    location ~ \.php$ {
 	        fastcgi_pass   fcgi-lb-$n;
 	        fastcgi_index  index.php;
@@ -158,17 +160,17 @@ fcgi_server() {
 	##cache        fastcgi_cache_valid 200      $CACHE_TIME;
 	##cache        fastcgi_cache_key \$host\$request_uri\$cookie_user\$scheme\$proxy_host\$uri\$is_args\$args;
 	##cache        fastcgi_cache_use_stale  error timeout invalid_header updating http_500 http_502 http_503 http_504;
-
+	
 	##user_auth        auth_basic           "Nginx Auth";
 	##user_auth        auth_basic_user_file /etc/nginx/.htpasswd-tag;
 	    }
-
+		
 	##nginx_status    location ~ /basic_status {
 	##nginx_status        stub_status;
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /etc/nginx/.htpasswd;
 	##nginx_status    }
-
+	
 	    location ~ /\.ht {
 	        deny  all;
 	    }
@@ -184,9 +186,9 @@ java_php_server() {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
 	    #server_name#
-
+		
 	##full_https    if (\$scheme = http) { return 301 https://\$host\$request_uri;}
-
+	    
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
@@ -194,14 +196,14 @@ java_php_server() {
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
-
+		
 	    location / {
 	        root   html;
 	        index  index.jsp index.php index.html index.htm;
 	    }
-
+		
 	    #alias#
-
+		
 	    location ~ .(jsp|jspx|do|php)?$ {
 	        proxy_pass http://java-php-lb-$n;
 	        proxy_http_version 1.1;
@@ -218,17 +220,17 @@ java_php_server() {
 	##cache        proxy_cache_valid 200      $CACHE_TIME;
 	##cache        proxy_cache_key \$host\$request_uri\$cookie_user\$scheme\$proxy_host\$uri\$is_args\$args;
 	##cache        proxy_cache_use_stale  error timeout invalid_header updating http_500 http_502 http_503 http_504;
-
+	
 	##user_auth        auth_basic           "Nginx Auth";
 	##user_auth        auth_basic_user_file /etc/nginx/.htpasswd-tag;
 	    }
-
+		
 	##nginx_status    location ~ /basic_status {
 	##nginx_status        stub_status;
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /etc/nginx/.htpasswd;
 	##nginx_status    }
-
+	
 	    location ~ /\.ht {
 	        deny  all;
 	    }
@@ -244,9 +246,9 @@ proxy_server() {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
 	    #server_name#
-
-		##full_https    if (\$scheme = http) { return 301 https://\$host\$request_uri;}
-
+		
+	    ##full_https    if (\$scheme = http) { return 301 https://\$host\$request_uri;}
+		
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
@@ -254,9 +256,9 @@ proxy_server() {
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
-
+		
 	    #alias#
-
+		
 	    location / {
 	        proxy_pass http://proxy-lb-$n;
 	        proxy_http_version 1.1;
@@ -271,7 +273,7 @@ proxy_server() {
 	        sub_filter_once    off;
 	        sub_filter_types   * ;
 			
-            #sub_filter#
+	        #sub_filter#
 	        sub_filter \$proxy_host \$host;
 			
 	##cache        proxy_cache cache1;
@@ -282,13 +284,13 @@ proxy_server() {
 	##user_auth        auth_basic           "Nginx Auth";
 	##user_auth        auth_basic_user_file /etc/nginx/.htpasswd-tag;
 	    }
-
+		
 	##nginx_status    location ~ /basic_status {
 	##nginx_status        stub_status;
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /etc/nginx/.htpasswd;
 	##nginx_status    }
-
+	
 	    location ~ /\.ht {
 	        deny  all;
 	    }
@@ -305,7 +307,7 @@ domain_proxy() {
 	    listen       $HTTPS_PORT ssl;
 	    #server_name#
 	    server_name *.$(echo $i |awk -F% '{print $1}'); #$(echo $i |awk -F% '{print $1}')
-
+	    
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
@@ -316,10 +318,10 @@ domain_proxy() {
 		
 	    #rewrite#
 	    #if (\$host !~* ^.*.$(echo $i |awk -F% '{print $1}')$) {return 301 https://cn.bing.com;}
-	    if (\$uri = /\$host) {rewrite ^(.*)$ http://\$host/index.php;}          #t66y login jump
-
-	    set \$domain $(echo $i |awk -F% '{print $1}');
-
+	    if (\$uri = /\$host) {rewrite ^(.*)$ https://\$host/index.php;}          #t66y login jump
+	    
+		set \$domain $(echo $i |awk -F% '{print $1}');
+	    
 	    location / {
             resolver $NGX_DNS;
             #domains#
@@ -332,7 +334,7 @@ domain_proxy() {
             proxy_http_version 1.1;
             proxy_read_timeout      300;
             proxy_connect_timeout   300;
-	        proxy_set_header   Connection "";
+            proxy_set_header   Connection "";
             proxy_set_header   Host              \$proxy_host;
             proxy_set_header   X-Real-IP         \$remote_addr;
             proxy_set_header   X-Forwarded-Proto \$scheme;
@@ -359,7 +361,7 @@ domain_proxy() {
 	##user_auth        auth_basic           "Nginx Auth";
 	##user_auth        auth_basic_user_file /etc/nginx/.htpasswd-tag;
 	    }
-
+		
 	##nginx_status    location ~ /basic_status {
 	##nginx_status        stub_status;
 	##nginx_status        auth_basic           "Nginx Stats";
@@ -594,10 +596,126 @@ http_basic() {
 
 
 
+##-------------------STREAM------------------
+
+stream_conf() {
+	cat >/etc/nginx/nginx.conf <<-END
+	#redhat.xyz
+	worker_processes  $WORKER_PROC;
+  
+	events {
+	    worker_connections  $(($WORKER_PROC*10240));
+	}
+  
+	stream {
+	    #upstream#
+	    #server#
+	}
+	daemon off;
+	END
+}
+
+
+
+stream_server() {
+	if [ -n "$(echo $i |grep '%')" ]; then
+		echo "% yes"
+		if [ -n "$(echo $i |awk -F% '{print $1}' |grep '|')" ]; then
+			PORT=$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $1}')
+
+			if [ -n "$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}' |grep ",")" ]; then
+				sed -i '/#upstream#/ a \    upstream backend-lb-'$n' {\n\    }\n' /etc/nginx/nginx.conf
+
+				for y in $(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
+					sed -i '/upstream backend-lb-'$n'/ a \        server '$y';' /etc/nginx/nginx.conf
+					sed -i 's/&/ /' /etc/nginx/nginx.conf
+				done
+				
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /etc/nginx/nginx.conf
+			else
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}')';\n\    }\n' /etc/nginx/nginx.conf
+			fi
+		else
+			echo "error.." && exit 1
+		fi
+	else
+		echo "% no"
+		if [ -n "$(echo $i |grep '|')" ]; then
+			PORT=$(echo $i |awk -F'|' '{print $1}')
+
+			if [ -n "$(echo $i |awk -F'|' '{print $2}' |grep ",")" ]; then
+				sed -i '/#upstream#/ a \    upstream backend-lb-'$n' {\n\    }\n' /etc/nginx/nginx.conf
+
+				for y in $(echo $i |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
+					sed -i '/upstream backend-lb-'$n'/ a \        server '$y';' /etc/nginx/nginx.conf
+					sed -i 's/&/ /' /etc/nginx/nginx.conf
+				done
+				
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /etc/nginx/nginx.conf
+			else
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F'|' '{print $2}')';\n\    }\n' /etc/nginx/nginx.conf
+			fi
+		else
+			echo "error.." && exit 1
+		fi
+	fi
+}
+	
+
+
+stream_other() {
+	for i in $(echo $i |awk -F% '{print $2}' |sed 's/,/\n/g'); do		
+		#负载均衡
+		if [ -n "$(echo $i |grep 'stream_lb=')" ]; then
+			stream_lb="$(echo $i |grep 'stream_lb=' |awk -F= '{print $2}')"
+		
+			if [ "$stream_lb" == "hash" ]; then
+				sed -i '/upstream backend-lb-'$n'/ a \        hash $remote_addr consistent;' /etc/nginx/nginx.conf
+			fi
+			
+			if [ "$stream_lb" == "least_conn" ]; then
+				sed -i '/upstream backend-lb-'$n'/ a \        least_conn;' /etc/nginx/nginx.conf
+			fi
+		fi
+		
+		#后端连接超时(1m)
+		if [ -n "$(echo $i |grep 'conn_timeout=')" ]; then
+			connect_timeout="$(echo $i |grep 'connect_timeout=' |awk -F= '{print $2}')"
+			sed -i '/#backend-lb-'$n'#/ a \        proxy_connect_timeout '$connect_timeout';' /etc/nginx/nginx.conf
+		fi
+		
+		#空闲超时(10m)
+		if [ -n "$(echo $i |grep 'proxy_timeout=')" ]; then
+			proxy_timeout="$(echo $i |grep 'proxy_timeout=' |awk -F= '{print $2}')"
+			sed -i '/#backend-lb-'$n'#/ a \        proxy_timeout '$proxy_timeout';' /etc/nginx/nginx.conf
+		fi
+		
+		#UDP
+		if [ -n "$(echo $i |grep 'udp=')" ]; then
+			sed -i 's/'$PORT';#'$n'/'$PORT' udp;#'$n'/' /etc/nginx/nginx.conf
+		fi
+	done
+}
+
+
+
+
 ###start
 
 if [ "$1" = 'nginx' ]; then
   if [ -z "$(grep "redhat.xyz" /etc/nginx/nginx.conf)" ]; then
+        \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+  
+	if [ "$STREAM_SERVER" ]; then
+		stream_conf
+		
+		n=0
+		for i in $(echo "$STREAM_SERVER" |sed 's/;/\n/g'); do
+			n=$(($n+1))
+			stream_server
+			stream_other
+		done
+	else
 
 		http_conf
 
@@ -674,15 +792,45 @@ if [ "$1" = 'nginx' ]; then
 			echo "$NGX_USER:$(openssl passwd -apr1 $NGX_PASS)" >> /etc/nginx/.htpasswd
 			echo "Nginx user AND password: $NGX_USER  $NGX_PASS"
 		fi
+    fi
+
+	#keepalived
+	\rm /etc/keepalived/keepalived.conf
+	if [ $KP_VIP ]; then
+		cat >/etc/keepalived/keepalived.conf <<-END
+		! Configuration File for keepalived
+    
+		vrrp_instance VI_1 {
+		    state BACKUP
+		    interface $KP_ETH
+		    virtual_router_id $KP_RID
+		    priority 100
+		    advert_int 1
+        
+		    authentication {
+		        auth_type PASS
+		        auth_pass $KP_PASS
+		    }
+        
+		    virtual_ipaddress {
+		        $KP_VIP
+		    }
+		}
+		END
+	fi
+
   fi
 
 	echo "Start ****"
+	#Keepalived Need root authority "--privileged"
+	[ -f /etc/keepalived/keepalived.conf ] && keepalived -f /etc/keepalived/keepalived.conf -P -l && [ -z "`iptables -S |grep vrrp`" ] && iptables -I INPUT -p vrrp -j ACCEPT
+
 	exec "$@"
 else
 
 	echo -e " 
 	Example:
-				docker run -d --restart always \\
+				docker run -d --restart unless-stopped [--privileged] \\
 				-v /docker/www:/usr/share/nginx/html \\
 				-v /docker/upload:/mp4 \\
 				-v /docker/key:/key \\
@@ -706,7 +854,7 @@ else
 				-e NGX_DNS=[9.9.9.9] \\
 				-e CACHE_TIME=[8h] \\
 				-e CACHE_SIZE=[4g] \\
-				-e CACHE_MEM=[物理内存的%10] \\
+				-e CACHE_MEM=[256m] \\
 				-e ACCLOG_OFF=<Y> \\
 				-e ERRLOG_OFF=<Y> \\
 				   alias=</boy|/mp4> \\
@@ -717,7 +865,7 @@ else
 				   full_https=<Y> \\
 				   charset=<gb2312> \\
 				   cache=<Y> \\
-				   header=<host> \\
+				   header=<host|http_host|proxy_host> \\
 				   http_lb=<ip_hash|hash|least_conn> \\
 				   backend_https=<Y> \\
 				   dns=<223.5.5.5> \\
@@ -726,7 +874,15 @@ else
 				   auth=<admin|passwd> \\
 				   filter=<.google.com|.fqhub.com&.twitter.com|.fqhub.com> \\
 				   log=<N|Y> \\
-				--hostname nginx \\
+				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
+				   stream_lb=<hash|least_conn> \\
+				   conn_timeout=[1m] \\
+				   proxy_timeout=[10m] \\
+				   udp=<Y> \\
+				-e KP_VIP=<virtual address> \\
+				-e KP_ETH=[default interface] \\
+				-e KP_RID=[77] \\
+				-e KP_PASS=[Newpa55] \\
 				--name nginx nginx
 	" 
 fi
