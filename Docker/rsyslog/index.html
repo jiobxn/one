@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<form action="/cgi-bin/hello.cgi" method="post">
+主机: <input type="text" name="post_1" />
+&nbsp;
+文件: <input type="text" name="post_2" />
+&nbsp;
+过滤: <input type="text" name="post_3" />
+&nbsp;
+&nbsp;
+日期: <select name="post_4">
+<option value="0">今天</option>
+<option value="1">昨天</option>
+<option value="2">前天</option>
+<option value="3">3天前</option>
+<option value="4">4天前</option>
+<option value="5">5天前</option>
+<option value="6">6天前</option>
+<option value="7">7天前</option>
+<option value="8">8天前</option>
+<option value="9">9天前</option>
+<option value="10">10天前</option>
+<option value="11">11天前</option>
+<option value="12">12天前</option>
+<option value="13">13天前</option>
+<option value="14">14天前</option>
+<option value="15">15天前</option>
+<option value="">all</option>
+</select>
+&nbsp;
+&nbsp;
+模板: <select name="post_5">
+<option value="">null</option>
+<option value="sshacc">SSH Accepted</option>
+<!--<option value="bash">BASH Log</option>-->
+<option value="ssherr">SSH Failed</option>
+<option value="router">ROUTER Login</option>
+</select>
+&nbsp;
+<input type="submit" value="查询" />
+</form>
+<br>
+<br>
+<br>
+<a href="down">下载文件</a>
+<br>
+<br>
+<br>
+<br>
+<br>
+<!--help-->
+<table style="width: 100%" border="1">
+<tbody>
+<tr><td><h2 style=color:blue>主机</h2></td><td><h2 style=color:blue>文件</h2></td><td><h2 style=color:blue>过滤</h2></td><td><h2 style=color:blue>日期</h2></td><td><h2 style=color:blue>模板</h2></td><td><h2 style=color:red>效果</h2></td></tr>
+<tr><td>10.10.5.13、10.10.2</td><td>sshd、2019-02-03、2019-02</td><td>Failed、error、10.10.1</td><td>任选</td><td>任选</td><td><h3 style=color:red>有效值</h3></td></tr>
+<tr><td>*</td><td>null</td><td>null</td><td>*</td><td>null</td><td>列出文件</td></tr>
+<tr><td>*</td><td>*</td><td>null</td><td>*</td><td>null</td><td>搜索文件</td></tr>
+<tr><td>*</td><td>*</td><td>*</td><td>*</td><td>null</td><td>搜索关键字</td></tr>
+<tr><td>10.10.2.100</td><td>null</td><td>10.10.2</td><td>*</td><td>*</td><td>模板</td></tr>
+</tbody>
+</table>
+</html>
