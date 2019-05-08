@@ -4,6 +4,13 @@ ARG LATEST="0"
 
 RUN yum clean all; yum -y update; yum -y install rsyslog httpd net-tools cronie; yum clean all
 
+RUN ln -s /var/log/rsyslog /var/www/html/down \
+        && curl -s https://raw.githubusercontent.com/jiobxn/one/master/Docker/rsyslog/index.html >/var/www/html/index.html \
+        && curl -s https://raw.githubusercontent.com/jiobxn/one/master/Docker/rsyslog/hello.cgi >/var/www/cgi-bin/hello.cgi \
+        && curl -s https://raw.githubusercontent.com/jiobxn/one/master/Docker/rsyslog/loginfo.sh >/var/www/cgi-bin/loginfo.sh \
+        && chown apache.apache /var/www/cgi-bin/* \
+        && chmod 700 /var/www/cgi-bin/*
+
 VOLUME /var/log/rsyslog
 
 COPY rsyslog.sh /rsyslog.sh
