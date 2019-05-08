@@ -26,6 +26,7 @@ if [ -z "$(grep "redhat.xyz" /etc/rsyslog.d/remote.conf)" ]; then
 	END
 
 	sed -i 's/Listen 80/Listen '$HTTP_PORT'/;/Listen/a ServerName localhost:'$HTTP_PORT'' /etc/httpd/conf/httpd.conf
+	sed -i '/^IndexOptions/a IndexOptions FancyIndexing NameWidth=*' /etc/httpd/conf.d/autoindex.conf
 fi
 
 	echo "Start ****"
