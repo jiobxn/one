@@ -2,17 +2,17 @@
 REPOS="$1"                  # 仓库的路径
 REV="$2"                    # 新提交的版本号
 
-LOGFILE=/tmp/svn.log    # 钩子脚本的日志
+LOGFILE=/var/log/httpd/Test.log    # 钩子脚本的日志
 # 脚本的标准输出和标准错误输出都打印到日志文件里
 exec 1>>"$LOGFILE"
 exec 2>&1
 
 SVNLOOK=/usr/bin/svnlook
-TIME=$(date "+%Y-%m-%d %H:%M:%S")
 AUTHOR=$($SVNLOOK author -r $REV "$REPOS")  #提交作者
 CHANGEDDIRS=$($SVNLOOK dirs-changed $REPOS) #修改的目录集合
 MESSAGE=$($SVNLOOK log -r $REV "$REPOS")    #提交时的备注信息，不建议用中文
 
 echo "#----------------$(date "+%F %T")----------------------#"
-echo "提交版本：$REV ,作者：$AUTHOR ,提交备注：$MESSAGE ,修改目录：$(echo $CHANGEDDIRS | tr '\n' ' ')" >>/tmp/svn.log
+echo "提交版本：$REV ,作者：$AUTHOR ,提交备注：$MESSAGE ,修改目录：$(echo $CHANGEDDIRS | tr '\n' ' ')"
 echo
+# chown apache.apache /var/log/httpd
