@@ -4,6 +4,7 @@ set -e
 : ${FTP_PORT:="21"}
 : ${PASV_PORT:="25000:25100"}
 : ${DATA_PORT:="20"}
+: ${FTP_UID:="21000"}
 : ${FTP_USER:="vsftpd"}
 : ${FTP_PASS:="$(openssl rand -hex 10)"}
 : ${ANON_ROOT:="public"}
@@ -315,6 +316,7 @@ PUBLIC_CHMOD() {
 
 
 INIT_FTP() {
+ 	useradd -u $FTP_UID -s /sbin/nologin $FTP_USER
 	mkdir -p /etc/vsftpd/conf
 	sed -i 's/anonymous_enable=YES/anonymous_enable=NO/' /etc/vsftpd/vsftpd.conf
 	sed -i 's/listen=NO/listen=YES/' /etc/vsftpd/vsftpd.conf
@@ -339,6 +341,7 @@ INIT_FTP() {
 			
 			echo -e "$USER\n$PASS" >> /etc/vsftpd/vuser.txt
 			mkdir -p /home/$FTP_USER/$ROOT
+			chown $FTP_USER.$FTP_USER /home/$FTP_USER/$ROOT
 			echo "$USER $PASS $CHMOD /$ROOT" |tee -a /key/ftp.log
 		fi
 	done
@@ -347,10 +350,8 @@ INIT_FTP() {
 	#auth
 	db_load -T -t hash -f /etc/vsftpd/vuser.txt /etc/vsftpd/vuser.db
 	chmod 600 /etc/vsftpd/vuser.*
-	useradd -s /sbin/nologin $FTP_USER
 	sed -i '2iauth sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
 	sed -i '3iaccount sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
-	chown -R $FTP_USER.$FTP_USER /home/$FTP_USER
 
 	#Download rate
 	[ "$ANON_MB" -gt 0 ] && ANON_MB=$(echo "$ANON_MB*1048576" |bc)
@@ -407,7 +408,8 @@ INIT_FTP() {
 		
 		PUBLIC_CHMOD
 		
-		chown -R $FTP_USER.$FTP_USER /home/$FTP_USER
+		chown $FTP_USER.$FTP_USER /home/$FTP_USER/$ANON_ROOT
+		chown $FTP_USER.$FTP_USER /home/$FTP_USER/$ANON_ROOT/pub
 	fi
 
 	#pasv disable
@@ -465,6 +467,7 @@ HELP() {
 				-p 25000-25100:25000-25100 \\
 				-e FTP_PORT=[21] \\
 				-e PASV_PORT=[25000:25100] \\
+				-e FTP_UID=[21000] \\
 				-e FTP_USER=[vsftpd] \\
 				-e FTP_PASS=[$(openssl rand -hex 10)] \\
 				-e ANON_ROOT=[public] \\
