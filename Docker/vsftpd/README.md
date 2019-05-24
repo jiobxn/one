@@ -34,6 +34,7 @@ VSFTPD
 				-p 25000-25100:25000-25100 \\
 				-e FTP_PORT=[21] \\       监听端口
 				-e PASV_PORT=[25000:25100]    被动模式数据端口范围
+				-e FTP_UID=[21000] \\     FTP用户UID
 				-e FTP_USER=[vsftpd] \\   管理员用户
 				-e FTP_PASS=[$(openssl rand -hex 10)] \\    随机密码
 				-e ANON_ROOT=[public] \\  匿名用户目录
