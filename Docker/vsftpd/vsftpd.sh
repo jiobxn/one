@@ -352,6 +352,7 @@ INIT_FTP() {
 	chmod 600 /etc/vsftpd/vuser.*
 	sed -i '2iauth sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
 	sed -i '3iaccount sufficient /lib64/security/pam_userdb.so db=/etc/vsftpd/vuser' /etc/pam.d/vsftpd
+	echo -e "\nFTP_UID: $FTP_UID\n" |tee -a /key/ftp.log
 
 	#Download rate
 	[ "$ANON_MB" -gt 0 ] && ANON_MB=$(echo "$ANON_MB*1048576" |bc)
