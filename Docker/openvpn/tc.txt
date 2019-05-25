@@ -1,0 +1,38 @@
+#**测试环境**  
+# eth0 192.168.1.130 
+# tun0 10.8.0.1     
+
+### TC限速
+# 将来自内vpn客户端的10.8.0.0/24用TC限制下载速度为100KB/s，上传速度为30KB/s。  
+
+##下载限制
+#1.清除原有配置
+tc qdisc del dev tun0 root
+#2.为网卡tun0添加创建一个HTB根队列
+tc qdisc add dev tun0 root handle 10: htb
+#3.在该队列上建立分类
+tc class add dev tun0 parent 10:0 classid 10:10 htb rate 100kbps ceil 100kbps prio 1
+#4.为每个分类建立过滤器
+tc filter add dev tun0 parent 10:0 protocol ip prio 10 handle 1 fw classid 10:10
+#5.为每个分类建立随机公平队列
+tc qdisc add dev tun0 parent 10:10 handle 101: sfq perturb 10
+#6.通过iptables标记目标地址
+iptables -t mangle -F POSTROUTING
+iptables -t mangle -A POSTROUTING -d 10.8.0.0/24 -j MARK --set-mark 1
+iptables -t mangle -A POSTROUTING -d 10.8.0.0/24 -j RETURN
+
+##上传限制
+#1.清除原有配置
+tc qdisc del dev eth0 root
+#2.为网卡eth0添加创建一个HTB根队列
+tc qdisc add dev eth0 root handle 20: htb
+#3.在该队列上建立分类
+tc class add dev eth0 parent 20:0 classid 20:10 htb rate 30kbps ceil 30kbps prio 1
+#4.为每个分类建立过滤器
+tc filter add dev eth0 parent 20:0 protocol ip prio 10 handle 2 fw classid 20:10
+#5.为每个分类建立随机公平队列
+tc qdisc add dev eth0 parent 20:10 handle 102: sfq perturb 10
+#6.通过iptables标记目标地址
+iptables -t mangle -F PREROUTING
+iptables -t mangle -A PREROUTING -s 10.8.0.0/24 -j MARK --set-mark 2
+iptables -t mangle -A PREROUTING -s 10.8.0.0/24 -j RETURN
