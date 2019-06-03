@@ -42,6 +42,19 @@ expect \"*>\" {send \"quit\r\"; exit}
 "
 }
 
+#建议给sysname定义一个特殊标识，例如xxx-xxx-switch
+SSH_HUAWEI() {
+expect -c "
+set timeout 60
+spawn ssh $USER@$IP
+expect \"Password:\" {send \"$PASS\r\"}
+expect \"*switch>\" {send \"system-view\r\"}
+expect \"*switch]\" {send \"display current-configuration\r\"}
+expect \"*switch]\" {send \"quit\r\"}
+expect \"*switch>\" {send \"quit\r\"; exit}
+"
+}
+
 TELNET_H3C() {
 expect -c "
 set timeout 60
@@ -90,8 +103,10 @@ while [ $i -le $N ];do
 	IP=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $2}')
 	USER=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $3}')
 	PASS=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $4}')
+	#PASS2=$(grep -v ^# $FILE |grep -v ^$ |sed -n ''$i'p' |awk '{print $5}')
 	if [ $IP -a $TYPE -a $USER -a $PASS ];then
 		[ "$TYPE" == "SSH_H3C" ] && SSH_H3C >"$IP-$(date +%F)".txt && sed -i '1,/>screen-length disable/d' "$IP-$(date +%F)".txt
+		[ "$TYPE" == "SSH_HUAWEI" ] && SSH_HUAWEI >"$IP-$(date +%F)".txt 
 		[ "$TYPE" == "SSH_CISCO" ] && SSH_CISCO >"$IP-$(date +%F)".txt && sed -i '1,/#terminal length/d' "$IP-$(date +%F)".txt
 		[ "$TYPE" == "TELNET_H3C" ] && TELNET_H3C >"$IP-$(date +%F)".txt && sed -i '1,/>screen-length disable/d' "$IP-$(date +%F)".txt
 		[ "$TYPE" == "TELNET_CISCO" ] && TELNET_CISCO >"$IP-$(date +%F)".txt && sed -i '1,/#terminal length/d' "$IP-$(date +%F)".txt
