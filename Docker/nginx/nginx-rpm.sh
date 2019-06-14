@@ -32,7 +32,6 @@ http_conf() {
 
 
 	#global
-	mkdir /etc/nginx/vhost
 	cat >/etc/nginx/nginx.conf <<-END
 	#redhat.xyz
 	user  nginx;
