@@ -51,7 +51,7 @@ SVN
 
 提交
 
-    svn commit -m add --force --username admin --password passwd0
+    svn commit -m add --username admin --password passwd0
 
 删除文件
 
