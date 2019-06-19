@@ -69,7 +69,7 @@ http_conf() {
 	    proxy_cache_path /tmp/proxy_cache levels=1:2 keys_zone=cache1:$CACHE_MEM inactive=$CACHE_TIME max_size=$CACHE_SIZE;
 	    fastcgi_cache_path /tmp/fastcgi_cache levels=1:2 keys_zone=cache2:$CACHE_MEM inactive=$CACHE_TIME max_size=$CACHE_SIZE;
 	    
-		gunzip on;
+	    gunzip on;
 	    gzip  on;
 	    gzip_comp_level 6;
 	    gzip_proxied any;
