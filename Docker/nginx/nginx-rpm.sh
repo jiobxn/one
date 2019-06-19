@@ -106,7 +106,7 @@ http_conf() {
 	    ssl_prefer_server_ciphers   on;
 		
 	    location / {
-	        root   html;
+	        root   /usr/share/nginx/html;
 	        index  index.html index.htm;
 	    }
 		
