@@ -41,7 +41,7 @@ SVN
 
 检出项目
 
-    svn co http://192.168.0.68/svn/repos/ --username admin --password passwd0 --non-interactive
+    svn co http://192.168.0.68/svn/repos/ --username admin --password passwd0 
 
 添加文件
 
