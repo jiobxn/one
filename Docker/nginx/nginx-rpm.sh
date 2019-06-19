@@ -139,7 +139,7 @@ fcgi_server() {
 	    ssl_prefer_server_ciphers   on;
 		
 	    location / {
-	        root   html;
+	        root   /usr/share/nginx/html;
 	        index  index.php index.html index.htm;
 	        try_files \$uri \$uri/ /index.php?q=\$uri&\$args;
 	    }
@@ -197,7 +197,7 @@ java_php_server() {
 	    ssl_prefer_server_ciphers   on;
 		
 	    location / {
-	        root   html;
+	        root   /usr/share/nginx/html;
 	        index  index.jsp index.php index.html index.htm;
 	    }
 		
