@@ -10,6 +10,7 @@ if [ "$1" = 'catalina.sh' ]; then
 : ${HTTPS_PORT:=8443}
 : ${REDIS_PORT:=6379}
 : ${SESSION_TTL:=30}
+: ${AJP_PORT:=8009}
 : ${MAX_MEM=$(($(free -m |grep Mem |awk '{print $2}')*50/100))}
 
   if [ -z "$(grep "redhat.xyz" /tomcat/conf/server.xml)" ]; then
@@ -87,6 +88,12 @@ if [ "$1" = 'catalina.sh' ]; then
 		sed -i 's/8443/'$HTTPS_PORT'/g' /tomcat/conf/server.xml
 	fi
 	
+	#ajp port
+	if [ $AJP_PORT -ne 8009 ];then
+		sed -i 's/8009/'$AJP_PORT'/g' /tomcat/conf/server.xml
+		sed -i 's/8005/'$(($AJP_PORT-4))'/g' /tomcat/conf/server.xml
+	fi
+	
 	#JVM Optimization
 	SIZE=$(($MAX_MEM/4))
 	MSIZE=$(($MAX_MEM/2))
@@ -130,6 +137,7 @@ else
 					-p 12345:12345 \\
 					-e HTTP_PORT=[8080] \\
 					-e HTTPS_PORT=[8443] \\
+					-e AJP_PORT=[8009] \\
 					-e TOM_USER=<admin> \\
 					-e TOM_PASS=<redhat> \\
 					-e WWW_ROOT=[ROOT] \\
