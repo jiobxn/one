@@ -6,6 +6,7 @@ if [ "$4" = 'bin/nexus' ]; then
 [ -z "$(ls -ld /usr/local/sonatype-work |egrep -o "nexus nexus")" ] && chown -R nexus.nexus /usr/local/sonatype-work
 
 if [ -z "$(grep redhat.xyz /usr/local/nexus/etc/nexus-default.properties)" ]; then
+	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	sed -i '1i #redhat.xyz' /usr/local/nexus/etc/nexus-default.properties
 
 	if [ "$RUN_MEM" ]; then
@@ -30,13 +31,13 @@ fi
 else
 	echo -e "
 	Example:
-				docker run -d \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/nexus:/usr/local/sonatype-work \\
 				-p 8081:8081 \\
 				-e RUN_MEM=[1200M] \\
 				-e MAX_MEM=[2G] \\
 				-e NEXUS_PORT=[8081] \\
 				-e URI_PATH=[/] \\
-				--hostname nexus --name nexus nexus
+				--name nexus nexus
 	"
 fi
