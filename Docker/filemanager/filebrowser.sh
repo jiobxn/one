@@ -41,7 +41,7 @@ else
 				-v /docker/date:/srv
 				-p 8080:8080 \
 				-e FB_PORT=[8080] \\
-				-e FB_AUTH=[Y] \\
+				-e FB_AUTH=<Y> \\
 				--name filebrowser filebrowser
 	"
 fi
