@@ -38,7 +38,7 @@ else
 	echo -e "
 	Example:
 				docker run -d --restart unless-stopped \\
-				-v /docker/date:/srv
+				-v /docker/filebrowser:/srv
 				-p 8080:8080 \
 				-e FB_PORT=[8080] \\
 				-e FB_AUTH=<Y> \\
