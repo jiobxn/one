@@ -17,6 +17,6 @@ FileBrowser
 				docker run -d --restart unless-stopped \\
 				-v /docker/filebrowser:/srv
 				-p 8080:8080 \
-				-e FM_PORT=[8080] \\
-				-e FM_AUTH=<Y> \\    #开启用户认证
+				-e FB_PORT=[8080] \\
+				-e FB_AUTH=<Y> \\    #开启用户认证
 				--name filemanager filemanager
