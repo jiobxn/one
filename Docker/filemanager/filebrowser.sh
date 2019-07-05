@@ -16,9 +16,11 @@ if [ ! -f /key/config.json ]; then
 	cat >/key/config.json <<-END
 	{
 	  "port": $FB_PORT,
+	  "baseURL": "",
 	  "address": "",
+	  "log": "stdout",
 	  "database": "/key/database.db",
-	  "scope": "/srv",
+	  "root": "/srv",
 	  "allowCommands": true,
 	  "allowEdit": true,
 	  "allowNew": true,
