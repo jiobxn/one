@@ -1,32 +1,33 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 if [ "$1" = 'filebrowser' ]; then
 
-: ${FM_PORT:="80"}
+: ${FB_PORT:="8080"}
 
 if [ ! -f /key/config.json ]; then
-	if [ "$FM_AUTH" == "N" ]; then
-		FM_AUTH=true
+	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+	if [ "$FB_AUTH" == "Y" ]; then
+		FB_AUTH=false
 	else
-		FM_AUTH=false
+		FB_AUTH=true
 	fi
 
 	cat >/key/config.json <<-END
 	{
-	  "port": $FM_PORT,
+	  "port": $FB_PORT,
 	  "address": "",
 	  "database": "/key/database.db",
 	  "scope": "/srv",
 	  "allowCommands": true,
 	  "allowEdit": true,
 	  "allowNew": true,
-	  "noAuth": $FM_AUTH,
+	  "noAuth": $FB_AUTH,
 	  "commands": []
 	}
 	END
 	
-	echo "username and password: admin"
+	echo "username : admin"
 fi
 
 	echo "Start ****"
@@ -34,11 +35,11 @@ fi
 else
 	echo -e "
 	Example:
-				docker run -d --restart always \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/date:/srv
-				-p 80:80 \
-				-e FM_PORT=[80] \\
-				-e FM_AUTH=[Y] \\
-				--hostname filebrowser --name filebrowser filebrowser
+				-p 8080:8080 \
+				-e FB_PORT=[8080] \\
+				-e FB_AUTH=[Y] \\
+				--name filebrowser filebrowser
 	"
 fi
