@@ -17,10 +17,10 @@ RUN chmod +x /filebrowser.sh
 
 ENTRYPOINT ["/filebrowser.sh"]
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["filebrowser", "--config", "/key/config.json"]
 
 # docker build -t filebrowser .
-# docker run -d --restart unless-stopped -p 8080:80 --name filebrowser filebrowser
+# docker run -d --restart unless-stopped -p 8080:8080 -v /docker/filebrowser:/srv --name filebrowser filebrowser
 # docker logs filebrowser
