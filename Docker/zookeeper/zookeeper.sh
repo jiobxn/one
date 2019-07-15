@@ -3,7 +3,7 @@ set -e
 
 : ${ZK_MEM:="1G"}
 : ${ZK_APORT:="8080"}
-: ${ZK_CPORT:="2181"}
+: ${ZK_PORT:="2181"}
 : ${ZK_SPORT:="2888"}
 
 if [ "$1" = 'bin/zkServer.sh' ]; then
@@ -16,7 +16,7 @@ if [ "$1" = 'bin/zkServer.sh' ]; then
 	sed -i 's/#maxClientCnxns=60/maxClientCnxns=0/' /zookeeper/conf/zoo.cfg
 	sed -i 's/syncLimit=5/syncLimit=2/' /zookeeper/conf/zoo.cfg
 	echo "admin.serverPort=$ZK_APORT" >>/zookeeper/conf/zoo.cfg
-	sed -i "s/2181/$ZK_CPORT/" /zookeeper/conf/zoo.cfg
+	sed -i "s/2181/$ZK_PORT/" /zookeeper/conf/zoo.cfg
 	echo "export JVMFLAGS=\"-Xms$ZK_MEM -Xmx$ZK_MEM \$JVMFLAGS\"" >/zookeeper/conf/java.env 
 
 	#Clustered
@@ -28,7 +28,7 @@ if [ "$1" = 'bin/zkServer.sh' ]; then
 			echo "server.$n=$i:$ZK_SPORT:$[$ZK_SPORT+1000]" >>/zookeeper/conf/zoo.cfg
 			[ -n "$(ifconfig |grep $i)" ] && echo $n >/zookeeper/data/myid
 		done
-		echo "echo stat | nc 127.0.0.1 $ZK_CPORT |awk '\$1==\"Mode:\"{print \$2}'" >/usr/local/bin/zoo
+		echo "echo stat | nc 127.0.0.1 $ZK_PORT |awk '\$1==\"Mode:\"{print \$2}'" >/usr/local/bin/zoo
 		chmod +x /usr/local/bin/zoo
 	fi
 	
@@ -68,7 +68,7 @@ else
 				-p 2181:2181 \\
 				-e ZK_MEM=[1G] \\
 				-e ZK_APORT=[8080] \\
-				-e ZK_CPORT=[2181] \\
+				-e ZK_PORT=[2181] \\
 				-e ZK_SPORT=[2888] \\
 				-e ZK_SERVER=<"10.0.0.71,10.0.0.72,10.0.0.73"> \\
 				-e VIP=<10.0.0.70> \\
