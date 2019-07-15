@@ -7,20 +7,23 @@ ZooKeeprt
 ## Example:
 
     #运行一个单机版ZK
-    docker run -d --restart always -p 2181:2181 -v /docker/zookeeper:/var/lib/zookeeper --hostname zookeeper --name zookeeper zookeeper
+    docker run -d --restart unless-stopped -p 2181:2181 -v /docker/zookeeper:/zookeeper/data --name zookeeper zookeeper
 
     #运行一个ZK集群
-    docker run -d --restart always --privileged --network=mynetwork --ip=10.0.0.71 -v /docker/zookeeper1:/var/lib/zookeeper -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --hostname zookeeper1 --name zookeeper1 zookeeper
-    docker run -d --restart always --privileged --network=mynetwork --ip=10.0.0.72 -v /docker/zookeeper2:/var/lib/zookeeper -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --hostname zookeeper2 --name zookeeper2 zookeeper
-    docker run -d --restart always --privileged --network=mynetwork --ip=10.0.0.73 -v /docker/zookeeper3:/var/lib/zookeeper -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --hostname zookeeper3 --name zookeeper3 zookeeper
+    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.71 -v /docker/zookeeper1:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --name zookeeper1 zookeeper
+    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.72 -v /docker/zookeeper2:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --name zookeeper2 zookeeper
+    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.73 -v /docker/zookeeper3:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --name zookeeper3 zookeeper
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart always [--privileged] \\
-				-v /docker/zookeeper:/var/lib/zookeeper \\
+				docker run -d --restart unless-stopped [--privileged] \\
+				-v /docker/zookeeper:/zookeeper/data \\
 				-p 2181:2181 \\
 				-e ZK_MEM=[1G] \\                                     默认内存大小1G
+				-e ZK_APORT=[8080] \\                                 zookeeper admin端口
+				-e ZK_PORT=[2181] \\                                  zookeeper client端口(提供服务)
+				-e ZK_SPORT=[2888] \\                                 zookeeper 集群端口(选举)
 				-e ZK_SERVER=<"10.0.0.71,10.0.0.72,10.0.0.73"> \\     集群节点数建议大于或等于3
 				-e VIP=<10.0.0.70> \\                                 leader IP Addr，需要 --privileged
 				-e IPTABLES=<"192.168.10.0/24,10.0.0.0/24"> \\        防火墙(2181)，需要 --privileged
@@ -30,7 +33,7 @@ ZooKeeprt
 ## 补充
 查看集群状态：
 
-    /usr/local/zookeeper/bin/zkServer.sh status
+    bin/zkServer.sh status
 
 Zookeeper中角色：
 
@@ -48,15 +51,15 @@ Zookeeper中角色：
 	zk_min_latency	0                                       最小延迟
 	zk_packets_received	1095806                         收到的数据包
 	zk_packets_sent	1095807                                 发送的数据包
-	zk_num_alive_connections	2                           活动连接数，
-	zk_outstanding_requests	0                                   请求队列，大于10报警
-	zk_server_state	leader                                      服务器角色
+	zk_num_alive_connections	2                       活动连接数，
+	zk_outstanding_requests	0                               请求队列，大于10报警
+	zk_server_state	leader                                  服务器角色
 	zk_znode_count	172                                     znodes的数量
 	zk_watch_count	22                                      watches的数量
 	zk_ephemerals_count	2                               ephemerals的数量
 	zk_approximate_data_size	12493                   approximate的数据大小
-	zk_open_file_descriptor_count	31                          打开文件数，大于%85报警
+	zk_open_file_descriptor_count	31                      打开文件数，大于%85报警
 	zk_max_file_descriptor_count	65536                   最大打开文件数
 	zk_followers	2                                       追随者的数量
 	zk_synced_followers	2                               同步的追随者
-	zk_pending_syncs	0                                   等待同步，大于10报警
+	zk_pending_syncs	0                               等待同步，大于10报警
