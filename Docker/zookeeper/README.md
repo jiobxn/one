@@ -26,8 +26,6 @@ ZooKeeprt
 				-e ZK_SPORT=[2888] \\                                 zookeeper 集群端口(选举)
 				-e ZK_SERVER=<"10.0.0.71,10.0.0.72,10.0.0.73"> \\     集群节点数建议大于或等于3
 				-e VIP=<10.0.0.70> \\                                 leader IP Addr，需要 --privileged
-				-e IPTABLES=<"192.168.10.0/24,10.0.0.0/24"> \\        防火墙(2181)，需要 --privileged
-				--hostname zookeeper \\
 				--name zookeeper zookeeper
 
 ## 补充
