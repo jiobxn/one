@@ -9,12 +9,12 @@ Kafka
 ## Example:
 
     #运行一个单机版Kafka
-    docker run -d --restart always --network=mynetwork --ip=10.0.0.100 -p 9092:9092 -v /docker/kafka:/var/lib/kafka-logs -e ZK_SERVER=10.0.0.70:2181 -e KK_TOPIC=test:1:1 --hostname kafka --name kafka kafka
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.100 -p 9092:9092 -v /docker/kafka:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_TOPIC=test:1:1 --name kafka kafka
     
     #运行一个Kafka集群
-    docker run -d --restart always --network=mynetwork --ip=10.0.0.101 -v /docker/kafka1:/var/lib/kafka-logs -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=0 --hostname kafka1 --name kafka1 kafka
-    docker run -d --restart always --network=mynetwork --ip=10.0.0.102 -v /docker/kafka2:/var/lib/kafka-logs -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=1 --hostname kafka2 --name kafka2 kafka
-    docker run -d --restart always --network=mynetwork --ip=10.0.0.103 -v /docker/kafka3:/var/lib/kafka-logs -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=2 -e KK_TOPIC=test1:3:1,test2:3:3 --hostname kafka3 --name kafka3 kafka
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.101 -v /docker/kafka1:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=0 --name kafka1 kafka
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.102 -v /docker/kafka2:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=1 --name kafka2 kafka
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.103 -v /docker/kafka3:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=2 -e KK_TOPIC=test1:3:1,test2:3:3 --name kafka3 kafka
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
@@ -27,12 +27,12 @@ Kafka
 				-e KK_IO=[8] \\                                    默认存储线程8个
 				-e KK_LOG_TIME=[168] \\                            默认日志储存时间7天
 				-e KK_REBA_TIME=[0] \\                             消费者重新平衡时间，默认为0，生产环境建议为3000(3s)
-				-e KK_SERVER=[ethX ip]                             默认取网关接口IP地址
+				-e KK_SERVER=[eth ip]                              默认监听地址
+				-e -e KK_PORT=[9092] \\                            默认监听端口
+				-e KK_SERVER=<kafka.redhat.xyz> \\                 生产者和消费者来连接的地址，默认没有配置它将使用监听地址；一般用于NAT环境对外提供Kafka服务，一般配置为域名，A记录指向公网IP，内网机器添加hosts指向内网IP
 				-e KK_ID=[0] \\                                    默认ID是0，在一个集群环境每个节点的ID不能相同
 				-e KK_TOPIC=<test:1:1> \\                          创建一个topic，格式“topic:replication-factor:partitions"，要创建多个用逗号","分隔
 				-e ZK_SERVER=<"10.0.0.70:2181"> \\                 指定zookeeper地址和端口，要使用多台用逗号","分隔
-				-e IPTABLES=<"192.168.10.0/24,10.0.0.0/24"> \\     防火墙(9092)，需要 --privileged
-				--hostname kafka \\
 				--name kafka kafka
 
 ## 补充
@@ -42,12 +42,12 @@ Kafka
 
 查看topic状态：
 
-    /usr/local/kafka/bin/kafka-topics.sh --describe --zookeeper 10.0.0.70:2181 --topic test1
-    /usr/local/kafka/bin/kafka-topics.sh --list --zookeeper 10.0.0.70:2181
+    bin/kafka-topics.sh --describe --zookeeper 10.0.0.70:2181 --topic test1
+    bin/kafka-topics.sh --list --zookeeper 10.0.0.70:2181
 
 通过ZK查看
 
-    echo -e "ls /brokers/ids\nls /brokers/topics" | /usr/local/zookeeper/bin/zkCli.sh |tail -6 && echo
+    echo -e "ls /brokers/ids\nls /brokers/topics" | bin/zkCli.sh |tail -6 && echo
 
 Kafka一些概念：
 
