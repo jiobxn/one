@@ -19,7 +19,7 @@ WORKDIR /zookeeper
 
 ENTRYPOINT ["/zookeeper.sh"]
 
-EXPOSE 2181 2888 3888
+EXPOSE 2181
 
 CMD ["bin/zkServer.sh", "start-foreground"]
 
