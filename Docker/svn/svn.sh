@@ -154,24 +154,15 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 		SvnAdminExecutable=/usr/bin/svnadmin
 		"
 	fi
-
-	#iptables
-	if [ "$IPTABLES" == "Y" ]; then
-		cat > /iptables.sh <<-END
-		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-		iptables -I INPUT -p tcp -m state --state NEW -m multiport --dport $HTTP_PORT,$HTTPS_PORT,$SVN_PORT -m comment --comment SVN -j ACCEPT
-		END
-	fi
 fi
 	echo "Start ****"
-	[ -f /iptables.sh ] && [ -z "`iptables -S |grep SVN`" ] && . /iptables.sh
 	svnd
 	exec "$@"
 else
 
     echo -e "
 	Example:
-				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/svn:/home/svn \\
 				-v /docker/key:/key \\
 				-p 10080:80 \\
@@ -187,7 +178,6 @@ else
 				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\
 				-e USER_PASS=[$(openssl rand -hex 6)] \\
 				-e SVNADMIN=<Y> \\
-				-e IPTABLES=<Y> \\
 				--name svn svn
 
 	Or prepare /docker/svn/conf/authz and /docker/svn/conf/passwd files.
