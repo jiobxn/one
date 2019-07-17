@@ -15,7 +15,7 @@ SVN
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/svn:/home/svn \\
 				-v /docker/key:/key \\
 				-p 10080:80 \\
@@ -30,8 +30,7 @@ SVN
 				-e ANON=<Y> \\            #开启匿名用户，还需在authz配置 *=r
 				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\   #随机密码
 				-e USER_PASS=[$(openssl rand -hex 6)] \\     #随机密码
-				-e SVNADMIN=<Y> \\        #启用iF.SVNAdmin
-				-e IPTABLES=<Y> \\        #防火墙
+				-e SVNADMIN=<Y> \\        #启用iF.SVNAdmin，图形化管理工具
 				--name svn svn
 
 提示：svn默认只创建两个用户和一个仓库，如果需要更复杂的权限和更多的用户，请提前准备好 authz、passwd 放入 svn/conf 目录。
