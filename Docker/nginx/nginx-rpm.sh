@@ -96,6 +96,7 @@ http_conf() {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
 	    server_name localhost;
+	    #LIMIT#
 		
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
@@ -117,6 +118,11 @@ http_conf() {
 	##nginx_status    }
 	}
 	END
+
+	#限速,带单位
+	if [ "$LIMIT_RATE" ]; then
+		sed -i '/#LIMIT#/ a \    set $limit_rate '$LIMIT_RATE';' /etc/nginx/conf.d/default.conf
+	fi
 }
 
 
@@ -508,6 +514,13 @@ http_other() {
 				sed -i '/#sub_filter#/ a \        sub_filter '$sub_s'  '$sub_d';' /etc/nginx/conf.d/${project_name}_$n.conf
 			done
 		fi
+
+		#限速,带单位
+		if [ -n "$(echo $i |grep 'limit_rate=')" ]; then
+			limit_rate="$(echo $i |grep 'limit_rate=' |awk -F= '{print $2}')"
+			
+			sed -i '/#alias#/ i \    set $limit_rate '$limit_rate';' /etc/nginx/conf.d/${project_name}_$n.conf
+		fi
 		
 		#日志
 		if [ -n "$(echo $i |grep 'log=')" ]; then
@@ -856,6 +869,7 @@ else
 				-e CACHE_MEM=[256m] \\
 				-e ACCLOG_OFF=<Y> \\
 				-e ERRLOG_OFF=<Y> \\
+				-e LIMIT_RATE=<2048k> \\
 				   alias=</boy|/mp4> \\
 				   root=<wordpress> \\
 				   http_port=<8080> \\
@@ -872,6 +886,7 @@ else
 				   error=<https://www.bing.com> \\
 				   auth=<admin|passwd> \\
 				   filter=<.google.com|.fqhub.com&.twitter.com|.fqhub.com> \\
+				   limit_rate=<2048k> \\
 				   log=<N|Y> \\
 				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
 				   stream_lb=<hash|least_conn> \\
