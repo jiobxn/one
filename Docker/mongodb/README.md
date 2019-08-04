@@ -12,9 +12,9 @@ MongoDB
     docker logs mongodb
 
     #运行一个MongoDB副本集
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.81 -v /docker/mongodb1:/mongo/data -e VIP=10.0.0.80 --name mongodb1 mongodb 
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.82 -v /docker/mongodb2:/mongo/data -e VIP=10.0.0.80 --name mongodb2 mongodb  
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e MONGO_SERVER="10.0.0.81:27017,10.0.0.82:27017,10.0.0.83:27017" --name mongodb3 mongodb
+    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.81 -v /docker/mongodb1:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb1 mongodb 
+    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.82 -v /docker/mongodb2:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb2 mongodb  
+    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 -e MONGO_SERVER="10.0.0.81:27017,10.0.0.82:27017,10.0.0.83:27017" --name mongodb3 mongodb
     #注意：顺序不能错，要先运行SECONDARY节点，再运行PRIMARY节点。
 
 ## Run Defult Parameter
@@ -34,13 +34,10 @@ MongoDB
 				-e MONGO_SERVER=<10.0.0.81:27017,10.0.0.82:27017,10.0.0.83:27017>  \\ 集群节点数建议大于或等于3,小于等于7
 				--name mongodb mongodb
 
-    备份库：mongodump -h <hostname><:port> -d dbname -o <directory-path>
-    还原库：mongorestore -h <hostname><:port> -d dbname <directory-path>
-    备份表：mongoexport -h <hostname><:port> -d dbname -c tabname -o <filename>
-    还原表：mongoimport -h <hostname><:port> -d dbname -c tabname --upsert <filename>
 
 ****
 
+## 其他
 
 1、使用适当的选项启动副本集的每个成员
 
@@ -114,3 +111,10 @@ MongoDB
 	cfg.members[1].priority = 2
 	cfg.members[2].priority = 2
 	rs.reconfig(cfg)
+
+备份还原
+
+    备份库：mongodump -h <hostname><:port> -d dbname -o <directory-path>
+    还原库：mongorestore -h <hostname><:port> -d dbname <directory-path>
+    备份表：mongoexport -h <hostname><:port> -d dbname -c tabname -o <filename>
+    还原表：mongoimport -h <hostname><:port> -d dbname -c tabname --upsert <filename>
