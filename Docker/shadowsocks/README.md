@@ -48,11 +48,13 @@ Shadowsocks
 
     export https_proxy=socks5://127.0.0.1:1080
     export http_proxy=socks5://127.0.0.1:1080
+    export all_proxy=socks5://127.0.0.1:1080
 
 禁用代理
 
     unset http_proxy
     unset https_proxy
+    unset all_proxy
 
 添加到环境变量(当前用户)
 
