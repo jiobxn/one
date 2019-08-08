@@ -125,7 +125,7 @@ Nginx
 
 ### docker hub proxy
 
-**创建证书脚本**
+**准备工具**
 
     ~]# cat crt.sh
     #!/bin/bash
@@ -142,16 +142,16 @@ Nginx
 
 **创建证书**
 
-    echo "get.k8s.io,gcr.io,storage.googleapis.com,packages.cloud.google.com,auth.docker.io,dseasb33srnrn.cloudfront.net,registry-1.docker.io" >crt.txt
-    bash crt.sh $(cat crt.txt) | tr '\n' ';' | sed 's/;;/\n/'
+    echo "k8s.gcr.io,dl.k8s.io,get.k8s.io,gcr.io,storage.googleapis.com,packages.cloud.google.com,auth.docker.io,dseasb33srnrn.cloudfront.net,registry-1.docker.io" >crt.txt
+    bash crt.sh $(cat crt.txt) | tr '\n' ';' | sed 's/;;/\n/' | tee domain.txt
 
 **proxy模式**
 
-    -e PROXY_SERVER="get.k8s.io|get.k8s.io%backend_https=y,crt_key=get.k8s.io.crt|get.k8s.io.key;gcr.io|gcr.io%backend_https=y,crt_key=gcr.io.crt|gcr.io.key;storage.googleapis.com|storage.googleapis.com%backend_https=y,crt_key=storage.googleapis.com.crt|storage.googleapis.com.key;packages.cloud.google.com|packages.cloud.google.com%backend_https=y,crt_key=packages.cloud.google.com.crt|packages.cloud.google.com.key;auth.docker.io|auth.docker.io%backend_https=y,crt_key=auth.docker.io.crt|auth.docker.io.key;dseasb33srnrn.cloudfront.net|dseasb33srnrn.cloudfront.net%backend_https=y,crt_key=dseasb33srnrn.cloudfront.net.crt|dseasb33srnrn.cloudfront.net.key;registry-1.docker.io|registry-1.docker.io%backend_https=y,crt_key=registry-1.docker.io.crt|registry-1.docker.io.key"
+    docker run -d --restart unless-stopped --network host -v /docker/key:/key -e PROXY_SERVER="$(cat domain.txt)" --name nginx-k8s jiobxn/nginx:rpm
 
 **客户端修改hosts**
 
-    echo "<ip-address> get.k8s.io gcr.io storage.googleapis.com packages.cloud.google.com auth.docker.io dseasb33srnrn.cloudfront.net registry-1.docker.io" >>/etc/hosts
+    echo "<ip-address> k8s.gcr.io dl.k8s.io get.k8s.io gcr.io storage.googleapis.com packages.cloud.google.com auth.docker.io dseasb33srnrn.cloudfront.net registry-1.docker.io" >>/etc/hosts
 
 **添加CA证书信任**
 
