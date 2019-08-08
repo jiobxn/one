@@ -125,32 +125,33 @@ Nginx
 
 ### docker hub proxy
 
+**创建证书脚本**
+
+    ~]# cat crt.sh
+    #!/bin/bash
+    [ ! -f ca.crt -o ! -f ca.key ] && openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker"
+    
+    for i in $(echo $1 |sed 's/,/ /g');do
+     if [ ! -f "$i.crt" -o ! -f "$i.key" ]; then
+        openssl req -newkey rsa:4096 -nodes -sha256 -keyout $i.key -out $i.csr -subj "/C=CN/L=London/O=Company Ltd/CN=$i"
+        openssl x509 -req -days 3650 -in $i.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out $i.crt
+     fi
+        echo "$i|$i%backend_https=y,crt_key=$i.crt|$i.key"
+    done
+    echo
+
 **创建证书**
 
-    #创建CA
-    openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 365 -out ca.crt -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker"
-    
-    #docker.io
-    openssl req -newkey rsa:4096 -nodes -sha256 -keyout auth.key -out auth.csr -subj "/C=CN/L=London/O=Company Ltd/CN=auth.docker.io"
-    openssl x509 -req -days 365 -in auth.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out auth.crt
-    
-    openssl req -newkey rsa:4096 -nodes -sha256 -keyout dseasb33srnrn.key -out dseasb33srnrn.csr -subj "/C=CN/L=London/O=Company Ltd/CN=dseasb33srnrn.cloudfront.net"
-    openssl x509 -req -days 365 -in dseasb33srnrn.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out dseasb33srnrn.crt
-    
-    openssl req -newkey rsa:4096 -nodes -sha256 -keyout registry-1.key -out registry-1.csr -subj "/C=CN/L=London/O=Company Ltd/CN=registry-1.docker.io"
-    openssl x509 -req -days 365 -in registry-1.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out registry-1.crt
-    
-    #google cloud
-    openssl req -newkey rsa:4096 -nodes -sha256 -keyout gcr.key -out gcr.csr -subj "/C=CN/L=London/O=Company Ltd/CN=gcr.io"
-    openssl x509 -req -days 365 -in gcr.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out gcr.crt
+    echo "get.k8s.io,gcr.io,storage.googleapis.com,packages.cloud.google.com,auth.docker.io,dseasb33srnrn.cloudfront.net,registry-1.docker.io" >crt.txt
+    bash crt.sh $(cat crt.txt) | tr '\n' ';' | sed 's/;;/\n/'
 
 **proxy模式**
 
-    -e PROXY_SERVER= "auth.docker.io|auth.docker.io%backend_https=y,crt_key=auth.crt|auth.key;dseasb33srnrn.cloudfront.net|dseasb33srnrn.cloudfront.net%backend_https=y,crt_key=dseasb33srnrn.crt|dseasb33srnrn.key;registry-1.docker.io|registry-1.docker.io%backend_https=y,crt_key=registry-1.crt|registry-1.key;gcr.io|gcr.io%backend_https=y,crt_key=gcr.crt|gcr.key"
+    -e PROXY_SERVER= "get.k8s.io|get.k8s.io%backend_https=y,crt_key=get.k8s.io.crt|get.k8s.io.key;gcr.io|gcr.io%backend_https=y,crt_key=gcr.io.crt|gcr.io.key;storage.googleapis.com|storage.googleapis.com%backend_https=y,crt_key=storage.googleapis.com.crt|storage.googleapis.com.key;packages.cloud.google.com|packages.cloud.google.com%backend_https=y,crt_key=packages.cloud.google.com.crt|packages.cloud.google.com.key;auth.docker.io|auth.docker.io%backend_https=y,crt_key=auth.docker.io.crt|auth.docker.io.key;dseasb33srnrn.cloudfront.net|dseasb33srnrn.cloudfront.net%backend_https=y,crt_key=dseasb33srnrn.cloudfront.net.crt|dseasb33srnrn.cloudfront.net.key;registry-1.docker.io|registry-1.docker.io%backend_https=y,crt_key=registry-1.docker.io.crt|registry-1.docker.io.key"
 
 **客户端修改hosts**
 
-    echo "<ip-address> auth.docker.io registry-1.docker.io dseasb33srnrn.cloudfront.net gcr.io" >>/etc/hosts
+    echo "<ip-address> get.k8s.io gcr.io storage.googleapis.com packages.cloud.google.com auth.docker.io dseasb33srnrn.cloudfront.net registry-1.docker.io" >>/etc/hosts
 
 **添加CA证书信任**
 
