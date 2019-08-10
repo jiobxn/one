@@ -39,6 +39,7 @@ if [ ! -f ~/.ssh/id_rsa -o ! -f ~/.ssh/id_rsa.pub ]; then
 	set timeout 60
 	spawn ssh-keygen -t rsa
 	expect {   
+                        \"*yes/no*\" {send \"yes\r\"; exp_continue}
 	                \"Enter file in which to save the key *\" {send \"\r\"; exp_continue}
 	                \"*y/n*\" {send \"y\r\"; exp_continue}
 	                \"*passphrase*\" {send \"\r\"; exp_continue}
