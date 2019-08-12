@@ -365,7 +365,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 
 		SQUID_INFO="Squid user AND password: $PROXY_USER  $PROXY_PASS"
 
-		echo "squid" >>/iptables.sh
+		echo "squid" >/usr/local/bin/SQUID && chmod +x /usr/local/bin/SQUID
 		echo "iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PROXY_PORT -m comment --comment OPENVPN -j ACCEPT" >>/iptables.sh
 	else	
 		echo "iptables -I INPUT -p $TCP_UDP -m state --state NEW -m $TCP_UDP --dport $VPN_PORT -m comment --comment OPENVPN -j ACCEPT" >>/iptables.sh
@@ -402,6 +402,7 @@ fi
 	echo "Start ****"
 	[ -f /etc/keepalived/keepalived.conf ] && keepalived -f /etc/keepalived/keepalived.conf -P -l
 	[ -z "$(iptables -S |grep OPENVPN)" ] && . /iptables.sh
+	[ -f /usr/local/bin/SQUID ] && SQUID
 	exec "$@"
 
 else
