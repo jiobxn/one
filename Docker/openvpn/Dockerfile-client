@@ -9,7 +9,7 @@ VOLUME /key
 
 WORKDIR /key
 
-ENTRYPOINT ["openvpn", "--config", "/key/client.ovpn"]
+ENTRYPOINT ["openvpn", "--config", "client.ovpn"]
 
 # docker build -t ovpn .
 # docker run -d --restart unless-stopped --privileged --network host -v /docker/ovpn:/key --name ovpn ovpn
