@@ -22,7 +22,7 @@ ETCD
 **协定：** []是默参数，<>是自定义参数
 
 					docker run -d --restart unless-stopped \\
-					-v /etc/kubernetes/pki/etcd:/key
+					-v /etc/kubernetes/pki/etcd:/key \\
 					-v /docker/etcd:/etcd/data \\
 					--network host \\
 					-e ETCD_PORT=[2379] \\          #默认端口
