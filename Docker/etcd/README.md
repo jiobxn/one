@@ -30,7 +30,7 @@ ETCD
 					-e CLUSTER_STATE=[new] \\       #集群状态，<new | existing>
 					-e ETCD_COUNT=[10000]\\         #快照事物数
 					-e CLUSTER=<10.0.0.11:2380,10.0.0.12:2380,10.0.0.13:2380> \\    #集群节点IP和端口，可以指定一个或多个，逗号分隔
-					-e AUTO_TLS=<Y> \\    #启用TLS，默认会去/key/目录下找证书文件：server.crt,server.key、ca.crt,server.crt,server.key、ca.crt,server.crt,server.key,peer.crt,peer.key
+					-e AUTO_TLS=<Y> \\    #启用集群间TLS连接。默认会去/key/目录下找证书文件：server.crt,server.key、ca.crt,server.crt,server.key、ca.crt,server.crt,server.key,peer.crt,peer.key ，根据证书文件数量自动启用不同方式的TLS
 					--name etcd etcd
 
 ## 测试
