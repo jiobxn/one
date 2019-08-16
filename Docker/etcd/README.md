@@ -3,6 +3,7 @@ ETCD
 ## 简介
 * **etcd** 是一个分布式，可靠的键值存储，用于存储分布式系统的最关键数据。
 > * 快速入门：https://github.com/etcd-io/etcd/blob/master/Documentation/demo.md
+> * API使用：https://github.com/etcd-io/etcd/blob/master/Documentation/dev-guide/api_grpc_gateway.md
 
 ****
 
