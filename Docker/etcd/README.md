@@ -27,7 +27,7 @@ ETCD
 					-v /docker/etcd:/etcd/data \\
 					--network host \\
 					-e ETCD_PORT=[2379] \\          #默认端口
-					-e ETCD_TOKEN=[token-01] \\     #集群密码
+					-e ETCD_TOKEN=[token-01] \\     #集群令牌
 					-e CLUSTER_STATE=[new] \\       #集群状态，<new | existing>
 					-e ETCD_COUNT=[10000]\\         #快照事物数
 					-e CLUSTER=<10.0.0.11:2380,10.0.0.12:2380,10.0.0.13:2380> \\    #集群节点IP和端口，可以指定一个或多个，逗号分隔
@@ -52,3 +52,62 @@ ETCD
     etcdctl --endpoints=$ENDPOINTS member list  #列出节点
     etcdctl --endpoints=$ENDPOINTS put foo 'Hello World!'  #写入
     etcdctl --endpoints=$ENDPOINTS get foo  #读取
+
+## API
+
+ETCD API 只支持Base64格式编码
+
+    # 编码
+    echo hello |base64
+    echo world |openssl enc -base64
+    
+    # 解码
+    echo d29ybGQK |base64 -d
+    echo Zm9vCg== |openssl enc -base64 -d
+
+版本
+
+    etcd v3.2或之前只使用 v3alpha
+    etcd v3.3使用 v3beta 同时保留 v3alpha
+    etcd v3.4使用 v3 同时保留 v3beta
+    etcd v3.5或更高版本仅使用 v3
+    
+    v3=v3beta
+
+交易
+
+    #写入
+    curl -sL http://localhost:2379/$v3/kv/put -X POST -d '{"key": "aGVsbG8K", "value": "aGVsbG8gd29ybGQhCg=="}'
+    curl -sL http://localhost:2379/$v3/kv/put -X POST -d '{"key": "aGVsbG8uCg==", "value": "aGVsbG8gd29ybGQhCg=="}'
+
+    # 读取
+    curl -sL http://localhost:2379/$v3/kv/range -X POST -d '{"key": "aGVsbG8K"}'
+
+    # 得到所有以“hello”为前缀的键
+    curl -sL http://localhost:2379/$v3/kv/range -X POST -d '{"key": "aGVsbG8K", "range_end": "aGVsbG8/"}' |jq
+
+认证
+
+    # 创建root用户
+    curl -sL http://localhost:2379/$v3/auth/user/add -X POST -d '{"name": "root", "password": "123"}'
+    
+    # 创建root角色
+    curl -sL http://localhost:2379/$v3/auth/role/add -X POST -d '{"name": "root"}'
+    
+    # 授予root角色
+    curl -sL http://localhost:2379/$v3/auth/user/grant -X POST -d '{"user": "root", "role": "root"}'
+    
+    # 启用身份验证
+    curl -sL http://localhost:2379/$v3/auth/enable -X POST -d '{}'
+    
+    # 获取root用户的身份验证令牌
+    curl -sL http://localhost:2379/$v3/auth/authenticate -X POST -d '{"name": "root", "password": "123"}'
+    
+    # 使用令牌来写入数据
+    curl -sL http://localhost:2379/$v3/kv/put -H 'Authorization : uYkPWfLCnjmidGhI.9' -X POST -d '{"key": "Zm9v", "value": "YmFy"}'
+    
+    # 使用令牌来读取数据
+    curl -sL http://localhost:2379/$v3/kv/range -H 'Authorization : uYkPWfLCnjmidGhI.9' -X POST -d '{"key": "Zm9v"}'
+
+
+    
