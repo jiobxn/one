@@ -8,10 +8,12 @@ if [ "$1" = 'dnscrypt' ]; then
 : ${LOG_SIZE:="100"}
 : ${CACHE_SIZE:="256"}
 : ${MAX_CLIENT:="250"}
-: ${CHINA_DNS:="127.0.0.1:55,114.114.114.114"}
+: ${TRUSE_DNS:="127.0.0.1#55"}
+: ${CHINA_DNS:="114.114.114.114,223.5.5.5"}
 
 
 if [ ! -f /usr/local/bin/dnscrypt ]; then
+	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	#bind
 	BIND() {
 		sed -i '/recursion yes;/ a \\n\        \/* #jiobxn.com# *\/' /etc/named.conf
@@ -26,7 +28,7 @@ if [ ! -f /usr/local/bin/dnscrypt ]; then
 		sed -i '/#jiobxn.com#/ a \\n\        max-cache-size '$CACHE_SIZE'm;' /etc/named.conf
 	
 		if [ "$QUERY_LOG" ]; then
-			sed -i '/logging {/ a \        channel query_log {\n\            file "data/query.log" versions 2 size '$LOG_SIZE'm;\n\            severity info;\n\            print-time yes;\n\            print-category   yes;\n\        };' /etc/named.conf
+			sed -i '/logging {/ a \        channel query_log {\n\            file "/dnslog/query.log" versions 2 size '$LOG_SIZE'm;\n\            severity info;\n\            print-time yes;\n\            print-category   yes;\n\        };' /etc/named.conf
 			sed -i '/logging {/ a \        category queries {\n\            query_log;\n\        };' /etc/named.conf
 		fi
 	
@@ -43,7 +45,7 @@ if [ ! -f /usr/local/bin/dnscrypt ]; then
 		sed -i 's/max_clients = 250/max_clients = '$MAX_CLIENT'/' /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
 	
 		if [ "$QUERY_LOG" ]; then
-			sed -i "s@# file = 'query.log'@file = '/var/named/data/query.log'@" /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
+			sed -i "s@# file = 'query.log'@file = '/dnslog/query.log'@" /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
 			sed -i 's/log_files_max_size = 10/log_files_max_size = '$LOG_SIZE'/' /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
 		fi
 	
@@ -57,7 +59,8 @@ if [ ! -f /usr/local/bin/dnscrypt ]; then
 		DNSCRYPT
 		echo "nohup dnscrypt-proxy &" >/usr/local/bin/dnscrypt
 		echo "sleep 50" >>/usr/local/bin/dnscrypt
-		echo "chinadns -m -c /chnroute.txt -s $CHINA_DNS -b $LISTEN_ADDR" >>/usr/local/bin/dnscrypt
+		echo "ipset -R < /chnroute.ipset" >>/usr/local/bin/dnscrypt
+		echo "chinadns-ng -b $LISTEN_ADDR -l 53 -t $TRUSE_DNS -c $CHINA_DNS" >>/usr/local/bin/dnscrypt
 	elif [ "$DNSCRYPT" ]; then
 		DNSCRYPT
 	else
@@ -85,7 +88,8 @@ else
 				-e LOG_SIZE=[100] \\
 				-e DNSCRYPT=<Y> \\
 				-e CHINADNS=<Y> \\
-				-e CHINA_DNS=[127.0.0.1:55,114.114.114.114] \\
+				-e TRUSE_DNS=[127.0.0.1#55] \\
+				-e CHINA_DNS=[114.114.114.114,223.5.5.5] \\
 				--name dns dnscrypt
 	"
 fi
