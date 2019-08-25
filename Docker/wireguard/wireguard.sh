@@ -1,0 +1,198 @@
+#!/bin/bash
+
+if [ "$1" = 'WG' ]; then
+
+: ${WG_TOKEN:="TEST"}
+: ${LOCAL_ID:="$(openssl rand -hex 5)"}
+: ${WGVETH_IP:="10.0.0"}
+: ${ETCD:="http://etcd.redhat.xyz:12379"}
+: ${MAX_CLIENT:="10"}
+
+  if [ ! -f /usr/local/bin/WG ]; then
+	echo "Initialize wireguard"
+	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+	export ETCDCTL_API=3
+
+	# clean TEST key
+	if [ -z "$WG_VPN" -a "$(etcdctl --endpoints=$ETCD get "TEST/" --prefix --keys-only |grep -c ^TEST/)" -ge 8 ]; then
+		etcdctl --endpoints=$ETCD del "TEST/" --from-key
+		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :TEST$); do
+			etcdctl --endpoints=$ETCD del $i
+		done
+	fi
+
+	if [ "$WG_VPN" == "SERVER" -a -n "$(etcdctl --endpoints=$ETCD get "TEST/" --prefix --keys-only |grep /public_ip_port$)" ]; then
+		etcdctl --endpoints=$ETCD del "TEST/" --from-key
+		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :TEST$); do
+			etcdctl --endpoints=$ETCD del $i
+		done
+	fi
+	
+	# clean token key
+	if [ "$KEY_CLEAN" == "Y" ]; then
+		etcdctl --endpoints=$ETCD del "$WG_TOKEN/" --from-key
+		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :$WG_TOKEN$); do
+			etcdctl --endpoints=$ETCD del $i
+		done
+	fi
+
+	# public IP
+	if [ -z "$PUBLIC_IP" ]; then
+		PUBLIC_IP=$(curl -s ip.sb)
+	fi
+
+	if [ -z "$PUBLIC_IP" ]; then
+		PUBLIC_IP=$(ip address |grep -A2 ": $(ip route |awk '$1=="default"{print $5}')" |awk '$1=="inet"{print $2}' |awk -F/ '{print $1}')
+	fi
+
+	# public port
+	PUBLIC_PORT=$(etcdctl --endpoints=$ETCD get "" --prefix --keys-only |egrep '^PUBNET/' |awk -F: '$1=="PUBNET/'$PUBLIC_IP'"{print $2}' |sort -n |tail -1)
+	if [ -n "$PUBLIC_PORT" ]; then
+		PUBLIC_PORT=$[$PUBLIC_PORT+1]
+	fi
+
+	if [ -z "$PUBLIC_PORT" ]; then
+		PUBLIC_PORT=20000
+	fi
+
+	# local IP
+	if [ -z "$LOCAL_IP" ]; then
+		LOCAL_IP=$(ip address |grep -A2 ": $(ip route |awk '$1=="default"{print $5}')" |awk '$1=="inet"{print $2}' |awk -F/ '{print $1}')
+	fi
+
+	# local port
+	if [ -z "$LOCAL_PORT" ]; then
+		LOCAL_PORT=$PUBLIC_PORT
+	fi
+
+	# local pubkey
+	if [ "$PRIVATE_KEY" ]; then
+		echo $PRIVATE_KEY >/private
+		PUBLIC_KEY=$(wg pubkey < /private)
+	else
+		umask 077
+		wg genkey > /private
+		PUBLIC_KEY=$(wg pubkey < /private)
+	fi
+
+	# put ETCD
+	if [ "$WG_VPN" != "CLIENT" ]; then
+		etcdctl --endpoints=$ETCD put PUBNET/$PUBLIC_IP:$PUBLIC_PORT:$WG_TOKEN $LOCAL_ID
+		etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/public_ip_port $PUBLIC_IP:$PUBLIC_PORT
+		etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/local_ip_port  $LOCAL_IP:$LOCAL_PORT
+		etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/public_key     $PUBLIC_KEY
+	fi
+
+	# perr ID
+	while [ -z "$PEER_ID" -a "$WG_VPN" != "SERVER" ]; do
+		PEER_ID=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep -v $LOCAL_ID |grep public_ip_port |awk -F/ '{print $2}')
+		sleep 5
+	done
+
+	# peer ip and port
+	if [ -z "$PEER_IP_PORT" ]; then
+		PEER_IP_PORT=$(etcdctl --endpoints=$ETCD get $WG_TOKEN/$PEER_ID/public_ip_port |tail -1)
+	fi
+
+	# peer pubkey
+	if [ -z "$PEER_PUBLIC_KEY" ]; then
+		PEER_PUBLIC_KEY=$(etcdctl --endpoints=$ETCD get $WG_TOKEN/$PEER_ID/public_key |tail -1)
+	fi
+
+	# P2P or VPN
+	if [ "$WG_VPN" == "SERVER" ]; then
+		# VPM SERVER
+		echo '#!/bin/bash' > /usr/local/bin/WG
+		echo "ip link add wg1 type wireguard" >> /usr/local/bin/WG
+		echo "ip addr add $WGVETH_IP.1/24 dev wg1" >> /usr/local/bin/WG
+		echo "ip link set wg1 up" >> /usr/local/bin/WG
+		echo "wg set wg1 listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
+		[ "$MAX_CLIENT" -gt 1000 ] && MAX_CLIENT=253
+		i=2
+		while [ $i -le $MAX_CLIENT ]; do
+			umask 077
+			wg genkey > /mnt/private$i
+			PUBKEY=$(wg pubkey < /mnt/private$i)
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/peerip_$i $WGVETH_IP.$i/24
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/peer_pubkey_$i $PUBKEY
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/peer_prikey_$i $(cat /mnt/private$i)
+			echo "wg set wg1 peer $PUBKEY allowed-ips $WGVETH_IP.$i/32" >> /usr/local/bin/WG
+			let  i++
+		done
+	elif [ "$WG_VPN" == "CLIENT" ]; then
+		# CLIENT
+		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
+
+		echo '#!/bin/bash' > /usr/local/bin/WG
+
+		if [ -z "$WGVETH" ]; then
+			wgip=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/peerip_2" |tail -1)
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_2 $wgip
+			wgeth=2
+			echo $(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/peer_prikey_2" |tail -1) > /private
+			PUBKEY=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/public_key" |tail -1)
+		else
+			wgip=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/peerip_$[$WGVETH+1]" |tail -1)
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_$[$WGVETH+1] $wgip
+			wgeth=$[$WGVETH+1]
+			echo $(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/peer_prikey_$[$WGVETH+1]" |tail -1) > /private
+			PUBKEY=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/public_key" |tail -1)
+		fi
+
+		echo "ip link add wg$wgeth type wireguard" >> /usr/local/bin/WG
+		echo "ip addr add $wgip dev wg$wgeth" >> /usr/local/bin/WG
+		echo "ip link set wg$wgeth up" >> /usr/local/bin/WG
+		echo "wg set wg$wgeth private-key /private" >> /usr/local/bin/WG
+		echo "wg set wg$wgeth peer $PUBKEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
+	else
+		# P2P
+		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
+		
+		if [ -z "$WGVETH" ]; then
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_2 $WGVETH_IP.2/24
+		else
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_$[$WGVETH+1] $WGVETH_IP.$[$WGVETH+1]/24
+		fi
+		
+		wgeth=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_" --prefix --keys-only |awk -F_ 'NR=="1"{print $2}')
+		wgip=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_$wgeth" |tail -1)
+
+		echo '#!/bin/bash' > /usr/local/bin/WG
+		echo "ip link add wg$wgeth type wireguard" >> /usr/local/bin/WG
+		echo "ip addr add $wgip dev wg$wgeth" >> /usr/local/bin/WG
+		echo "ip link set wg$wgeth up" >> /usr/local/bin/WG
+		echo "wg set wg$wgeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
+		echo "wg set wg$wgeth peer $PEER_PUBLIC_KEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
+	fi
+	echo bash >> /usr/local/bin/WG
+	chmod +x /usr/local/bin/WG
+
+  fi
+
+	echo
+	echo "Start wireguard ****"
+	exec $@
+
+else
+	echo -e "
+	Example
+					docker run -d --restart unless-stopped --privileged \\
+					-p 20000:20000 \\
+					-e ETCD=[http://etcd.redhat.xyz:12379] \\
+					-e WG_TOKEN=[TEST] \\
+					-e LOCAL_ID=[openssl rand -hex 5] \\
+					-e WGVETH_IP=[10.0.0] \\
+					-e MAX_CLIENT=[10] \\
+					-e PUBLIC_IP=[curl -s ip.sb] \\
+					-e PUBLIC_PORT=[20000] \\
+					-e LOCAL_IP=[ip address] \\
+					-e LOCAL_PORT=[PUBLIC_PORT] \\
+					-e PRIVATE_KEY=[wg pubkey] \\
+					-e PEER_ID=[ETCD] \\
+					-e PEER_IP_PORT=[ETCD] \\
+					-e PEER_PUBLIC_KEY=[ETCD] \\
+					-e WG_VPN=<SERVER | CLIENT> \\
+					-e KEY_CLEAN=<Y> \\
+					--name wireguard wireguard
+	"
+fi
