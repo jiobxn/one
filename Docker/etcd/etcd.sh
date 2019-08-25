@@ -90,7 +90,7 @@ else
 					-e ETCD_PORT=[2379] \\
 					-e ETCD_TOKEN=[token-01] \\
 					-e CLUSTER_STATE=[new] \\
-					-e ETCD_COUNT=[10000]\\
+					-e ETCD_COUNT=[10000] \\
 					-e CLUSTER=<10.0.0.11:2380,10.0.0.12:2380,10.0.0.13:2380> \\
 					-e AUTO_TLS=<Y> \\
 					--name etcd etcd
