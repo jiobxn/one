@@ -15,9 +15,9 @@ ETCD
 
 运行一个etcd集群
 
-    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.11 -e CLUSTER="10.0.0.21:2380,10.0.0.22:2380,10.0.0.23:2380" --name etcd-1 jiobxn/etcd
-    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.12 -e CLUSTER="10.0.0.21:2380,10.0.0.22:2380,10.0.0.23:2380" --name etcd-2 jiobxn/etcd
-    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.13 -e CLUSTER="10.0.0.21:2380,10.0.0.22:2380,10.0.0.23:2380" --name etcd-3 jiobxn/etcd
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.21 -e CLUSTER="10.0.0.21:2380,10.0.0.22:2380,10.0.0.23:2380" --name etcd-1 jiobxn/etcd
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.22 -e CLUSTER="10.0.0.21:2380,10.0.0.22:2380,10.0.0.23:2380" --name etcd-2 jiobxn/etcd
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.23 -e CLUSTER="10.0.0.21:2380,10.0.0.22:2380,10.0.0.23:2380" --name etcd-3 jiobxn/etcd
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
