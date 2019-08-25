@@ -48,7 +48,7 @@ WireGuard
 					-e WGVETH_IP=[10.0.0] \\                     ip前缀
 					-e MAX_CLIENT=[10] \\                        最大vpn客户端
 					-e PUBLIC_IP=[curl -s ip.sb] \\              公网IP
-					-e PUBLIC_PORT=[20000] \\                    公网端口
+					-e PUBLIC_PORT=[20000] \\                    公网端口，默认递增
 					-e LOCAL_IP=[ip address] \\                  容器或主机IP
 					-e LOCAL_PORT=[PUBLIC_PORT] \\               默认和公网端口一致
 					-e PRIVATE_KEY=[wg pubkey] \\                私钥
