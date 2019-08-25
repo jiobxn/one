@@ -20,5 +20,5 @@ EXPOSE 20000
 
 CMD ["WG"]
 
-# docker build -t img.io/wireguard .
-# docker run -itd --privileged -p 20000:20000 --name wireguard jiobxn/wireguard
+# docker build -t wireguard .
+# docker run -itd --privileged -p 20000:20000 --name wireguard wireguard
