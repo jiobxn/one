@@ -51,6 +51,7 @@ if [ "$1" = 'WG' ]; then
 	if [ -z "$LOCAL_IP" ]; then
 		LOCAL_IP=$(ip address |grep -A2 ": $(ip route |awk '$1=="default"{print $5}')" |awk '$1=="inet"{print $2}' |awk -F/ '{print $1}')
 	fi
+	DEV=$(ip route |awk '$NF=="'$LOCAL_IP'"{print $3}')
 
 	# local port
 	if [ -z "$LOCAL_PORT" ]; then
@@ -95,7 +96,7 @@ if [ "$1" = 'WG' ]; then
 	if [ "$WG_VPN" == "SERVER" ]; then
 		# VPM SERVER
 		echo '#!/bin/bash' > /usr/local/bin/WG
-		echo "ip link add wg1 type wireguard" >> /usr/local/bin/WG
+		echo "ip link add wg1 type wireguard 2>/dev/null || echo" >> /usr/local/bin/WG
 		echo "ip addr add $WGVETH_IP.1/24 dev wg1" >> /usr/local/bin/WG
 		echo "ip link set wg1 up" >> /usr/local/bin/WG
 		echo "wg set wg1 listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
@@ -111,6 +112,7 @@ if [ "$1" = 'WG' ]; then
 			echo "wg set wg1 peer $PUBKEY allowed-ips $WGVETH_IP.$i/32" >> /usr/local/bin/WG
 			let  i++
 		done
+		echo "iptables -t nat -A  POSTROUTING -s $WGVETH_IP.0/24 -o $DEV -j MASQUERADE" >> /usr/local/bin/WG
 	elif [ "$WG_VPN" == "CLIENT" ]; then
 		# CLIENT
 		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
@@ -131,7 +133,7 @@ if [ "$1" = 'WG' ]; then
 			PUBKEY=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/public_key" |tail -1)
 		fi
 
-		echo "ip link add wg$wgeth type wireguard" >> /usr/local/bin/WG
+		echo "ip link add wg$wgeth type wireguard 2>/dev/null || echo" >> /usr/local/bin/WG
 		echo "ip addr add $wgip dev wg$wgeth" >> /usr/local/bin/WG
 		echo "ip link set wg$wgeth up" >> /usr/local/bin/WG
 		echo "wg set wg$wgeth private-key /private" >> /usr/local/bin/WG
@@ -150,12 +152,14 @@ if [ "$1" = 'WG' ]; then
 		wgip=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_$wgeth" |tail -1)
 
 		echo '#!/bin/bash' > /usr/local/bin/WG
-		echo "ip link add wg$wgeth type wireguard" >> /usr/local/bin/WG
+		echo "ip link add wg$wgeth type wireguard 2>/dev/null || echo" >> /usr/local/bin/WG
 		echo "ip addr add $wgip dev wg$wgeth" >> /usr/local/bin/WG
 		echo "ip link set wg$wgeth up" >> /usr/local/bin/WG
 		echo "wg set wg$wgeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
 		echo "wg set wg$wgeth peer $PEER_PUBLIC_KEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
 	fi
+	echo "sysctl -w net.ipv4.ip_forward=1" >> /usr/local/bin/WG
+	echo "iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited 2>/dev/null || echo" >> /usr/local/bin/WG
 	echo bash >> /usr/local/bin/WG
 	chmod +x /usr/local/bin/WG
 
