@@ -24,16 +24,16 @@ WireGuard
 运行一个P2P WG
 
     # host1
-    docker run -itd --privileged -p 2000:20000 -e ETCD=http://10.10.0.246:2379 --name wg img.io/wireguard
+    docker run -itd --privileged -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
     # host2
-    docker run -itd --privileged -p 2000:20000 -e ETCD=http://10.10.0.246:2379 --name wg img.io/wireguard
+    docker run -itd --privileged -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
 
 运行一个VPN WG
 
     # server
-    docker run -itd --privileged -p 2000:20000 -e ETCD=http://10.10.0.246:2379 -e WG_VPN=SERVER --name wg img.io/wireguard
+    docker run -itd --privileged -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 -e WG_VPN=SERVER --name wg-server jiobxn/wireguard
     # client
-    docker run -itd --privileged -p 2000:20000 -e ETCD=http://10.10.0.246:2379 -e WG_VPN=CLIENT --name wg img.io/wireguard
+    docker run -itd --privileged -e ETCD=http://10.10.0.246:2379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
 
 ****
 
@@ -41,7 +41,7 @@ WireGuard
 **协定：** []是默参数，<>是自定义参数
 
 					docker run -d --restart unless-stopped --privileged \\
-					-p 20000:20000 \\
+					-p 20000:20000/udp \\
 					-e ETCD=[http://etcd.redhat.xyz:12379] \\    etcd服务器
 					-e WG_TOKEN=[TEST] \\                        定义token前缀的key，相同的token才能连接
 					-e LOCAL_ID=[openssl rand -hex 5] \\         id
