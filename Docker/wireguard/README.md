@@ -56,5 +56,4 @@ WireGuard
 					-e PEER_IP_PORT=[ETCD] \\                    对端IP端口，来自etcd
 					-e PEER_PUBLIC_KEY=[ETCD] \\                 对端公钥，来自etcd
 					-e WG_VPN=<SERVER | CLIENT> \\               vpn模式，server或client
-					-e KEY_CLEAN=<Y> \\                          清空token前缀的key
 					--name etcd etcd
