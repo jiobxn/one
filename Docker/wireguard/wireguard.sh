@@ -168,8 +168,8 @@ if [ "$1" = 'WG' ]; then
 else
 	echo -e "
 	Example
-					docker run -d --restart unless-stopped --privileged \\
-					-p 20000:20000 \\
+					docker run -d --restart unless-stopped --cap-add net_admin \\
+					-p 20000:20000/udp \\
 					-e ETCD=[http://etcd.redhat.xyz:12379] \\
 					-e WG_TOKEN=[TEST] \\
 					-e LOCAL_ID=[openssl rand -hex 5] \\
