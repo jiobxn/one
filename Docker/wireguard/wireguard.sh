@@ -112,8 +112,6 @@ if [ "$1" = 'WG' ]; then
 			echo "wg set wg1 peer $PUBKEY allowed-ips $WGVETH_IP.$i/32" >> /usr/local/bin/WG
 			let  i++
 		done
-		echo "sysctl -w net.ipv4.ip_forward=1" >> /usr/local/bin/WG
-		echo "iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited 2>/dev/null || echo" >> /usr/local/bin/WG
 		echo "iptables -t nat -A  POSTROUTING -s $WGVETH_IP.0/24 -o $DEV -j MASQUERADE" >> /usr/local/bin/WG
 	elif [ "$WG_VPN" == "CLIENT" ]; then
 		# CLIENT
@@ -160,6 +158,9 @@ if [ "$1" = 'WG' ]; then
 		echo "wg set wg$wgeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
 		echo "wg set wg$wgeth peer $PEER_PUBLIC_KEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
 	fi
+	echo "You may also want:"
+	echo "sysctl -w net.ipv4.ip_forward=1"
+	echo "iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited"
 	echo bash >> /usr/local/bin/WG
 	chmod +x /usr/local/bin/WG
 
