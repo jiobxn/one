@@ -21,4 +21,4 @@ EXPOSE 20000
 CMD ["WG"]
 
 # docker build -t wireguard .
-# docker run -itd --privileged -p 20000:20000 --name wireguard wireguard
+# docker run -itd --cap-add net_admin -p 20000:20000/udp --name wireguard wireguard
