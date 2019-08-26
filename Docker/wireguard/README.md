@@ -31,7 +31,7 @@ WireGuard
 运行一个VPN WG
 
     # server
-    docker run -itd --privileged -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 -e WG_VPN=SERVER --name wg-server jiobxn/wireguard
+    docker run -itd --cap-add net_admin -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 -e WG_VPN=SERVER --name wg-server jiobxn/wireguard
     # client
     docker run -itd --cap-add net_admin -e ETCD=http://10.10.0.246:2379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
 
