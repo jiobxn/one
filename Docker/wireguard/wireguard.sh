@@ -13,23 +13,15 @@ if [ "$1" = 'WG' ]; then
 	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	export ETCDCTL_API=3
 
-	# clean TEST key
-	if [ -z "$WG_VPN" -a "$(etcdctl --endpoints=$ETCD get "TEST/" --prefix --keys-only |grep -c ^TEST/)" -ge 8 ]; then
-		etcdctl --endpoints=$ETCD del "TEST/" --from-key
-		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :TEST$); do
+	# clean key
+	if [ -z "$WG_VPN" -a "$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep -c ^$WG_TOKEN/)" -ge 8 ]; then
+		etcdctl --endpoints=$ETCD del "$WG_TOKEN/" --from-key
+		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :$WG_TOKEN$); do
 			etcdctl --endpoints=$ETCD del $i
 		done
 	fi
 
-	if [ "$WG_VPN" == "SERVER" -a -n "$(etcdctl --endpoints=$ETCD get "TEST/" --prefix --keys-only |grep /public_ip_port$)" ]; then
-		etcdctl --endpoints=$ETCD del "TEST/" --from-key
-		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :TEST$); do
-			etcdctl --endpoints=$ETCD del $i
-		done
-	fi
-	
-	# clean token key
-	if [ "$KEY_CLEAN" == "Y" ]; then
+	if [ "$WG_VPN" == "SERVER" -a -n "$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep /public_ip_port$)" ]; then
 		etcdctl --endpoints=$ETCD del "$WG_TOKEN/" --from-key
 		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :$WG_TOKEN$); do
 			etcdctl --endpoints=$ETCD del $i
@@ -192,7 +184,6 @@ else
 					-e PEER_IP_PORT=[ETCD] \\
 					-e PEER_PUBLIC_KEY=[ETCD] \\
 					-e WG_VPN=<SERVER | CLIENT> \\
-					-e KEY_CLEAN=<Y> \\
 					--name wireguard wireguard
 	"
 fi
