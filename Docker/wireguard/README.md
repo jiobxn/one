@@ -35,6 +35,10 @@ WireGuard
     # client
     docker run -itd --cap-add net_admin -e ETCD=http://10.10.0.246:2379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
 
+    # 宿主机上需要开启路由转发
+    sysctl -w net.ipv4.ip_forward=1
+    iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited
+
 ****
 
 ## Run Defult Parameter
