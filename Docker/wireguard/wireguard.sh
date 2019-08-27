@@ -166,9 +166,6 @@ if [ "$1" = 'WG' ]; then
 		echo "wg set $realeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
 		echo "wg set $realeth peer $PEER_PUBLIC_KEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
 	fi
-	echo "You may also want:"
-	echo "sysctl -w net.ipv4.ip_forward=1"
-	echo "iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited"
 	echo bash >> /usr/local/bin/WG
 	chmod +x /usr/local/bin/WG
 
