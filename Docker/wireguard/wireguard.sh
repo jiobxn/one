@@ -92,14 +92,22 @@ if [ "$1" = 'WG' ]; then
 		PEER_PUBLIC_KEY=$(etcdctl --endpoints=$ETCD get $WG_TOKEN/$PEER_ID/public_key |tail -1)
 	fi
 
+	# real veth
+	realeth=$(ip address |grep default |awk -F: '$2~"wg"{print $2}' |sed 's/ wg//g' |sort -n |tail -1)
+	if [ -z "$realeth" ]; then
+		realeth=wg0
+	else
+		realeth="wg$[$realeth+1]"
+	fi
+
 	# P2P or VPN
 	if [ "$WG_VPN" == "SERVER" ]; then
 		# VPM SERVER
 		echo '#!/bin/bash' > /usr/local/bin/WG
-		echo "ip link add wg1 type wireguard 2>/dev/null || echo" >> /usr/local/bin/WG
-		echo "ip addr add $WGVETH_IP.1/24 dev wg1" >> /usr/local/bin/WG
-		echo "ip link set wg1 up" >> /usr/local/bin/WG
-		echo "wg set wg1 listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
+		echo "ip link add $realeth type wireguard" >> /usr/local/bin/WG
+		echo "ip addr add $WGVETH_IP.1/24 dev $realeth" >> /usr/local/bin/WG
+		echo "ip link set $realeth up" >> /usr/local/bin/WG
+		echo "wg set $realeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
 		[ "$MAX_CLIENT" -gt 1000 ] && MAX_CLIENT=253
 		i=2
 		while [ $i -le $MAX_CLIENT ]; do
@@ -109,7 +117,7 @@ if [ "$1" = 'WG' ]; then
 			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/peerip_$i $WGVETH_IP.$i/24
 			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/peer_pubkey_$i $PUBKEY
 			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/peer_prikey_$i $(cat /mnt/private$i)
-			echo "wg set wg1 peer $PUBKEY allowed-ips $WGVETH_IP.$i/32" >> /usr/local/bin/WG
+			echo "wg set $realeth peer $PUBKEY allowed-ips $WGVETH_IP.$i/32" >> /usr/local/bin/WG
 			let  i++
 		done
 		echo "iptables -t nat -A  POSTROUTING -s $WGVETH_IP.0/24 -o $DEV -j MASQUERADE" >> /usr/local/bin/WG
@@ -133,11 +141,11 @@ if [ "$1" = 'WG' ]; then
 			PUBKEY=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$PEER_ID/public_key" |tail -1)
 		fi
 
-		echo "ip link add wg$wgeth type wireguard 2>/dev/null || echo" >> /usr/local/bin/WG
-		echo "ip addr add $wgip dev wg$wgeth" >> /usr/local/bin/WG
-		echo "ip link set wg$wgeth up" >> /usr/local/bin/WG
-		echo "wg set wg$wgeth private-key /private" >> /usr/local/bin/WG
-		echo "wg set wg$wgeth peer $PUBKEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
+		echo "ip link add $realeth type wireguard" >> /usr/local/bin/WG
+		echo "ip addr add $wgip dev $realeth" >> /usr/local/bin/WG
+		echo "ip link set $realeth up" >> /usr/local/bin/WG
+		echo "wg set $realeth private-key /private" >> /usr/local/bin/WG
+		echo "wg set $realeth peer $PUBKEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
 	else
 		# P2P
 		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
@@ -152,11 +160,11 @@ if [ "$1" = 'WG' ]; then
 		wgip=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_$wgeth" |tail -1)
 
 		echo '#!/bin/bash' > /usr/local/bin/WG
-		echo "ip link add wg$wgeth type wireguard 2>/dev/null || echo" >> /usr/local/bin/WG
-		echo "ip addr add $wgip dev wg$wgeth" >> /usr/local/bin/WG
-		echo "ip link set wg$wgeth up" >> /usr/local/bin/WG
-		echo "wg set wg$wgeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
-		echo "wg set wg$wgeth peer $PEER_PUBLIC_KEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
+		echo "ip link add $realeth type wireguard" >> /usr/local/bin/WG
+		echo "ip addr add $wgip dev $realeth" >> /usr/local/bin/WG
+		echo "ip link set $realeth up" >> /usr/local/bin/WG
+		echo "wg set $realeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
+		echo "wg set $realeth peer $PEER_PUBLIC_KEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
 	fi
 	echo "You may also want:"
 	echo "sysctl -w net.ipv4.ip_forward=1"
