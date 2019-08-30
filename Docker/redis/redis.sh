@@ -20,20 +20,20 @@ if [ "$1" = 'redis-server' ]; then
 	sed -i 's/^port 6379/port '$REDIS_PORT'/' /redis/redis.conf
 
 	#persistence
-	if [ $LOCAL_STROGE ]; then
+	if [ "$LOCAL_STROGE" ]; then
 		sed -i 's@dir \./@dir /redis/data@' /redis/redis.conf
 		sed -i 's@appendonly no@appendonly yes@' /redis/redis.conf
 	fi
 
 	#user auth
-	if [ $REDIS_PASS ]; then
+	if [ "$REDIS_PASS" ]; then
 		echo "requirepass $REDIS_PASS" >>/redis/redis.conf
 		echo "Redis password: $REDIS_PASS" |tee /redis/data/info
 		AUTH="-a $REDIS_PASS"
 	fi
 
 	#redis master
-	if [ $REDIS_MASTER ]; then
+	if [ "$REDIS_MASTER" ]; then
 		echo "slaveof $REDIS_MASTER $REDIS_PORT" >>/redis/redis.conf
 		
 		#sentinel
@@ -50,7 +50,7 @@ if [ "$1" = 'redis-server' ]; then
 	fi
 
 	#master pass
-	if [ $MASTER_PASS ]; then
+	if [ "$MASTER_PASS" ]; then
 		echo "masterauth $MASTER_PASS" >>/redis/redis.conf
 		echo "sentinel auth-pass $MASTER_NAME $MASTER_PASS" >>/sentinel.txt
 		
@@ -62,14 +62,14 @@ if [ "$1" = 'redis-server' ]; then
 	fi
 
 	#VIP, Need root authority "--privileged"
-	if [ $VIP ]; then
+	if [ "$VIP" ]; then
 		#vip
 		cat >/vip.sh<<-END
 		#!/bin/bash
 		PASS="$AUTH"
 
 		for i in {1..29}; do
-		if [ -n "\$(echo "info Replication" |/usr/local/bin/redis-cli \$PASS |grep "role:" |awk -F: '{print \$2}' |egrep -o master)" ]; then
+		if [ -n "\$(echo "info Replication" |/redis/bin/redis-cli \$PASS |grep "role:" |awk -F: '{print \$2}' |egrep -o master)" ]; then
 		    if [ -z "\$(ifconfig |grep $VIP)" ]; then
 		        ifconfig lo:0 $VIP broadcast $VIP netmask 255.255.255.255 up || echo
 		    fi
@@ -85,7 +85,7 @@ if [ "$1" = 'redis-server' ]; then
 		chmod +x /vip.sh
 		echo "* * * * * . /etc/profile;/bin/sh /vip.sh &>/dev/null" >>/var/spool/cron/root
 
-		if [ $REDIS_MASTER ]; then
+		if [ "$REDIS_MASTER" ]; then
 			\cp /sentinel.txt /redis/sentinel.conf
 			echo -e "/redis/bin/redis-server /redis/redis.conf\n/redis/bin/redis-server /redis/sentinel.conf --sentinel" >/sentinel.sh
 			sed -i 's/daemonize no/daemonize yes/' /redis/redis.conf
