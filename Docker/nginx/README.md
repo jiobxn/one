@@ -79,7 +79,7 @@ Nginx
 	ACCLOG_OFF=<Y>								#关闭访问日志记录
 	ERRLOG_OFF=<Y>								#关闭错误日志记录
 	KP_ETH=[default interface]						#用于组播的网络接口
-	KP_RID=[77]								#路由ID
+	KP_VRID=[77]								#路由ID
 	KP_PASS=[Newpa55]							#认证密码
 
 	#HTTP 子选项：作用于四种工作模式，与基本选项之间以"%"为分隔符，各子选项之间用","为分隔符，参数之间用"|"为分隔符，用于替换某种模式下的默认选项
