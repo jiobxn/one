@@ -5,6 +5,8 @@ ARG LATEST="0"
 RUN rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
 RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install nginx keepalived net-tools iproute; yum clean all
 
+VOLUME /var/log/nginx
+
 COPY l4pxy.sh /l4pxy.sh
 RUN chmod +x /l4pxy.sh
 
