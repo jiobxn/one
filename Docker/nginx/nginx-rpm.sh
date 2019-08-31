@@ -14,7 +14,7 @@ set -e
 : ${CACHE_SIZE:="2g"}
 : ${CACHE_MEM:="$(($(free -m |grep Mem |awk '{print $2}')*10/100))m"}
 : ${KP_ETH:="$(route -n |awk '$1=="0.0.0.0"{print $NF }')"}
-: ${KP_RID:="77"}
+: ${KP_VRID:="77"}
 : ${KP_PASS:="Newpa55"}
 : ${WORKER_PROC:="2"}
 
@@ -815,7 +815,7 @@ if [ "$1" = 'nginx' ]; then
 		vrrp_instance VI_1 {
 		    state BACKUP
 		    interface $KP_ETH
-		    virtual_router_id $KP_RID
+		    virtual_router_id $KP_VRID
 		    priority 100
 		    advert_int 1
         
@@ -895,7 +895,7 @@ else
 				   udp=<Y> \\
 				-e KP_VIP=<virtual address> \\
 				-e KP_ETH=[default interface] \\
-				-e KP_RID=[77] \\
+				-e KP_VRID=[77] \\
 				-e KP_PASS=[Newpa55] \\
 				--name nginx nginx
 	" 
