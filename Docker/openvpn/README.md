@@ -47,7 +47,7 @@ OpenVPN
     1.到App Store 安装OpenVPN.
     2.用iTunes 导入ta.key、auth.txt和client.ovpn 到OpenVPN
 
-### [MAC OS](https://tunnelblick.net/index.html)
+### [Tunnelblick](https://tunnelblick.net/index.html)、[OpenVPN Connect Client](https://openvpn.net/downloads/openvpn-connect-v3-macos.dmg)
 
 ### Linux Client:
 
