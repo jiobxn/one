@@ -41,7 +41,7 @@ if [ "$1" = 'L4PXY' ]; then
 		
 		vrrp_instance L4PXY_IP {
 		    state BACKUP
-		    interface KP_DEV
+		    interface KP_ETH
 		    virtual_router_id $KP_VRID
 		    priority 100
 		    advert_int 1
@@ -110,10 +110,10 @@ if [ "$1" = 'L4PXY' ]; then
 		fi
 		
 		if [ -n "$ADDR" ];then
-			[ -z "$KP_DEV" ] && KP_DEV="$(ip route |grep $(echo $ADDR |awk -F. '{print $1"."$2"."$3}') |awk '$2=="dev"{print $3}' |head -1)"
-			sed -i "s/KP_DEV/$KP_DEV/" /etc/keepalived/keepalived.conf
+			[ -z "$KP_ETH" ] && KP_ETH="$(ip route |grep $(echo $ADDR |awk -F. '{print $1"."$2"."$3}') |awk '$2=="dev"{print $3}' |head -1)"
+			sed -i "s/KP_ETH/$KP_ETH/" /etc/keepalived/keepalived.conf
 			echo "keepalived -f /etc/keepalived/keepalived.conf -P -l" >/usr/local/bin/L4PXY
-			echo $KP_DEV
+			echo $KP_ETH
 		fi
 	}
 
@@ -179,7 +179,7 @@ else
 	Example
 			docker run -d --restart unless-stopped --cap-add net_admin \\
 			-e WORKER_PROC=[2] \\
-			-e KP_DEV=[listen eth] \\
+			-e KP_ETH=[listen eth] \\
 			-e KP_PASS=[openssl rand -hex 5] \\
 			-e KP_VRID=[91] \\
 			-e ACCLOG_ON=<Y> \\
