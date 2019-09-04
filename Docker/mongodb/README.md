@@ -14,7 +14,7 @@ MongoDB
     #运行一个MongoDB副本集
     docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.81 -v /docker/mongodb1:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb1 mongodb 
     docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.82 -v /docker/mongodb2:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb2 mongodb  
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 -e MONGO_SERVER="10.0.0.82:27017,10.0.0.83:27017" -e RAB_SERVER="10.0.0.81:27017" --name mongodb3 mongodb
+    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 -e MONGO_SERVER="10.0.0.82:27017,10.0.0.83:27017" -e ARB_SERVER="10.0.0.81:27017" --name mongodb3 mongodb
     #注意：顺序不能错，要先运行SECONDARY节点，最后运行PRIMARY节点。
 
 ## Run Defult Parameter
@@ -32,7 +32,7 @@ MongoDB
 				-e REPL_NAME=<rs0> \\              副本集名称
 				-e VIP=<10.0.0.80> \\              PRIMARY IP Addr，需要 --privileged
 				-e MONGO_SERVER=<10.0.0.82:27017,10.0.0.83:27017>  \\ 集群节点数建议大于或等于3,小于等于7
-				-e RAB_SERVER=<10.0.0.81:27017>  \\    仲裁者
+				-e ARB_SERVER=<10.0.0.81:27017>  \\    仲裁者
 				--name mongodb mongodb
 
 
