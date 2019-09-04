@@ -73,7 +73,7 @@ http_conf() {
 	    gzip  on;
 	    gzip_comp_level 6;
 	    gzip_proxied any;
-	    gzip_types text/plain text/css text/xml text/javascript application/json application/x-javascript application/xml application/xml+rss application/javascript application/x-httpd-php image/jpeg image/gif image/png;
+	    gzip_types text/plain text/css text/xml text/javascript application/json application/x-javascript application/javascript application/xml application/xml+rss application/javascript application/x-httpd-php image/jpeg image/gif image/png;
 	    gzip_vary on;
 		
 	    #upstream#
