@@ -96,6 +96,10 @@ MongoDB
 	net:
 	   bindIp: localhost,<hostname(s)|ip address(es)>
 
+将新实例转换为仲裁者
+
+	rs.addArb("<hostname><:port>")
+
 延迟节点
 
 	cfg = rs.conf()
