@@ -67,7 +67,11 @@ MongoDB
 
 	rs.status()
 
-将成员添加到副本集
+准备一个新成员
+
+	mongod --port 27017 --dbpath /data/arb --replSet rs0 --bind_ip 0.0.0.0
+
+将新成员添加到副本集
 
 	rs.add( { host: "mongodb3.example.net:27017", priority: 1, votes: 0 } )
 
@@ -96,7 +100,7 @@ MongoDB
 	net:
 	   bindIp: localhost,<hostname(s)|ip address(es)>
 
-将新实例转换为仲裁者
+将新成员转换为仲裁者
 
 	rs.addArb("<hostname><:port>")
 
