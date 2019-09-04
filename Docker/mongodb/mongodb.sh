@@ -118,6 +118,7 @@ mongo_gluster() {
 			mongo_gluster
 			[ -f /replset.json ] && echo "/usr/local/bin/mongo < /replset.json 1>/dev/null" >>/init.sh && echo "sleep 5" >>/init.sh
 			[ -f /rsadd.txt ] && cat /rsadd.txt >>/init.sh
+			[ "$ARB_SERVER" ] && echo 'rs.addArb("'$ARB_SERVER'")' | /usr/local/bin/mongo --quiet
 		else
 			sed -i '1 i #redhat.xyz' /etc/mongod.conf
 			sed -i 's/#security:/security:/' /etc/mongod.conf
@@ -158,7 +159,8 @@ else
 				-e MONGO_BACK=<Y> \\
 				-e REPL_NAME=<rs0> \\
 				-e VIP=<10.0.0.80> \\
-				-e MONGO_SERVER=<10.0.0.81:27017,10.0.0.82:27017,10.0.0.83:27017>
+				-e MONGO_SERVER=<10.0.0.81:27017,10.0.0.82:27017>
+				-e ARB_SERVER=<10.0.0.83:27017> \\
 				--name mongodb mongodb
 	"
 fi
