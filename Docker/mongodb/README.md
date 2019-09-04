@@ -100,7 +100,7 @@ MongoDB
 	net:
 	   bindIp: localhost,<hostname(s)|ip address(es)>
 
-将新成员转换为仲裁者
+将新成员添加为仲裁者
 
 	rs.addArb("<hostname><:port>")
 
