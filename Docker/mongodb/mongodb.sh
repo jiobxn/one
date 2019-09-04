@@ -116,8 +116,7 @@ mongo_gluster() {
 			echo "$(ip route |awk '$3=="'$(ip route |awk '$1=="default"{print $NF}')'" && $NR1~"src"{print $NF}'):$MONGO_PORT" >/mongo/data/myid
 
 			mongo_gluster
-			[ -f /replset.json ] && echo "/usr/local/bin/mongo < /replset.json 1>/dev/null" >>/init.sh
-			echo "sleep 5" >>/init.sh
+			[ -f /replset.json ] && echo "/usr/local/bin/mongo < /replset.json 1>/dev/null" >>/init.sh && echo "sleep 5" >>/init.sh
 			[ -f /rsadd.txt ] && cat /rsadd.txt >>/init.sh
 		else
 			sed -i '1 i #redhat.xyz' /etc/mongod.conf
