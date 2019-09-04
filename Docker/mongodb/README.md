@@ -104,7 +104,7 @@ MongoDB
 
 	rs.addArb("<hostname><:port>")
 
-延迟节点
+配置延迟副本集成员
 
 	cfg = rs.conf()
 	cfg.members[0].priority = 0
@@ -112,7 +112,7 @@ MongoDB
 	cfg.members[0].slaveDelay = 3600
 	rs.reconfig(cfg)
 
-节点优先级
+调整副本集成员的优先级
 
 	cfg = rs.conf()
 	cfg.members[0].priority = 0.5
