@@ -79,6 +79,7 @@ mongo_gluster() {
 		for i in $(echo "$MONGO_SERVER" |sed 's/,/\n/g'); do
 			[ -z "$(ifconfig |grep "$(echo $i |awk -F: '{print $1}')")" ] && echo 'echo "rs.add(\"'$i'\")" |/usr/local/bin/mongo --quiet' >> /rsadd.txt
 		done
+		chmod +r /rsadd.txt
 	fi
 }
 
