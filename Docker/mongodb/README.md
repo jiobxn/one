@@ -12,15 +12,15 @@ MongoDB
     docker logs mongodb
 
     #运行一个MongoDB副本集
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.81 -v /docker/mongodb1:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb1 mongodb 
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.82 -v /docker/mongodb2:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb2 mongodb  
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 -e MONGO_SERVER="10.0.0.82:27017,10.0.0.83:27017" -e ARB_SERVER="10.0.0.81:27017" --name mongodb3 mongodb
+    docker run -d --restart unless-stopped --network mynetwork --ip=10.0.0.81 -v /docker/mongodb1:/mongo/data -e REPL_NAME=rs0 --name mongodb1 mongodb 
+    docker run -d --restart unless-stopped --cap-add net_admin --network mynetwork --ip=10.0.0.82 -v /docker/mongodb2:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb2 mongodb  
+    docker run -d --restart unless-stopped --cap-add net_admin --network mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 -e MONGO_SERVER="10.0.0.82:27017,10.0.0.83:27017" -e ARB_SERVER="10.0.0.81:27017" --name mongodb3 mongodb
     #注意：顺序不能错，要先运行SECONDARY节点，最后运行PRIMARY节点。
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart unless-stopped [--privileged] \\
+				docker run -d --restart unless-stopped [--cap-add net_admin] \\
 				-v /docker/mongodb:/mongo/data \\
 				-p 27017:27017 \\
 				-e MONGO_PORT=[27017] \\           mongodb端口
