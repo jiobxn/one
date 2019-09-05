@@ -21,7 +21,7 @@ ENTRYPOINT ["/mongodb.sh"]
 
 EXPOSE 27017
 
-CMD ["mongod", "-f", "/etc/mongod.conf"]
+CMD ["MONGOD"]
 
 # docker build -t mongodb .
 # docker run -d --restart unless-stopped -p 27017:27017 -v /docker/mongodb:/mongo/data -e MONGO_ROOT_PASS=newpass --name mongodb mongodb
