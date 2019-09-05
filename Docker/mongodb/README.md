@@ -230,17 +230,15 @@ MongoDB
 	sh.addShard( "s1-mongo1.example.net:27017")
 
 
-### 为数据库启用分片(1)
+**为数据库启用分片(1)**
 
 	sh.enableSharding("<database>")
 
-
-### 使用散列分片对集合进行分片(2)
+**使用散列分片对集合进行分片(2)**
 
 	sh.shardCollection("<database>.<collection>", { <shard key> : "hashed" } )
 
-
-### 使用远程分片对集合进行分片(3)
+**使用远程分片对集合进行分片(3)**
 
 	sh.shardCollection("<database>.<collection>", { <shard key> : <direction> } )
 
