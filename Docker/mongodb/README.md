@@ -33,8 +33,8 @@ MongoDB
     docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.86 -e REPL_NAME=shard0 -e CLUSTER=SHARD --name mongodb6 -e MONGO_SERVER="10.0.0.85:27017,10.0.0.86:27017" -e ARB_SERVER="10.0.0.84:27017" mongodb
 
     #路由节点
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.87 -e CLUSTER=ROUTER --name mongodb7 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.84:27017,10.0.0.85:27017,10.0.0.86:27017" mongodb
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.88 -e CLUSTER=ROUTER --name mongodb8 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.84:27017,10.0.0.85:27017,10.0.0.86:27017" mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.87 -e CLUSTER=ROUTER --name mongodb7 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.85:27017,10.0.0.86:27017" mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.88 -e CLUSTER=ROUTER --name mongodb8 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.85:27017,10.0.0.86:27017" mongodb
 
 
 ## Run Defult Parameter
