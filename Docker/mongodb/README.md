@@ -288,3 +288,29 @@ MongoDB
 查看群集细节
 
 	sh.status()
+
+
+### 从现有的分片群集中删除分片
+
+1、确保平衡器已启用
+
+	sh.getBalancerState()  #启用平衡器时返回true， 如果禁用平衡器则返回false。
+
+2、确定要删除的分片的名称
+
+	db.adminCommand( { listShards: 1 } )
+	#运行 db.printShardingStatus() 或 db.printShardingStatus() 方法
+
+4、迁移fizz从数据库 mongodb0到mongodb1
+
+	db.adminCommand( { movePrimary: "fizz", to: "mongodb1" })
+
+5、删除分片
+
+	db.adminCommand( { removeShard: "mongodb0" } )
+	#这些迁移发生得很慢
+
+6、检查迁移状态
+
+	db.adminCommand( { removeShard: "mongodb0" } )
+	#直到剩余的块数为止0
