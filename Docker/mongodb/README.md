@@ -89,7 +89,10 @@ MongoDB
 
 5、检查副本集的状态
 
-	rs.status()
+	复制集状态查询：rs.status()
+	查看oplog状态： rs.printReplicationInfo()
+	查看复制延迟：  rs.printSlaveReplicationInfo()
+	查看服务状态详情:   db.serverStatus()
 
 准备一个新成员
 
