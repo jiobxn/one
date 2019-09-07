@@ -14,16 +14,16 @@ if [ "$1" = 'WG' ]; then
 	export ETCDCTL_API=3
 
 	# clean key
-	if [ -z "$WG_VPN" -a "$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep -c ^$WG_TOKEN/)" -ge 8 ]; then
+	if [ -z "$WG_VPN" -a "$(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep -c ":$WG_TOKEN$")" -ge 2 ]; then
 		etcdctl --endpoints=$ETCD del "$WG_TOKEN/" --from-key
-		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :$WG_TOKEN$); do
+		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep ":$WG_TOKEN$"); do
 			etcdctl --endpoints=$ETCD del $i
 		done
 	fi
 
-	if [ "$WG_VPN" == "SERVER" -a -n "$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep /public_ip_port$)" ]; then
+	if [ "$WG_VPN" == "SERVER" -a -n "$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep "/public_ip_port$")" ]; then
 		etcdctl --endpoints=$ETCD del "$WG_TOKEN/" --from-key
-		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep :$WG_TOKEN$); do
+		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep ":$WG_TOKEN$"); do
 			etcdctl --endpoints=$ETCD del $i
 		done
 	fi
