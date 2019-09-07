@@ -171,6 +171,7 @@ if [ "$1" = 'WG' ]; then
 	fi
 	echo bash >> /usr/local/bin/WG
 	chmod +x /usr/local/bin/WG
+	echo "etcdctl --endpoints=$ETCD get \"\" --prefix --keys-only |grep $WG_TOKEN"
 
   fi
 
