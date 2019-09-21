@@ -7,10 +7,10 @@ if [ "$1" = 'openvpn' ]; then
 : ${VPN_PORT:=1194}
 : ${TCP_UDP:=tcp}
 : ${TAP_TUN:=tun}
-: ${VPN_PASS:=$(pwmake 64)}
+: ${VPN_PASS:=$(pwgen 15 |awk '{print $NF}')}
 : ${GATEWAY_VPN:=Y}
 : ${C_TO_C:=Y}
-: ${PROXY_PASS:=$(pwmake 64)}
+: ${PROXY_PASS:=$(pwgen 15 |awk '{print $NF}')}
 : ${PROXY_PORT:=8080}
 : ${DNS1:=9.9.9.9}
 : ${DNS2:=8.8.8.8}
@@ -20,15 +20,15 @@ if [ "$1" = 'openvpn' ]; then
 if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	# Get ip address
 	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
-	if [ -z $SERVER_IP ]; then
+	if [ -z "$SERVER_IP" ]; then
 		SERVER_IP=$(curl -s http://ip.sb/)
 	fi
 
-	if [ -z $SERVER_IP ]; then
+	if [ -z "$SERVER_IP" ]; then
 		SERVER_IP=$(curl -s https://httpbin.org/ip |awk -F\" 'NR==2{print $4}')
 	fi
 
-	if [ -z $SERVER_IP ]; then
+	if [ -z "$SERVER_IP" ]; then
 		SERVER_IP=$(ifconfig $DEV |awk '$3=="netmask"{print $2}')
 	fi
 
@@ -193,7 +193,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		
 			# add user
 			if [ "$VPN_USER" -a ! -f /key/psw-file ];then
-				PASS=$(pwmake 64)
+				PASS=$(pwgen 15 |awk '{print $NF}')
 				echo "client$i       $PASS" >> /etc/openvpn/psw-file
 			fi
 			
@@ -409,7 +409,7 @@ else
 
 	echo -e "
 	Example
-			docker run -d --restart unless-stopped --privileged \\
+			docker run -d --restart unless-stopped --cap-add=NET_ADMIN --device=/dev/net/tun \\
 			-v /docker/openvpn:/key \\
 			-p 1194:1194 \\
 			-p <8080:8080> \\
