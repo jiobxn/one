@@ -8,16 +8,16 @@ OpenVPN
 ## Example:
 
     #运行一个原生openvpn
-    docker run -d --restart always --privileged -v /docker/openvpn:/key -p 1194:1194 --name openvpn jiobxn/openvpn
+    docker run -d --restart unless-stopped --cap-add=NET_ADMIN --device=/dev/net/tun -v /docker/openvpn:/key -p 1194:1194 --name openvpn jiobxn/openvpn
 
     #运行一个http代理的openvpn
-    docker run -d --restart always --privileged -v /docker/openvpn:/key -p 8080:8080 -e PROXY_USER=jiobxn --name openvpn jiobxn/openvpn
+    docker run -d --restart unless-stopped --cap-add=NET_ADMIN --device=/dev/net/tun -v /docker/openvpn:/key -p 8080:8080 -e PROXY_USER=jiobxn --name openvpn jiobxn/openvpn
     
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-			docker run -d --restart unless-stopped --privileged \\
+			docker run -d --restart unless-stopped --restart unless-stopped --cap-add=NET_ADMIN --device=/dev/net/tun \\
 			-v /docker/openvpn:/key \\
 			-p 1194:1194 \\
 			-p <8080:8080> \\
@@ -34,7 +34,7 @@ OpenVPN
 			-e IP_RANGE=[10.8.0] \\      分配的IP地址池
 			-e PROXY_USER=<jiobxn> \\    http代理用户名
 			-e PROXY_PASS=<123456> \\    代理密码，默认随机
-			-e PROXY_PORT=<8080> \\      代理端口
+			-e PROXY_PORT=[8080] \\      代理端口
 			-e DNS1=[9.9.9.9] \\         默认DNS
 			-e DNS2=[8.8.8.8] \\
 			-e RADIUS_SERVER=<radius ip> \\    radius 服务器
