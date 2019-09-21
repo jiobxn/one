@@ -425,7 +425,7 @@ else
 			-e IP_RANGE=[10.8] \\
 			-e PROXY_USER=<jiobxn> \\
 			-e PROXY_PASS=<123456> \\
-			-e PROXY_PORT=<8080> \\
+			-e PROXY_PORT=[8080] \\
 			-e DNS1=[9.9.9.9] \\
 			-e DNS2=[8.8.8.8] \\
 			-e PUSH_ROUTE=<"172.31.10.0/255.255.0.0,10.10.0.0/255.255.0.0">
