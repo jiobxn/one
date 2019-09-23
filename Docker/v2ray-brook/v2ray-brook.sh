@@ -16,6 +16,11 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 		sed -i "s/23ad6b10-8d1a-40f7-8ad0-e3e35cd38297/${UUID}/g" /v2ray/vpoint_vmess_freedom.json
 		sed -i "s/warning/${LOG}/" /v2ray/vpoint_vmess_freedom.json
 		echo -e "mode: v2ray \nport: $PORT \nUUID: $UUID"
+		if [ "$WSPATH" ]; then
+		    sed -i '/"vmess"/ a \    "streamSettings": {\n      "network": "ws",\n      "wsSettings": {\n        "path": "'$WSPATH'"\n      }\n    },' /v2ray/vpoint_vmess_freedom.json
+		    echo "PATH: $WSPATH"
+		fi
+		
 		echo "v2ray -config /v2ray/vpoint_vmess_freedom.json" >/usr/bin/v2ray-brook
 	else
 		if [ "$HTTP" ]; then
@@ -47,6 +52,7 @@ else
 				-e PORT=[19443] \\
 				-e MODE=[server] \\ <v2ray| [server|ssserver] | [client|ssclient]>
 				-e UUID=[Random] \\
+				-e WSPATH=</mp4> \\
 				-e LOG=[none] \\ <debug|info|warning|error|none>
 				-e HTTP=<Y> \\
 				-e SERVER=<server_address:port> \\
