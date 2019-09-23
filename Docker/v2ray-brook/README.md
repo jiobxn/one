@@ -26,3 +26,22 @@ v2ray-brook
 				-e HTTP=<Y> \\         #客户端启动http代理。 默认socks5
 				-e SERVER=<server_address:port> \\    #brook服务器地址和端口
 				--name v2ray-brook v2ray-brook
+
+****
+
+### V2Ray客户端
+
+**Windown**  
+https://github.com/Cenmrev/V2RayW/releases  
+https://github.com/2dust/v2rayN/releases
+
+**MacOS**  
+https://github.com/Cenmrev/V2RayX/releases  
+https://github.com/yanue/V2rayU/releases
+
+**Android**  
+https://apkpure.com/v2rayng/com.v2ray.ang  
+https://apkpure.com/bifrostv/com.github.dawndiy.bifrostv
+
+**IOS**  
+Shadowrocket、Quantumult、i2Ray，类型选择Vmess
