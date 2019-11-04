@@ -67,6 +67,7 @@ if [ ! -f /usr/local/bin/dnscrypt ]; then
 		BIND
 	fi
 	
+	chown named.named /dnslog
 	chmod +x /usr/local/bin/dnscrypt
 fi
 
@@ -77,6 +78,7 @@ else
 	Example:
 				docker run -d --restart unless-stopped \\
 				-p 53:53/udp \\
+				-v /docker/dnslog:/dnslog \\
 				-e VERSION=["windows 2003 DNS"] \\
 				-e BIND_DNS=<8.8.8.8;9.9.9.9> \\
 				-e FORWARD_ONLY=<Y> \\
