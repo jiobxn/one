@@ -5,7 +5,7 @@ ARG LATEST="0"
 RUN yum clean all; yum -y update; yum -y install net-tools ipset wget bind bind-utils; yum clean all
 
 RUN cd /mnt \
-        && wget -c https://github.com/$(curl -s https://github.com/jedisct1/dnscrypt-proxy/releases |grep dnscrypt-proxy-linux_x86_64 |awk -F\" 'NR==1{print $2}') \
+        && wget -c https://github.com/$(curl -s https://github.com/DNSCrypt/dnscrypt-proxy/releases |grep dnscrypt-proxy-linux_x86_64 |awk -F\" 'NR==1{print $2}') \
         && wget -c https://github.com/jiobxn/one/raw/master/Docker/dnscrypt/chinadns-ng -O /usr/local/bin/chinadns-ng \
         && wget -c https://github.com/jiobxn/one/raw/master/Docker/dnscrypt/chnroute.ipset -O /chnroute.ipset \
         && wget -c http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest \
