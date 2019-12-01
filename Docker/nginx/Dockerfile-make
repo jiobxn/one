@@ -1,0 +1,88 @@
+FROM centos:7
+MAINTAINER "The CentOS Project" <admin@jiobxn.com>
+ARG LATEST="0"
+
+RUN yum clean all; yum -y update; yum -y install net-tools iproute wget autoreconf automake make gcc-c++ iptables cronie geoip-devel libxml2-devel libxslt-devel gd-devel gperftools; yum clean all
+
+RUN cd /mnt \
+        && pcre_down="https://sourceforge.net/projects/pcre/files/pcre/" && pcre_v=$(curl -s $pcre_down |grep "tr title" |awk -F\" 'NR==1{print $2}') && wget -c "$pcre_down$pcre_v/pcre-$pcre_v.tar.gz" \
+        && wget -c https://www.openssl.org/source/$(curl -s https://www.openssl.org/source/ |grep tar.gz |awk -F\" 'NR==3{print $2}') \
+        && wget -c http://zlib.net/$(curl -s http://zlib.net/ |grep "\.tar.gz" |awk -F\" 'NR==1{print $2}') \
+        && wget -c $(curl -s http://www.cpan.org/src/ |grep wget |awk -F\" '{print $2}') \
+        && wget -c https://github.com$(curl -s https://github.com/acassen/keepalived/releases |grep tar.gz |awk -F\" 'NR==1{print $4}') \
+        && nginx_v=$(curl -s http://nginx.org/ |awk -F'download.html">nginx-' '{print $2}' |grep -v ^$ |awk -F'<' 'NR==1{print $1}') && wget -c http://nginx.org/download/nginx-$nginx_v.tar.gz \
+        && tar zxf nginx-*.tar.gz \
+        && tar zxf pcre-*.tar.gz \
+        && tar zxf openssl-*.tar.gz \
+        && tar zxf zlib-*.tar.gz \
+        && tar zxf perl-*.tar.gz \
+        && tar zxf v*.tar.gz \
+        && \rm *.tar.gz \
+        && mv perl-* perl \
+        && mv pcre-* pcre \
+        && mv zlib-* zlib \
+        && mv openssl-* openssl \
+        && cd /mnt/zlib \
+        && ./configure && make -j8 && make install \
+        && cd /mnt/perl \
+        && ./Configure -des && make -j8 && make install \
+        && cd /mnt/openssl \
+        && ./config --prefix=/usr/local zlib threads shared  && make -j8 && make install \
+        && echo "/usr/local/lib64" >> /etc/ld.so.conf && ldconfig \
+        && cd /mnt/keepalived-* \
+        && ./build_setup \
+        && ./configure --sysconf=/etc && make -j8 && make install \
+        && cd /mnt/nginx-* \
+        && sed -i 's/\.openssl\/include/include/' auto/lib/openssl/conf \
+        && sed -i 's/\.openssl\/lib\///' auto/lib/openssl/conf \
+        && ./configure --prefix=/nginx \
+           --with-pcre=/mnt/pcre \
+           --with-zlib=/mnt/zlib \
+           --with-openssl=/mnt/openssl \
+           --with-threads \
+           --with-file-aio \
+           --with-http_ssl_module \
+           --with-http_v2_module \
+           --with-http_realip_module \
+           --with-http_addition_module \
+           --with-http_xslt_module \
+           --with-http_image_filter_module \
+           --with-http_geoip_module \
+           --with-http_sub_module \
+           --with-http_dav_module \
+           --with-http_flv_module \
+           --with-http_mp4_module \
+           --with-http_gunzip_module \
+           --with-http_gzip_static_module \
+           --with-http_auth_request_module \
+           --with-http_random_index_module \
+           --with-http_secure_link_module \
+           --with-http_degradation_module \
+           --with-http_slice_module \
+           --with-http_stub_status_module \
+           --with-http_perl_module \
+           --with-mail \
+           --with-mail_ssl_module \
+           --with-stream \
+           --with-stream_ssl_module \
+           --with-stream_realip_module \
+           --with-stream_geoip_module \
+           --with-stream_ssl_preread_module \
+           --with-google_perftools_module \
+        && make -j8 && make install \
+        && rm -rf /mnt/* \
+        && ln -s /nginx/sbin/* /usr/local/bin/
+
+VOLUME /nginx/html /key /nginx/logs
+
+COPY nginx-make.sh /nginx.sh
+RUN chmod +x /nginx.sh
+
+ENTRYPOINT ["/nginx.sh"]
+
+EXPOSE 80 443
+
+CMD ["nginx"]
+
+# docker build -t nginx .
+# docker run -d --restart always -p 80:80 -p 443:443 -v /docker/www:/www -v /docker/nginx:/key -e DOMAIN_PROXY="fqhub.com%backend_https=y" -e PROXY_SERVER="jiobxn.com,www.jiobxn.com|jiobxn.wordpress.com%backend_https=y,alias=/down|/www" --name nginx nginx
