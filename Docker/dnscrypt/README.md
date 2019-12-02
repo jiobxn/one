@@ -45,3 +45,34 @@ DNSCrypt
 				-e TRUSE_DNS=[127.0.0.1#55] \\       可信DNS(dnscrypt)
 				-e CHINA_DNS=[114.114.114.114,223.5.5.5] \\    大陆DNS
 				--name dns dnscrypt
+
+****
+
+## 添加NS解析
+
+	DOMAIN=qq.com
+	IPADDR=192.168.80.100
+	
+	cat >>/etc/named.rfc1912.zones <<-END
+	#$DOMAIN
+	zone "$DOMAIN" IN {
+			type master;
+			file "$DOMAIN";
+			allow-update { none; };
+	};
+	END
+
+	cat >/var/named/$DOMAIN <<-END
+	@       IN SOA  ns.$DOMAIN. root.$DOMAIN. (
+									$(date +%Y%m%d%H)
+											1D
+											1H
+											1W
+											3H )
+	@     IN      NS      ns.$DOMAIN.
+	ns    IN      A       $IPADDR
+
+	@     IN      A       $IPADDR
+	m     IN      A       $IPADDR
+	*     IN      A       $IPADDR
+	END
