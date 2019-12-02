@@ -76,3 +76,10 @@ DNSCrypt
 	m     IN      A       $IPADDR
 	*     IN      A       $IPADDR
 	END
+
+### dnsmasq
+
+	yum install dnsmasq -y
+	echo address=/.google.com/192.168.1.3 >/etc/dnsmasq.d/google.conf
+	echo address=/m.youtube.com/192.168.1.3 >/etc/dnsmasq.d/youtube.conf
+	systemctl restart dnsmasq.service
