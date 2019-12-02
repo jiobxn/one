@@ -6,7 +6,8 @@ set -e
 : ${FCGI_PATH:="/var/www"}
 : ${HTTP_PORT:="80"}
 : ${HTTPS_PORT:="443"}
-: ${SSL_CACHE:="10m"}
+: ${SSL_CACHE:="25m"}
+: ${SSL_TIMEOUT:="10m"}
 : ${DOMAIN_TAG:="888"}
 : ${EOORO_JUMP:="https://cn.bing.com"}
 : ${NGX_DNS="9.9.9.9"}
@@ -19,17 +20,10 @@ set -e
 : ${WORKER_PROC:="2"}
 
 
+##-----------------HTTP----------------
 
 http_conf() {
 	echo "Initialize nginx"
-	if [ -f /key/server.crt -a -f /key/server.key ]; then
-		\cp /key/*.{crt,key} /etc/nginx/
-	else
-		openssl genrsa -out /etc/nginx/server.key 4096 2>/dev/null
-		openssl req -new -key /etc/nginx/server.key -out /etc/nginx/server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker" 2>/dev/null
-		openssl x509 -req -days 3650 -in /etc/nginx/server.csr -signkey /etc/nginx/server.key -out /etc/nginx/server.crt 2>/dev/null
-	fi
-
 
 	#global
 	cat >/etc/nginx/nginx.conf <<-END
@@ -73,7 +67,7 @@ http_conf() {
 	    gzip  on;
 	    gzip_comp_level 6;
 	    gzip_proxied any;
-	    gzip_types text/plain text/css text/xml text/javascript application/json application/x-javascript application/javascript application/xml application/xml+rss application/javascript application/x-httpd-php image/jpeg image/gif image/png;
+	    gzip_types text/plain text/css text/xml text/javascript application/json application/x-javascript application/javascript application/xml application/xml+rss application/x-httpd-php image/jpeg image/gif image/png;
 	    gzip_vary on;
 		
 	    #upstream#
@@ -101,7 +95,7 @@ http_conf() {
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
-	    ssl_session_timeout  5m;
+	    ssl_session_timeout  $SSL_TIMEOUT;
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
@@ -123,6 +117,14 @@ http_conf() {
 	if [ "$LIMIT_RATE" ]; then
 		sed -i '/#LIMIT#/ a \    set $limit_rate '$LIMIT_RATE';' /etc/nginx/conf.d/default.conf
 	fi
+
+	#最大并发数
+	if [ "$LIMIT_CONN" ]; then
+		sed -i '/#upstream#/ i \    limit_conn_zone $binary_remote_addr zone=addr:'$ADDR_CACHE';' /etc/nginx/nginx.conf
+		sed -i '/#LIMIT#/ i \    limit_conn           addr '$LIMIT_CONN';' /etc/nginx/conf.d/default.conf
+		sed -i '/#LIMIT#/ i \    limit_conn_log_level error;' /etc/nginx/conf.d/default.conf
+		sed -i '/#LIMIT#/ i \    limit_conn_status    403;' /etc/nginx/conf.d/default.conf
+	fi
 }
 
 
@@ -139,7 +141,7 @@ fcgi_server() {
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
-	    ssl_session_timeout  5m;
+	    ssl_session_timeout  $SSL_TIMEOUT;
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
@@ -197,7 +199,7 @@ java_php_server() {
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
-	    ssl_session_timeout  5m;
+	    ssl_session_timeout  $SSL_TIMEOUT;
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
@@ -257,7 +259,7 @@ proxy_server() {
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
-	    ssl_session_timeout  5m;
+	    ssl_session_timeout  $SSL_TIMEOUT;
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
@@ -316,7 +318,7 @@ domain_proxy() {
 	    ssl_certificate      /etc/nginx/server.crt;
 	    ssl_certificate_key  /etc/nginx/server.key;
 	    ssl_session_cache shared:SSL:$SSL_CACHE;
-	    ssl_session_timeout  5m;
+	    ssl_session_timeout  $SSL_TIMEOUT;
 	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 	    ssl_ciphers  HIGH:!aNULL:!MD5;
 	    ssl_prefer_server_ciphers   on;
@@ -522,6 +524,16 @@ http_other() {
 			sed -i '/#alias#/ i \    set $limit_rate '$limit_rate';' /etc/nginx/conf.d/${project_name}_$n.conf
 		fi
 		
+		#最大并发数
+		if [ -n "$(echo $i |grep 'limit_conn=')" ]; then
+		    limit_conn="$(echo $i |grep 'limit_conn=' |awk -F= '{print $2}')"
+			
+			sed -i '/#upstream#/ i \    limit_conn_zone '\$binary_remote_addr' zone=addr'$n':'$ADDR_CACHE';' /etc/nginx/nginx.conf
+			sed -i '/#alias#/ i \        limit_conn_log_level error;' /etc/nginx/conf.d/${project_name}_$n.conf
+			sed -i '/#alias#/ i \        limit_conn_status    403;' /etc/nginx/conf.d/${project_name}_$n.conf
+			sed -i '/#alias#/ i \        limit_conn           addr'$n' '$limit_conn';' /etc/nginx/conf.d/${project_name}_$n.conf
+		fi
+		
 		#日志
 		if [ -n "$(echo $i |grep 'log=')" ]; then
 			log="$(echo $i |grep 'log=' |awk -F= '{print $2}')"
@@ -620,7 +632,12 @@ stream_conf() {
 	}
   
 	stream {
+	    log_format main '\$remote_addr:\$remote_port [\$time_local] \$protocol \$status \$session_time "\$upstream_addr" \$upstream_connect_time';
+	    ##acclog_on access_log access.log main;
+	    ##errlog_off error_log off;
+	
 	    #upstream#
+		
 	    #server#
 	}
 	daemon off;
@@ -702,9 +719,50 @@ stream_other() {
 			sed -i '/#backend-lb-'$n'#/ a \        proxy_timeout '$proxy_timeout';' /etc/nginx/nginx.conf
 		fi
 		
-		#UDP
+		#UDP, 不能和SSL共存
 		if [ -n "$(echo $i |grep 'udp=')" ]; then
 			sed -i 's/'$PORT';#'$n'/'$PORT' udp;#'$n'/' /etc/nginx/nginx.conf
+		fi
+		
+		#最大并发数
+		if [ -n "$(echo $i |grep 'limit_conn=')" ]; then
+		    limit_conn="$(echo $i |grep 'limit_conn=' |awk -F= '{print $2}')"
+			sed -i '/#upstream#/ i \    limit_conn_zone $binary_remote_addr zone=addr'$n':'$ADDR_CACHE';' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        limit_conn_log_level error;' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        limit_conn           addr'$n' '$limit_conn';' /etc/nginx/nginx.conf
+		fi
+		
+		#SSL
+		if [ -n "$(echo $i |grep 'ssl=')" ]; then
+			sed -i 's/'$PORT';#'$n'/'$PORT' ssl;#'$n'/' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        ssl_certificate_key     /etc/nginx/server.key;' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        ssl_certificate         /etc/nginx/server.crt;' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        ssl_session_timeout '$SSL_TIMEOUT';' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        ssl_session_cache   shared:SSL:'$SSL_CACHE';' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        ssl_ciphers         AES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5;' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;' /etc/nginx/nginx.conf
+		fi
+		
+		#上游SSL
+		if [ -n "$(echo $i |grep 'ssl_backend=')" ]; then
+			sed -i '/#backend-lb-'$n'#/ a \        proxy_ssl_certificate_key     /etc/nginx/server.key;' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        proxy_ssl_certificate         /etc/nginx/server.crt;' /etc/nginx/nginx.conf
+			sed -i '/#backend-lb-'$n'#/ a \        proxy_ssl  on;' /etc/nginx/nginx.conf
+		fi
+		
+		#日志
+		if [ -n "$(echo $i |grep 'log=')" ]; then
+			log="$(echo $i |grep 'log=' |awk -F= '{print $2}')"
+			
+			if [ "$log" == "Y" ]; then
+				sed -i '/#backend-lb-'$n'#/ a \        access_log logs/'$n'-access.log main;' /etc/nginx/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ a \        error_log logs/'$n'-error.log;' /etc/nginx/nginx.conf
+			fi
+			
+			if [ "$log" == "N" ]; then
+				sed -i '/#backend-lb-'$n'#/ i \        access_log off;' /etc/nginx/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ i \        error_log off;' /etc/nginx/nginx.conf
+			fi 
 		fi
 	done
 }
@@ -716,8 +774,16 @@ stream_other() {
 
 if [ "$1" = 'nginx' ]; then
   if [ -z "$(grep "redhat.xyz" /etc/nginx/nginx.conf)" ]; then
-        \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-  
+	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+	if [ -f /key/server.crt -a -f /key/server.key ]; then
+		\cp /key/*.{crt,key} /etc/nginx/
+	else
+		openssl genrsa -out /etc/nginx/server.key 4096 2>/dev/null
+		openssl req -new -key /etc/nginx/server.key -out /etc/nginx/server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker" 2>/dev/null
+		openssl x509 -req -days 3650 -in /etc/nginx/server.csr -signkey /etc/nginx/server.key -out /etc/nginx/server.crt 2>/dev/null
+	fi
+
 	if [ "$STREAM_SERVER" ]; then
 		stream_conf
 		
@@ -825,10 +891,13 @@ if [ "$1" = 'nginx' ]; then
 		    }
         
 		    virtual_ipaddress {
-		        $KP_VIP
 		    }
 		}
 		END
+
+		for vip in $(echo $KP_VIP |sed 's/,/ /g');do
+			sed -i "/virtual_ipaddress/a \        $vip" /etc/keepalived/keepalived.conf
+		done
 	fi
 
   fi
@@ -859,8 +928,10 @@ else
 				-e NGX_CHARSET=[utf-8] \\
 				-e FCGI_PATH=[/var/www] \\
 				-e HTTP_PORT=[80] \\
-				-e SSL_CACHE=[10m] \\
 				-e HTTPS_PORT=[443] \\
+				-e ADDR_CACHE=[25m] \\
+				-e SSL_CACHE=[25m] \\
+				-e SSL_TIMEOUT=[10m] \\
 				-e DOMAIN_TAG=[888] \\
 				-e EOORO_JUMP=[https://cn.bing.com] \\
 				-e NGX_DNS=[9.9.9.9] \\
@@ -869,7 +940,9 @@ else
 				-e CACHE_MEM=[256m] \\
 				-e ACCLOG_OFF=<Y> \\
 				-e ERRLOG_OFF=<Y> \\
+				-e ACCLOG_ON=<Y> \\
 				-e LIMIT_RATE=<2048k> \\
+				-e LIMIT_CONN=<50> \\
 				   alias=</boy|/mp4> \\
 				   root=<wordpress> \\
 				   http_port=<8080> \\
@@ -887,12 +960,17 @@ else
 				   auth=<admin|passwd> \\
 				   filter=<.google.com|.fqhub.com&.twitter.com|.fqhub.com> \\
 				   limit_rate=<2048k> \\
+				   limit_conn=<50> \\
 				   log=<N|Y> \\
 				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
 				   stream_lb=<hash|least_conn> \\
 				   conn_timeout=[1m] \\
 				   proxy_timeout=[10m] \\
+				   limit_conn=<50> \\
 				   udp=<Y> \\
+				   log=<N|Y> \\
+				   ssl=<Y> \\
+				   ssl_backend=<Y> \\
 				-e KP_VIP=<virtual address> \\
 				-e KP_ETH=[default interface] \\
 				-e KP_VRID=[77] \\
