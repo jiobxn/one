@@ -6,6 +6,7 @@ set -e
 : ${FCGI_PATH:="/var/www"}
 : ${HTTP_PORT:="80"}
 : ${HTTPS_PORT:="443"}
+: ${ADDR_CACHE:="25m"}
 : ${SSL_CACHE:="25m"}
 : ${SSL_TIMEOUT:="10m"}
 : ${DOMAIN_TAG:="888"}
