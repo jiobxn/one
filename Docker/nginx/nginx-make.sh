@@ -527,7 +527,8 @@ http_other() {
 
 		#最大并发数
 		if [ -n "$(echo $i |grep 'limit_conn=')" ]; then
-		    limit_conn="$(echo $i |grep 'limit_conn=' |awk -F= '{print $2}')"
+			limit_conn="$(echo $i |grep 'limit_conn=' |awk -F= '{print $2}')"
+		    
 			sed -i '/#upstream#/ i \    limit_conn_zone '\$binary_remote_addr' zone=addr'$n':'$ADDR_CACHE';' /nginx/conf/nginx.conf
 			sed -i '/#alias#/ i \        limit_conn_log_level error;' /nginx/conf/vhost/${project_name}_$n.conf
 			sed -i '/#alias#/ i \        limit_conn_status    403;' /nginx/conf/vhost/${project_name}_$n.conf
