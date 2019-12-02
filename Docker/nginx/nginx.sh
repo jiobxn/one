@@ -794,6 +794,14 @@ if [ "$1" = 'nginx' ]; then
 			stream_server
 			stream_other
 		done
+
+		if [ "$ACCLOG_ON" ]; then
+			sed -i 's/##acclog_on//' /nginx/conf/nginx.conf
+		fi
+
+		if [ "$ERRLOG_OFF" ]; then
+			sed -i 's/##errlog_off//' /nginx/conf/nginx.conf
+		fi
 	else
 
 		http_conf
