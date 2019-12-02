@@ -944,8 +944,8 @@ else
 				-e DOMAIN_TAG=[888] \\
 				-e EOORO_JUMP=[https://cn.bing.com] \\
 				-e NGX_DNS=[9.9.9.9] \\
-				-e CACHE_TIME=[8h] \\
-				-e CACHE_SIZE=[4g] \\
+				-e CACHE_TIME=[10m] \\
+				-e CACHE_SIZE=[2g] \\
 				-e CACHE_MEM=[256m] \\
 				-e ACCLOG_OFF=<Y> \\
 				-e ERRLOG_OFF=<Y> \\
@@ -958,6 +958,7 @@ else
 				   https_port=<8443> \\
 				   crt_key=<jiobxn.crt|jiobxn.key> \\
 				   full_https=<Y> \\
+				   http2=<Y> \\
 				   charset=<gb2312> \\
 				   cache=<Y> \\
 				   header=<host|http_host|proxy_host> \\
