@@ -980,7 +980,7 @@ else
 				   log=<N|Y> \\
 				   ssl=<Y> \\
 				   ssl_backend=<Y> \\
-				-e KP_VIP=<virtual address> \\
+				-e KP_VIP=<20.20.6.4,20.20.6.25> \\
 				-e KP_ETH=[default interface] \\
 				-e KP_VRID=[77] \\
 				-e KP_PASS=[Newpa55] \\
