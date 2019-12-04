@@ -2,7 +2,7 @@
 set -e
 
 : ${MONGO_PORT:="27017"}
-: ${MONGO_ROOT_PASS:="$(pwgen 20 |awk '{print $NF}')"}
+#: ${MONGO_ROOT_PASS:="$(pwgen 20 |awk '{print $NF}')"}
 
 if [ "$1" = 'MONGOD' ]; then
 
@@ -159,7 +159,7 @@ else
 				-v /docker/mongolog:/mongo/log \\
 				-p 27017:27017 \\
 				-e MONGO_PORT=[27017] \\
-				-e MONGO_ROOT_PASS=[pwgen 20 |awk '{print $NF}'] \\
+				-e MONGO_ROOT_PASS=<youpasswd> \\
 				-e MONGO_USER=<user1> \\
 				-e MONGO_PASS=<newpass> \\
 				-e MONGO_DB=<user1> \\
