@@ -3,7 +3,7 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
 RUN rpm -ivh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install nginx keepalived net-tools iproute iptables cronie; yum clean all
+RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install nginx nginx-all-modules keepalived net-tools iproute iptables cronie; yum clean all
 
 VOLUME /usr/share/nginx/html /key /var/log/nginx
 
