@@ -126,6 +126,14 @@ http_conf() {
 		sed -i '/#LIMIT#/ i \    limit_conn_log_level error;' /etc/nginx/conf.d/default.conf
 		sed -i '/#LIMIT#/ i \    limit_conn_status    403;' /etc/nginx/conf.d/default.conf
 	fi
+
+	#最大请求率
+	if [ "$LIMIT_REQ" ]; then
+		sed -i '/#upstream#/ i \    limit_req_zone $binary_remote_addr zone=one:'$ADDR_CACHE' rate='$LIMIT_REQ'r/s;' /etc/nginx/nginx.conf
+		sed -i '/#LIMIT#/ i \    limit_req            zone=one burst='$LIMIT_REQ' nodelay;' /etc/nginx/conf.d/default.conf
+		sed -i '/#LIMIT#/ i \    limit_req_log_level  error;' /etc/nginx/conf.d/default.conf
+		sed -i '/#LIMIT#/ i \    limit_req_status     403;' /etc/nginx/conf.d/default.conf
+	fi
 }
 
 
@@ -529,10 +537,20 @@ http_other() {
 		if [ -n "$(echo $i |grep 'limit_conn=')" ]; then
 			limit_conn="$(echo $i |grep 'limit_conn=' |awk -F= '{print $2}')"
 			
-			sed -i '/#upstream#/ i \    limit_conn_zone '\$binary_remote_addr' zone=addr'$n':'$ADDR_CACHE';' /etc/nginx/nginx.conf
+			sed -i '/#upstream#/ i \    limit_conn_zone  $binary_remote_addr zone=addr'$n':'$ADDR_CACHE';' /etc/nginx/nginx.conf
 			sed -i '/#alias#/ i \        limit_conn_log_level error;' /etc/nginx/conf.d/${project_name}_$n.conf
 			sed -i '/#alias#/ i \        limit_conn_status    403;' /etc/nginx/conf.d/${project_name}_$n.conf
 			sed -i '/#alias#/ i \        limit_conn           addr'$n' '$limit_conn';' /etc/nginx/conf.d/${project_name}_$n.conf
+		fi
+		
+		#最大请求率
+		if [ -n "$(echo $i |grep 'limit_req=')" ]; then
+			limit_req="$(echo $i |grep 'limit_req=' |awk -F= '{print $2}')"
+			
+			sed -i '/#upstream#/ i \    limit_req_zone  $binary_remote_addr zone=one'$n':'$ADDR_CACHE' rate='$limit_req'r/s;' /etc/nginx/nginx.conf
+			sed -i '/#alias#/ i \        limit_req_log_level  error;' /etc/nginx/conf.d/${project_name}_$n.conf
+			sed -i '/#alias#/ i \        limit_req_status     403;' /etc/nginx/conf.d/${project_name}_$n.conf
+			sed -i '/#alias#/ i \        limit_req            zone=one'$n' burst='$limit_req' nodelay;' /etc/nginx/conf.d/${project_name}_$n.conf
 		fi
 		
 		#日志
@@ -952,6 +970,7 @@ else
 				-e ACCLOG_ON=<Y> \\
 				-e LIMIT_RATE=<2048k> \\
 				-e LIMIT_CONN=<50> \\
+				-e LIMIT_REQ=<2> \\
 				   alias=</boy|/mp4> \\
 				   root=<wordpress> \\
 				   http_port=<8080> \\
@@ -971,6 +990,7 @@ else
 				   filter=<.google.com|.fqhub.com&.twitter.com|.fqhub.com> \\
 				   limit_rate=<2048k> \\
 				   limit_conn=<50> \\
+				   limit_req=<2> \\
 				   log=<N|Y> \\
 				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
 				   stream_lb=<hash|least_conn> \\
