@@ -69,7 +69,7 @@ Nginx
 	FCGI_PATH=[/var/www]							#fcgi工作目录
 	HTTP_PORT=[80]								#http端口
 	HTTPS_PORT=[443]							#https端口
-	ADDR_CACHE=[25m]							#最大并发的ip地址缓存记录大小
+	ADDR_CACHE=[25m]							#ip地址缓存记录大小
 	SSL_CACHE=[25m]								#ssl session缓存大小(1m是4000连接)
 	SSL_TIMEOUT=[10m]							#ssl session超时时间
 	DOMAIN_TAG=[888]							#域名混淆字符，用于DOMAIN_PROXY模式
@@ -83,6 +83,7 @@ Nginx
 	ACCLOG_ON=<Y>								#开启stream访问日志
 	LIMIT_RATE=<2048k>							#单IP下周速率限制
 	LIMIT_CONN=<50>								#单IP最大并发数限制
+	LIMIT_REQ=<2>								#单IP最大请求速率限制
 	KP_ETH=[default interface]						#用于组播的网络接口
 	KP_VRID=[77]								#路由ID
 	KP_PASS=[Newpa55]							#认证密码
@@ -105,6 +106,9 @@ Nginx
 		error=<https://www.bing.com>					#错误跳转，用于DOMAIN模式
 		auth=<admin|passwd>						#用户认证，用于PROXY和DOMAIN模式
 		filter=<.google.com|.fqhub.com&.twitter.com|.fqhubcom>		#字符替换，用于PROXY和DOMAIN模式
+		limit_rate=<2048k> \\						#单IP下周速率限制
+		limit_conn=<50> \\						#单IP最大并发数限制
+		limit_req=<2> \\						#单IP最大请求速率限制
 		log=<N|Y>							#使用独立日志文件，或者关闭日志
 
 	#TCP/UDP 子选项
