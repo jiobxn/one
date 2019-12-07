@@ -3,6 +3,7 @@ PHP
 ## 简介
 * **PHP** 是一种流行的通用脚本语言，特别适合于Web开发。
 > * 官方站点：http://www.php.net/
+> * REPO：https://rpms.remirepo.net/enterprise/remi-release-7.rpm
 
 
 ## Example:
