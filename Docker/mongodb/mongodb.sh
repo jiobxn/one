@@ -2,7 +2,6 @@
 set -e
 
 : ${MONGO_PORT:="27017"}
-#: ${MONGO_ROOT_PASS:="$(pwgen 20 |awk '{print $NF}')"}
 
 if [ "$1" = 'MONGOD' ]; then
 
@@ -139,7 +138,7 @@ mongo_gluster() {
 		fi
 		
 		chmod +x /usr/local/bin/MONGOD && \cp /usr/local/bin/MONGOD /mongo/data/
-		[ -f /init.sh ] && chmod +x /init.sh && atd && echo "bash /init.sh" |at now +1 minutes
+		[ -f /init.sh ] && atd && echo "$(cat /init.sh)" |at now +1 minutes
 		[ "$MONGO_BACK" ] && echo "0 3 * * * . /etc/profile;/bin/sh /backup.sh &>/dev/null" >>/var/spool/cron/root
 	else
 		echo
