@@ -44,7 +44,7 @@ MongoDB
 				-v /docker/mongodb:/mongo/data \\
 				-p 27017:27017 \\
 				-e MONGO_PORT=[27017] \\           mongodb端口
-				-e MONGO_ROOT_PASS=[random] \\     创建 root用户 的密码
+				-e MONGO_ROOT_PASS=<youpasswd> \\  创建 root用户 的密码
 				-e MONGO_USER=<user1> \\           创建一个mongodb用户
 				-e MONGO_PASS=<newpass> \\         mongodb用户的密码
 				-e MONGO_DB=<user1> \\             创建的数据库名称，为空则与用户同名
