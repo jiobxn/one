@@ -75,7 +75,7 @@ Nginx
 	DOMAIN_TAG=[888]							#域名混淆字符，用于DOMAIN_PROXY模式
 	EOORO_JUMP=[https://cn.bing.com]					#错误跳转，用于DOMAIN_PROXY模式
 	NGX_DNS=[9.9.9.9]							#DNS，用于DOMAIN_PROXY模式
-	CACHE_TIME=[10m]							#缓存时间，默认10分钟
+	CACHE_TIME=[10h]							#缓存时间，默认10小时
 	CACHE_SIZE=[2g]								#用于缓存的磁盘大小
 	CACHE_MEM=[server memory 10%]						#用于缓存的内存大小
 	ACCLOG_OFF=<Y>								#关闭访问日志记录
