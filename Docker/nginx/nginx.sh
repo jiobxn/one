@@ -8,7 +8,7 @@ set -e
 : ${HTTPS_PORT:="443"}
 : ${ADDR_CACHE:="25m"}
 : ${SSL_CACHE:="25m"}
-: ${SSL_TIMEOUT:="10m"}
+: ${SSL_TIMEOUT:="10h"}
 : ${DOMAIN_TAG:="888"}
 : ${EOORO_JUMP:="https://cn.bing.com"}
 : ${NGX_DNS="9.9.9.9"}
@@ -962,7 +962,7 @@ else
 				-e DOMAIN_TAG=[888] \\
 				-e EOORO_JUMP=[https://cn.bing.com] \\
 				-e NGX_DNS=[9.9.9.9] \\
-				-e CACHE_TIME=[10m] \\
+				-e CACHE_TIME=[10h] \\
 				-e CACHE_SIZE=[2g] \\
 				-e CACHE_MEM=[256m] \\
 				-e ACCLOG_OFF=<Y> \\
