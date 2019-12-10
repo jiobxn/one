@@ -8,11 +8,11 @@ set -e
 : ${HTTPS_PORT:="443"}
 : ${ADDR_CACHE:="25m"}
 : ${SSL_CACHE:="25m"}
-: ${SSL_TIMEOUT:="10h"}
+: ${SSL_TIMEOUT:="10m"}
 : ${DOMAIN_TAG:="888"}
 : ${EOORO_JUMP:="https://cn.bing.com"}
 : ${NGX_DNS="9.9.9.9"}
-: ${CACHE_TIME:="10m"}
+: ${CACHE_TIME:="10h"}
 : ${CACHE_SIZE:="2g"}
 : ${CACHE_MEM:="$(($(free -m |grep Mem |awk '{print $2}')*10/100))m"}
 : ${KP_ETH:="$(route -n |awk '$1=="0.0.0.0"{print $NF }')"}
@@ -801,6 +801,7 @@ if [ "$1" = 'nginx' ]; then
 		openssl genrsa -out /etc/nginx/server.key 4096 2>/dev/null
 		openssl req -new -key /etc/nginx/server.key -out /etc/nginx/server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker" 2>/dev/null
 		openssl x509 -req -days 3650 -in /etc/nginx/server.csr -signkey /etc/nginx/server.key -out /etc/nginx/server.crt 2>/dev/null
+		\cp /etc/nginx/server.{crt,key} /key/
 	fi
 
 	if [ "$STREAM_SERVER" ]; then
