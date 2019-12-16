@@ -9,12 +9,12 @@ Nginx
 ### 七层
 
 	#运行一个FCGI模式实例
-	docker run -d --restart unless-stopped -p 10080:80 -p 10443:443 -v /docker/www:/usr/local/nginx/html -e FCGI_SERVER="php.redhat.xyz|192.17.0.5:9000" --name php jiobxn/nginx
+	docker run -d --restart unless-stopped -p 10080:80 -p 10443:443 -v /docker/www:/usr/share/nginx/html -e FCGI_SERVER="php.redhat.xyz|192.17.0.5:9000" --name php jiobxn/nginx
 
 	#运行两个JAVA_PHP模式实例
-	docker run -d --restart unless-stopped -p 10081:80 -p 10441:443 -v /docker/webapps:/usr/local/nginx/html -e JAVA_PHP_SERVER="java.redhat.xyz|172.17.0.6:8080" --name java jiobxn/nginx
+	docker run -d --restart unless-stopped -p 10081:80 -p 10441:443 -v /docker/webapps:/usr/share/nginx/html -e JAVA_PHP_SERVER="java.redhat.xyz|172.17.0.6:8080" --name java jiobxn/nginx
 
-	docker run -d --restart unless-stopped -p 10082:80 -p 10442:443 -v /docker/www:/usr/local/nginx/html -e JAVA_PHP_SERVER="apache.redhat.xyz|172.17.0.7" --name apache jiobxn/nginx
+	docker run -d --restart unless-stopped -p 10082:80 -p 10442:443 -v /docker/www:/usr/share/nginx/html -e JAVA_PHP_SERVER="apache.redhat.xyz|172.17.0.7" --name apache jiobxn/nginx
 
 	#运行一个PROXY模式实例
 	docker run -d --restart unless-stopped -p 10083:80 -p 10443:443 -e PROXY_SERVER="g.redhat.xyz|www.google.co.id%backend_https=y" --name proxy jiobxn/nginx
