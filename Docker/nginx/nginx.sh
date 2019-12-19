@@ -774,8 +774,8 @@ stream_other() {
 			log="$(echo $i |grep 'log=' |awk -F= '{print $2}')"
 			
 			if [ "$log" == "Y" ]; then
-				sed -i '/#backend-lb-'$n'#/ a \        access_log '$n'-access.log main;' /etc/nginx/nginx.conf
-				sed -i '/#backend-lb-'$n'#/ a \        error_log '$n'-error.log;' /etc/nginx/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ a \        access_log /var/log/nginx/'$n'-access.log main;' /etc/nginx/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ a \        error_log /var/log/nginx/'$n'-error.log;' /etc/nginx/nginx.conf
 			fi
 			
 			if [ "$log" == "N" ]; then
