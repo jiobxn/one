@@ -7,7 +7,7 @@ BDAY=3
 [ ! -d "$DATA/mysql_back" ] && mkdir "$DATA/mysql_back"
 
 cd "$DATA/mysql_back"
-for i in $(mysql -uroot -P$PORT -p$PASS -e "show databases;" |awk 'NR!=1{print $1}' |egrep -v "information_schema|performance_schema|mysql|sys"); do
+for i in $(mysql -uroot -P$PORT -p$PASS -e "show databases;" |sed 1d |egrep -v ^"information_schema|performance_schema|mysql|sys"$); do
 	/usr/bin/mysqldump -uroot -P$PORT -p$PASS --single-transaction "$i" >"$i"_`date +%F`_db.sql 2>/dev/null
 	tar czf "$i"_`date +%F`_db.tar.gz "$i"_`date +%F`_db.sql
 	\rm "$i"_`date +%F`_db.sql
