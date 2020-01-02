@@ -120,6 +120,7 @@ Nginx
 		log=<N|Y>							#开启或关闭日志
 		ssl=<Y>								#启用SSL加密
 		ssl_backend=<Y>							#SSL加密连接
+		allow=<1.2.3.4&5.6.7.8>						#访问控制
 
 ****
 
