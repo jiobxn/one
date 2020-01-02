@@ -783,6 +783,14 @@ stream_other() {
 				sed -i '/#backend-lb-'$n'#/ i \        error_log off;' /etc/nginx/nginx.conf
 			fi 
 		fi
+		
+                #访问控制
+                if [ -n "$(echo $i |grep 'allow=')" ]; then
+                        sed -i '/#backend-lb-'$n'#/ a \        deny  all;' /etc/nginx/nginx.conf
+                        for x in $(echo $i |grep 'allow=' |gawk -F= '{print $2}' |sed 's/&/\n/g'); do
+                                sed -i '/#backend-lb-'$n'#/ a \        allow '$x';' /etc/nginx/nginx.conf
+                        done
+                fi
 	done
 }
 
@@ -1002,6 +1010,7 @@ else
 				   log=<N|Y> \\
 				   ssl=<Y> \\
 				   ssl_backend=<Y> \\
+				   allow=<1.2.3.4&5.6.7.8> \\
 				-e KP_VIP=<20.20.6.4,20.20.6.25> \\
 				-e KP_ETH=[default interface] \\
 				-e KP_VRID=[77] \\
