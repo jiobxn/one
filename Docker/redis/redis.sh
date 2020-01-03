@@ -10,7 +10,6 @@ if [ "$1" = 'redis-server' ]; then
 
   if [ -z "$(grep "redhat.xyz" /redis/redis.conf)" ]; then
 	echo "Initialize redis"
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	sed -i '1 i #redhat.xyz' /redis/redis.conf
 
 	#bind
