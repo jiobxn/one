@@ -9,7 +9,7 @@ HTTPD
 
 ## Build Parameter
 
-    docker build --build-arg php_v=56 -t apache:5.6 .
+    docker build --build-arg php_v=56 -t apache:56 .
 
 ## Example:
 
