@@ -801,8 +801,6 @@ stream_other() {
 
 if [ "$1" = 'nginx' ]; then
   if [ -z "$(grep "redhat.xyz" /nginx/conf/nginx.conf)" ]; then
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-
 	if [ -f /key/server.crt -a -f /key/server.key ]; then
 		\cp /key/*.{crt,key} /nginx/conf/
 	else
