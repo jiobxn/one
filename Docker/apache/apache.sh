@@ -98,25 +98,26 @@ else
 
 	echo -e "
 	Example:
-					docker run -d --restart unless-stopped \\
-					-v /docker/www:/var/www/html \\
-					-p 80:80 \\
-					-p 443:443 \\
-					-p 9000:9000 \\
-					-e REDIS_SERVER=<redhat.xyz> \\
-					-e REDIS_PORT=[16379] \\
-					-e REDIS_PASS=<bigpass> \\
-					-e REDIS_DB=[0] \\
-					-e post_max_size=[4G] \\
-					-e upload_max_filesize=[4G] \\
-					-e max_file_uploads=[50] \\
-					-e memory_limit=<2048M> \\
-					-e HTTP_PORT=[80] \\
-					-e HTTPS_PORT=[443] \\
-					-e APC_CHARSET=[UTF-8] \\
-					-e ALIAS=</boy,/mp4> \\
-					-e APC_USER=<apache> \\
-					-e APC_PASS=[jiobxn.com] \\
-					--name apache apache
+			docker run -d --restart unless-stopped \\
+			-v /docker/www:/var/www/html \\
+			-p 80:80 \\
+			-p 443:443 \\
+			-p 9000:9000 \\
+			-p PHP_PORT=[9000] \\
+			-e post_max_size=[4G] \\
+			-e upload_max_filesize=[4G] \\
+			-e max_file_uploads=[50] \\
+			-e memory_limit=<2048M> \\
+			-e HTTP_PORT=[80] \\
+			-e HTTPS_PORT=[443] \\
+			-e APC_CHARSET=[UTF-8] \\
+			-e ALIAS=</boy,/mp4> \\
+			-e APC_USER=<apache> \\
+			-e APC_PASS=[jiobxn.com] \\
+			-e REDIS_SERVER=<redhat.xyz> \\
+			-e REDIS_PORT=[16379] \\
+			-e REDIS_PASS=<bigpass> \\
+			-e REDIS_DB=[0] \\
+			--name apache apache
 	"
 fi
