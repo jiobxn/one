@@ -7,7 +7,7 @@ Redis
 ## Example:
 
     #运行一个单机版redis
-    docker run -d --restart unless-stopped -v /docker/redis:/usr/local/redis/data -p 6379:6379 -e LOCAL_STROGE=Y -e REDIS_PASS=bigpass --name redis redis
+    docker run -d --restart unless-stopped -v /docker/redis:/redis/data -p 6379:6379 -e LOCAL_STROGE=Y -e REDIS_PASS=bigpass --name redis redis
 
     #运行一个redis主从
     docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.91 -e VIP=10.0.0.90 -e REDIS_PASS=bigpass --name redis1 redis
@@ -18,7 +18,7 @@ Redis
 **协定：** []是默参数，<>是自定义参数
 
 					docker run -d --restart always [--privileged] \\
-					-v /docker/redis:/usr/local/redis/data \\
+					-v /docker/redis:/redis/data \\
 					-p 16379:6379 \\
 					-e REDIS_PORT=[6379] \\
 					-e REDIS_PASS=<bigpass> \\            设置一个密码
