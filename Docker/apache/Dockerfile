@@ -19,7 +19,7 @@ EXPOSE 80 443 9000
 
 CMD ["httpd", "-DFOREGROUND"]
 
-# docker build --build-arg php_v=56 -t apache:5.6 .
-# docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/www:/var/www/html -e TZ=Asia/Shanghai --name httpd apache:5.6
-# docker run -d --restart unless-stopped -p 9000:9000 -v /docker/www:/var/www -e TZ=Asia/Shanghai --name php apache:5.6 php-fpm -F
+# docker build --build-arg php_v=56 -t apache:56 .
+# docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/www:/var/www/html -e TZ=Asia/Shanghai --name httpd apache:56
+# docker run -d --restart unless-stopped -p 9000:9000 -v /docker/www:/var/www -e TZ=Asia/Shanghai --name php apache:56 php-fpm -F
 # docker run -it --rm apache --help
