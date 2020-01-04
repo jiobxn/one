@@ -17,7 +17,7 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 		sed -i "s/warning/${LOG}/" /v2ray/vpoint_vmess_freedom.json
 		echo -e "mode: v2ray \nport: $PORT \nUUID: $UUID"
 		if [ "$WSPATH" ]; then
-		    sed -i '/"vmess"/ a \    "streamSettings": {\n      "network": "ws",\n      "wsSettings": {\n        "path": "'$WSPATH'"\n      }\n    },' /v2ray/vpoint_vmess_freedom.json
+		    sed -i '/"vmess"/ a \    "streamSettings": {\n      "network": "ws",\n      "wsSettings": {\n        "path": "'$WSPATH'",\n        "headers": {}\n      }\n    },' /v2ray/vpoint_vmess_freedom.json
 		    echo "PATH: $WSPATH"
 		fi
 		
@@ -29,13 +29,30 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 		else
 			TYPE="socks5"
 		fi
+
+		if [ "$DOMAIN" ]; then
+			DOMAIN="--domain $DOMAIN"
+			TLS=s
+		else
+			DOMAIN="-l :$PORT"
+		fi
 		
 		if [ "$SERVER" ]; then
-			echo -e "mode: $MODE \nport: $PORT \ntype: $TYPE"
-			echo "brook $MODE -l :$PORT -i 0.0.0.0 -s $SERVER -p $PASS $HTTP" >/usr/bin/v2ray-brook
+			if [ "$MODE" == "wsclient" ]; then
+				echo -e "mode: $MODE \nport: $PORT \ntype: $TYPE"
+				echo "brook $MODE -l :$PORT -i 0.0.0.0 -s ws$TLS://$SERVER -p $PASS $HTTP" >/usr/bin/v2ray-brook
+			else
+				echo -e "mode: $MODE \nport: $PORT \ntype: $TYPE"
+				echo "brook $MODE -l :$PORT -i 0.0.0.0 -s $SERVER -p $PASS $HTTP" >/usr/bin/v2ray-brook
+			fi
 		else
-			echo -e "mode: $MODE \nport: $PORT \npassword: $PASS"
-			echo "brook $MODE -l :$PORT -p $PASS" >/usr/bin/v2ray-brook
+			if [ "$MODE" == "wsserver" ]; then
+                        	echo -e "mode: $MODE \nport: $PORT \npassword: $PASS"
+                        	echo "brook $MODE $DOMAIN -p $PASS" >/usr/bin/v2ray-brook
+			else
+				echo -e "mode: $MODE \nport: $PORT \npassword: $PASS"
+				echo "brook $MODE -l :$PORT -p $PASS" >/usr/bin/v2ray-brook
+			fi
 		fi
 	fi
 	chmod +x /usr/bin/v2ray-brook
@@ -50,9 +67,10 @@ else
 				-p 19443:19443 \
 				-e PASS=[Random] \\
 				-e PORT=[19443] \\
-				-e MODE=[server] \\ <v2ray| [server|ssserver] | [client|ssclient]>
+				-e MODE=[server] \\ <v2ray| [server|ssserver|wsserver] | [client|ssclient|wsclient]>
 				-e UUID=[Random] \\
 				-e WSPATH=</mp4> \\
+				-e DOMAIN=<jiobxn.com> \\
 				-e LOG=[none] \\ <debug|info|warning|error|none>
 				-e HTTP=<Y> \\
 				-e SERVER=<server_address:port> \\
