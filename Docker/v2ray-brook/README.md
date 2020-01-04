@@ -20,10 +20,12 @@ v2ray-brook
 				-p 19443:19443 \
 				-e PASS=[Random] \\    #随机密码
 				-e PORT=[19443] \\     #监听端口
-				-e MODE=[server] \\ <v2ray| [server|ssserver] | [client|ssclient]>    #运行模式：v2ray服务器、brook服务器(默认)、brook客户端
+				-e MODE=[server] \\ <v2ray| [server|ssserver|wsserver] | [client|ssclient|wsclient]>    #运行模式：v2ray服务器、brook服务器(默认)、brook客户端
 				-e UUID=[Random] \\    #随机UUID，v2ray
+				-e WSPATH=</mp4> \\    #WS路径，v2ray
+				-e DOMAIN=<jiobxn.com> \\    #wsserver模式填写你的域名，wsclient模式值不为空
 				-e LOG=[none] \\ <debug|info|warning|error|none>    #记录日志，v2ray
-				-e HTTP=<Y> \\         #客户端启动http代理。 默认socks5
+				-e HTTP=<Y> \\         #客户端启动http代理，brook。 默认socks5
 				-e SERVER=<server_address:port> \\    #brook服务器地址和端口
 				--name v2ray-brook v2ray-brook
 
