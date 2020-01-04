@@ -3,7 +3,6 @@ MAINTAINER "The Alpine Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
 RUN apk update && apk add curl openssl tzdata bash && rm -rf /var/cache/apk/*
-RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 RUN cd /mnt \
         && wget -c https://github.com/$(curl -s https://github.com/txthinking/brook/releases |grep '/brook" rel' |awk -F\" 'NR==1{print $2}') \
