@@ -16,7 +16,7 @@ v2ray-brook
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart always \\
+				docker run -d --restart unless-stopped \\
 				-p 19443:19443 \
 				-e PASS=[Random] \\    #随机密码
 				-e PORT=[19443] \\     #监听端口
