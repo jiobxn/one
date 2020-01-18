@@ -9,12 +9,18 @@ WireGuard
 
 ## 宿主机升级内核
 
-    rpm -ivh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+    rpm -ivh http://www.elrepo.org/elrepo-release-7.0-4.el7.elrepo.noarch.rpm
     sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/elrepo.repo
     yum -y install kernel-lt-devel kernel-lt      #kernel-lt(长期支持版本)、kernel-ml(主线最新版本)
-    grub2-mkconfig |grep "menuentry 'CentOS Linux"    #查看新内核
-    grub2-editenv - set saved_entry='CentOS Linux (4.4.186-1.el7.elrepo.x86_64) 7 (Core)'  #指定默认内核
+    grub2-mkconfig 2>/dev/null |grep "menuentry 'CentOS Linux" |head -1    #查看新内核
+    grub2-editenv - set saved_entry='CentOS Linux (4.4.210-1.el7.elrepo.x86_64) 7 (Core)'  #指定默认内核
     grub2-editenv list
+    
+    #安装wireguard内核支持
+    curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/
+    yum install epel-release -y
+    yum install wireguard-dkms wireguard-tools -y
+    
     reboot
 
 ****
