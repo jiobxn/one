@@ -13,7 +13,7 @@ Zabbix
     #运行一个zabbix客户端
     docker run -d --restart unless-stopped --network host -e ZBX_SERVER_HOST=<zabbix-server-address> --name agent zabbix/zabbix-agent
 
-    #使用alpine版镜像zabbix/zabbix-appliance添加中文支持
+    #使用alpine镜像zabbix/zabbix-appliance添加中文支持
     docker cp /usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc zabbix:/usr/share/zabbix/assets/fonts/DejaVuSans.ttf
 
     #访问zabbix示例 http://<zabbix-server-ip>:11080/zabbix   用户名/密码：Admin/zabbix
