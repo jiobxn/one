@@ -8,32 +8,35 @@ Zabbix
 ## Example:
 
     #运行一个zabbix服务器
-    docker run -d --restart always --privileged -p 11080:80 -p 11443:443 -v /docker/www:/var/www/html -e PHP_SERVER=<php-server-ip> -e ZBX_DB_SERVER=<mysql-server-ip> --hostname zabbix --name zabbix-server zabbix-httpd
+    docker run -d --restart unless-stopped -v /docker/zabbix-db:/var/lib/mysql -p 11080:80 --name zabbix jiobxn/zabbix
 
     #运行一个zabbix客户端
-    docker run -d --restart always --privileged --network host --name zabbix-agent zabbix-agent <zabbix-server-ip>
+    docker run -d --restart unless-stopped --network container:zabbix -e ZBX_SERVER_HOST=127.0.0.1 --name agent zabbix/zabbix-agent
 
-    #访问zabbix示例 http://<zabbix-server-ip>:11080/zabbix   用户名/密码：admin/zabbix
+    #使用alpine版镜像zabbix/zabbix-appliance添加中文支持
+    docker cp /usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc zabbix:/usr/share/zabbix/assets/fonts/DejaVuSans.ttf
+
+    #访问zabbix示例 http://<zabbix-server-ip>:11080/zabbix   用户名/密码：Admin/zabbix
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart always [--privileged] \\
-				-v /docker/www:/var/www/html \\
-				-p 11080:80 \\
-				-p 11443:443 \\
-				-e PHP_SERVER=<redhat.xyz> \\    PHP服务器地址
-				-e PHP_PORT=[9000] \\            PHP服务端口
-				-e PHP_PATH=[/var/www] \\        PHP工作路径
-				-e ZBX_DB_SERVER=<redhat.xyz> \\    mysql服务器地址
-				-e ZBX_DB_PORT=[3306] \\            mysql服务端口
-				-e ZBX_DB_USER=[zabbix] \\          mysql用户名
-				-e ZBX_DB_PASSWORD=[newpass] \\     mysql密码
-				-e ZBX_DB_DATABASE=[zabbix] \\      数据库名称
-				--hostname zabbix-httpd \\
-				--name zabbix-httpd zabbix-httpd
+			docker run -d --restart unless-stopped \\
+			-v /docker/zabbix-db:/var/lib/mysql \\
+			-p 80:80 \\
+			-p 10051:10051 \\
+			-p HTTP_PORT:=[80] \\
+			-p MYSQL_HOST:=[127.0.0.1] \\
+			-p MYSQL_PORT:=[3306] \\
+			-p MYSQL_USER:=[zabbix] \\
+			-p MYSQL_PASS:=[password] \\
+			-p ZABBIX_DB:=[zabbix] \\
+			-p SERVER_PORT:=[10051] \\
+			-p AGENTD_PORT:=[10050] \\
+			-p TZ=[Asia/Shanghai] \\
+			--name zabbix zabbix
 
-提示：zabbix默认使用 被动模式，即 server --> agent，agent要开放10050端口 。主动模式是 agent --> server 。
+提示：被动模式是 server --> agent(10050端口) 。主动模式是 agent --> server(10050端口)。
 
 ****
 
@@ -111,5 +114,5 @@ https://github.com/jiobxn/one/blob/master/Script/show_veth.sh
 https://github.com/jiobxn/one/blob/master/Script/clean_item.sh
 
 **Zabbix API使用**  
-1.API文档：https://www.zabbix.com/documentation/3.2/manual/api  
+1.API文档：https://www.zabbix.com/documentation/4.0/manual/api  
 2.参考浏览器的URL
