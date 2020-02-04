@@ -11,7 +11,7 @@ Zabbix
     docker run -d --restart unless-stopped -v /docker/zabbix-db:/var/lib/mysql -p 11080:80 --name zabbix jiobxn/zabbix
 
     #运行一个zabbix客户端
-    docker run -d --restart unless-stopped --network container:zabbix -e ZBX_SERVER_HOST=127.0.0.1 --name agent zabbix/zabbix-agent
+    docker run -d --restart unless-stopped --network host -e ZBX_SERVER_HOST=<zabbix-server-address> --name agent zabbix/zabbix-agent
 
     #使用alpine版镜像zabbix/zabbix-appliance添加中文支持
     docker cp /usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc zabbix:/usr/share/zabbix/assets/fonts/DejaVuSans.ttf
