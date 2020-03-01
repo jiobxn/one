@@ -60,7 +60,7 @@ END
 
 
 SET_CLIENT(){
-: ${LOCAL_ADDR:="127.0.0.1"}
+: ${LOCAL_ADDR:="0.0.0.0"}
 : ${LOCAL_PORT:="1080"}
 : ${REMOT_PORT:="443"}
 
@@ -130,7 +130,7 @@ else
 				docker run -d --restart unless-stopped \\
 				-v /docker/key:/key \\
 				-p 443:443 \\
-				-e LOCAL_ADDR=[0.0.0.0 | 127.0.0.1] \\
+				-e LOCAL_ADDR=[0.0.0.0] \\
 				-e LOCAL_PORT=[443 | 1080] \\
 				-e REMOT_ADDR=[127.0.0.1 | trojan.example.com] \\
 				-e REMOT_PORT=[80 | 443] \\
