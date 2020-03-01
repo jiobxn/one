@@ -56,6 +56,8 @@ cat >>/etc/config.json <<-END
     }
 }
 END
+
+echo password: $PASS
 }
 
 
