@@ -1,7 +1,7 @@
 kcp2raw
 ===
 ## 简介
-**KCP** 是一个快速可靠协议，能以比 TCP浪费10%-20%的带宽的代价，换取平均延迟降低 30%-40%，且最大延迟降低三倍的传输效果。
+**KCP** 是一个快速可靠协议，能以比 TCP浪费10%-20%的带宽的代价，换取平均延迟降低 30%-40%，且最大延迟降低三倍的传输效果。  
 **udp2raw tunnel** 通过raw socket给UDP包加上TCP或ICMP header，进而绕过UDP屏蔽或QoS，或在UDP不稳定的环境下提升稳定性。
 
 > * kcptun项目地址：https://github.com/xtaci/kcptun
