@@ -26,6 +26,10 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	if [ -f /key/server.crt -a -f /key/server.key ]; then
 		\cp /key/server.crt /etc/pki/tls/certs/localhost.crt
 		\cp /key/server.key /etc/pki/tls/private/localhost.key
+		if [ -f /key/chain.crt ]; then
+			\cp /key/chain.crt /etc/pki/tls/certs/server-chain.crt
+			sed -i 's/#SSLCertificateChainFile/SSLCertificateChainFile/' /etc/httpd/conf.d/ssl.conf
+		fi
 	fi
 
 	#php
