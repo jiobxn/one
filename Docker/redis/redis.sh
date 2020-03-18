@@ -18,6 +18,9 @@ if [ "$1" = 'redis-server' ]; then
 	#port
 	sed -i 's/^port 6379/port '$REDIS_PORT'/' /redis/redis.conf
 
+	#Ignore errors
+	sed -i 's/stop-writes-on-bgsave-error yes/stop-writes-on-bgsave-error no/' /redis/redis.conf
+
 	#persistence
 	if [ "$LOCAL_STROGE" ]; then
 		sed -i 's@dir \./@dir /redis/data@' /redis/redis.conf
