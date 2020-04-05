@@ -38,7 +38,7 @@ HTTPD
 			-e APC_USER=<apache> \\           用于查看/basic_status的用户
 			-e APC_PASS=[jiobxn.com] \\       默认密码
 			-e REDIS_SERVER=<redhat.xyz> \\   redis服务器地址
-			-e REDIS_PORT=[16379] \\          redis服务端口
+			-e REDIS_PORT=[6379] \\           redis服务端口
 			-e REDIS_PASS=<bigpass> \\        redis密码
 			-e REDIS_DB=[0] \\                redis数据库
 			--name apache apache
