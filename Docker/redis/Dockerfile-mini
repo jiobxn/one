@@ -20,4 +20,4 @@ EXPOSE 6379
 CMD ["redis-server", "/redis/redis.conf"]
 
 # docker build -t redis .
-# docker run -d --restart unless-stopped -v /docker/redis:/redis/data -p 16379:6379  -e REDIS_PASS=bigpass --name redis redis
+# docker run -d --restart unless-stopped -v /docker/redis:/redis/data -p 6379:6379  -e REDIS_PASS=bigpass --name redis redis
