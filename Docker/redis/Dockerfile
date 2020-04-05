@@ -6,18 +6,17 @@ RUN yum clean all; yum -y update; yum -y install net-tools wget cronie make gcc-
 
 RUN cd /mnt \
         && wget -c $(curl -s https://redis.io/ |grep tar.gz |awk -F\' '{print $2}') \
-        && wget -c $(curl -s https://www.ruby-lang.org/zh_cn/downloads/ |grep tar.gz |awk -F\" 'NR==1{print $2}')
-
-RUN cd /mnt \
+        && wget -c $(curl -s https://www.ruby-lang.org/zh_cn/downloads/ |grep tar.gz |awk -F\" 'NR==1{print $2}') \
         && tar zxf ruby-*.tar.gz \
         && tar zxf redis-*.tar.gz \
-        && cd /mnt/ruby-* \
+	&& \rm *.tar.gz && mv ruby-* ruby && mv redis-* redis \
+        && cd /mnt/ruby \
         && autoconf && ./configure --disable-install-rdoc \
         && make -j8 && make install \
         && gem install json_pure \
         && gem update --system \
         && gem install redis \
-        && cd /mnt/redis-* \
+        && cd /mnt/redis \
         && make -j8 PREFIX=/redis \
         && make PREFIX=/redis install \
         && cp *.conf /redis/ \
