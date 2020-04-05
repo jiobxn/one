@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = 'httpd' -o "$1" = 'php-fpm' ]; then
 
-: ${REDIS_PORT:=16379}
+: ${REDIS_PORT:=6379}
 : ${REDIS_DB:=0}
 : ${post_max_size:=4G}
 : ${upload_max_filesize:=4G}
@@ -119,7 +119,7 @@ else
 			-e APC_USER=<apache> \\
 			-e APC_PASS=[jiobxn.com] \\
 			-e REDIS_SERVER=<redhat.xyz> \\
-			-e REDIS_PORT=[16379] \\
+			-e REDIS_PORT=[6379] \\
 			-e REDIS_PASS=<bigpass> \\
 			-e REDIS_DB=[0] \\
 			--name apache apache
