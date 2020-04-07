@@ -46,3 +46,16 @@ HTTPD
 **关于日志记录客户端真实IP(nginx proxy)**
 
     log_format 参数：$http_x_forwarded_for
+
+**最大连接数设置**
+
+	~]# httpd -V |grep 'Server MPM'
+	~]# tail /etc/httpd/conf.modules.d/00-mpm.conf
+	<IfModule mpm_prefork_module>
+	StartServers          32
+	MinSpareServers      10
+	MaxSpareServers      10
+	ServerLimit         1000
+	MaxClients          1000
+	MaxRequestsPerChild  0
+	</IfModule>
