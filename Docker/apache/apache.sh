@@ -61,6 +61,11 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	</ifModule>  
 	END
 
+	#root
+	if [ "$ROOT" ]; then
+		sed -i 's#DocumentRoot "/var/www/html"#DocumentRoot "/var/www/html/'$ROOT'"#' /etc/httpd/conf/httpd.conf
+	fi
+
 	#alias
 	if [ "$ALIAS" ]; then
 		if [ -n "$(echo $ALIAS |grep ',')" ]; then
@@ -115,6 +120,7 @@ else
 			-e HTTP_PORT=[80] \\
 			-e HTTPS_PORT=[443] \\
 			-e APC_CHARSET=[UTF-8] \\
+			-e ROOT=<public> \\
 			-e ALIAS=</boy,/mp4> \\
 			-e APC_USER=<apache> \\
 			-e APC_PASS=[jiobxn.com] \\
