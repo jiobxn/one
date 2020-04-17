@@ -34,6 +34,7 @@ HTTPD
 			-e HTTP_PORT=[80] \\              HTTP端口
 			-e HTTPS_PORT=[443] \\            HTTPS端口
 			-e APC_CHARSET=[UTF-8] \\         字符集
+			-e ROOT=<public>                  网站根目录
 			-e ALIAS=</boy,/mp4> \\           alisa，第一个/boy是别名，第二个/mp4是目录路径
 			-e APC_USER=<apache> \\           用于查看/basic_status的用户
 			-e APC_PASS=[jiobxn.com] \\       默认密码
