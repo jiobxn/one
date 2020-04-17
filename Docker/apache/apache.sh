@@ -48,6 +48,7 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	sed -i 's/Listen 80/Listen '$HTTP_PORT'/g' /etc/httpd/conf/httpd.conf
 	sed -i 's/Listen 443/Listen '$HTTPS_PORT'/g' /etc/httpd/conf.d/ssl.conf
 	sed -i 's/_default_:443/_default_:'$HTTPS_PORT'/g' /etc/httpd/conf.d/ssl.conf
+	sed -i 's/AllowOverride None/AllowOverride All/g' /etc/httpd/conf/httpd.conf
 
 	#gzip
 	cat >>/etc/httpd/conf/httpd.conf <<-END
