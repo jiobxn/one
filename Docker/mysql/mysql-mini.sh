@@ -149,7 +149,7 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 	if [ "$MYSQL_BACK" ]; then
 		[ -z "$MYSQL_ROOT_PASSWORD" ] && MYSQL_ROOT_PASSWORD=$(awk '{print $4}' $DATADIR/root_info)
 		sed -i 's/newpass/'$MYSQL_ROOT_PASSWORD'/' /backup.sh
-		echo "0 4 * * * . /etc/profile;/bin/sh /backup.sh &>/dev/null" >>/var/spool/cron/root
+		echo "0 4 * * * . /etc/profile;/bin/sh /backup.sh &>/dev/null" >/var/spool/cron/root
 	fi
 	
 	#Mysql max connections
@@ -160,6 +160,10 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 	#Mysql general log
 	if [ "$MYSQL_GENERAL_LOG" ]; then
 		sed -i '/\[mysqld\]/a general-log = 1' /etc/my.cnf
+	fi
+	#Mysql mode
+	if [ "$MYSQL_MODE" ]; then
+		sed -i '/\[mysqld\]/a sql-mode = '$MYSQL_MODE'' /etc/my.cnf
 	fi
 	
 	#Mysql modify the default port
@@ -205,18 +209,7 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 		fi
 	fi
 
-	#iptables, Need root authority "--privileged"
-	if [ $IPTABLES ]; then
-		[ -z $MYSQL_PORT ] && MYSQL_PORT=3306
-		cat > /iptables.sh <<-END
-		iptables -I INPUT -p tcp --dport $MYSQL_PORT -j DROP
-		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-		iptables -I INPUT -s $IPTABLES -p tcp -m state --state NEW -m tcp --dport $MYSQL_PORT -m comment --comment MYSQL -j ACCEPT
-		END
-	fi
-
 	echo "Start MYSQL ****"
-	[ -f /iptables.sh ] && [ -z "`iptables -S |grep MYSQL`" ] && . /iptables.sh
 	[ "$mysql_V" -ge "80" ] &&  atd && echo "mysql_upgrade -uroot -p$(awk '{print $4}' $DATADIR/root_info) && sed -i '/mysql_upgrade/d' /mysql.sh" |at now + 1 minutes
 	crond
 
@@ -225,7 +218,7 @@ else
 
     echo -e "
     Example:
-				docker run -d --restart always [--privileged] \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/mysql-mini:/var/lib/mysql \\
 				-v /docker/sql:/docker-entrypoint-initdb.d \\
 				-p 3306:3306 \\
@@ -242,9 +235,8 @@ else
 				-e REPL_PASSWORD=<newpass> \\
 				-e MASTER_HOST=<10.0.0.50> \\
 				-e MASTER_PORT=[3306] \\
-				-e IPTABLES=<"192.168.10.0/24,10.0.0.0/24"> \\
+				-e MYSQL+MODE=<NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION> \\
 				-e MYSQL_GENERAL_LOG=Y \\
-				--hostname mysql-mini \\
 				--name mysql-mini mysql-mini
 	"
 fi
