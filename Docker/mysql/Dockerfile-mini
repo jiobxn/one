@@ -25,6 +25,6 @@ EXPOSE 3306
 CMD ["mysqld"]
 
 # docker build --build-arg mysql_v=5.7 -t mysql-mini:5.7 .
-# docker run -d --restart always -p 3306:3306 -v /docker/mysql-mini:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=newpass -e MYSQL_DATABASE=zabbix -e MYSQL_USER=zabbix -e MYSQL_PASSWORD=newpass -e MYSQL_BACK=Y --name mysql mysql-mini:5.7
+# docker run -d --restart unless-stopped -p 3306:3306 -v /docker/mysql-mini:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=newpass -e MYSQL_DATABASE=zabbix -e MYSQL_USER=zabbix -e MYSQL_PASSWORD=newpass -e MYSQL_BACK=Y --name mysql mysql-mini:5.7
 # docker logs mysql |grep "PASSWORD"
 # docker run -it --rm mysql-mini --help
