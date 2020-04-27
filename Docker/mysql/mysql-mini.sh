@@ -235,7 +235,7 @@ else
 				-e REPL_PASSWORD=<newpass> \\
 				-e MASTER_HOST=<10.0.0.50> \\
 				-e MASTER_PORT=[3306] \\
-				-e MYSQL+MODE=<NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION> \\
+				-e MYSQL_MODE=<NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION> \\
 				-e MYSQL_GENERAL_LOG=Y \\
 				--name mysql-mini mysql-mini
 	"
