@@ -25,15 +25,15 @@ Zabbix
 			-v /docker/zabbix-db:/var/lib/mysql \\
 			-p 80:80 \\
 			-p 10051:10051 \\
-			-p HTTP_PORT=[80] \\
-			-p MYSQL_HOST=[127.0.0.1] \\
-			-p MYSQL_PORT=[3306] \\
-			-p MYSQL_USER=[zabbix] \\
-			-p MYSQL_PASS=[password] \\
-			-p ZABBIX_DB=[zabbix] \\
-			-p SERVER_PORT=[10051] \\
-			-p AGENTD_PORT=[10050] \\
-			-p TZ=[Asia/Shanghai] \\
+			-e HTTP_PORT=[80] \\
+			-e MYSQL_HOST=[127.0.0.1] \\
+			-e MYSQL_PORT=[3306] \\
+			-e MYSQL_USER=[zabbix] \\
+			-e MYSQL_PASS=[password] \\
+			-e ZABBIX_DB=[zabbix] \\
+			-e SERVER_PORT=[10051] \\
+			-e AGENTD_PORT=[10050] \\
+			-e TZ=[Asia/Shanghai] \\
 			--name zabbix zabbix
 
 提示：被动模式是 server --> agent(10050端口) 。主动模式是 agent --> server(10050端口)。
