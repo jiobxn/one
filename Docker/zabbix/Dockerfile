@@ -10,7 +10,7 @@ RUN yum clean all && yum -y update \
         && mysql_V=$(curl -s https://dev.mysql.com/downloads/mysql/$mysql_v.html#downloads |grep "<h1>" |awk '{print $4}') \
         && mysql_f=$(curl -s https://repo.mysql.com/yum/mysql-$mysql_v-community/docker/x86_64/ |grep server-minimal |grep $mysql_V |awk -F\" '{print $6}') \
         && yum install -y https://repo.mysql.com/yum/mysql-$mysql_v-community/docker/x86_64/$mysql_f \
-        && rpm -ivh https://rpmfind.net/linux/centos/7.7.1908/os/x86_64/Packages/libssh2-1.8.0-3.el7.x86_64.rpm \
+        && rpm -ivh http://mirror.centos.org/centos/7/os/x86_64/Packages/libssh2-1.8.0-3.el7.x86_64.rpm \
         && yum -y install zabbix-server-mysql zabbix-web-mysql zabbix-agent zabbix-apache-conf zabbix-get langpacks-zh_CN net-tools wget \
         && yum clean all
 
