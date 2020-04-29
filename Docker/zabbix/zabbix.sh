@@ -23,6 +23,7 @@ if [ "$1" = '/usr/sbin/init' ]; then
   		sed -i 's/# ListenPort=10050/ListenPort='$AGENTD_PORT'/' /etc/zabbix/zabbix_agentd.conf
 		sed -i 's/Listen 80/Listen '$HTTP_PORT'/g' /etc/httpd/conf/httpd.conf
   		sed -i 's#;date.timezone =#date.timezone = '$TZ'#' /etc/php.ini
+		sed -i '/\[mysqld\]/a port = '$MYSQL_PORT'' /etc/my.cnf
   		sed -i 's/# default-authentication-plugin=mysql_native_password/default-authentication-plugin=mysql_native_password/' /etc/my.cnf
   	fi
 
@@ -34,6 +35,8 @@ if [ "$1" = '/usr/sbin/init' ]; then
   	zabbix_agentd
   else
   	if [ "$MYSQL_HOST" == "127.0.0.1" ]; then
+		sed -i '/\[mysqld\]/a mysqlx-port = '$(($MYSQL_PORT+1))'' /etc/my.cnf
+		sed -i '/\[mysqld\]/a port = '$MYSQL_PORT'' /etc/my.cnf
   		sed -i 's/# default-authentication-plugin=mysql_native_password/default-authentication-plugin=mysql_native_password/' /etc/my.cnf
   		mysqld --initialize-insecure &>/dev/null
   		mysqld -D
@@ -51,7 +54,7 @@ if [ "$1" = '/usr/sbin/init' ]; then
   		TAB=$(MYSQL_PWD="$MYSQL_PASS" mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -e "use $ZABBIX_DB; show tables;" |awk 'NR!=1{print $1,$2}' |wc -l)
   	fi
 
-  	if [ "$TAB" -gt "100" ]; then
+  	if [ "$TAB" -gt "100" 2>/dev/null ]; then
   		echo "$ZABBIX_DB Table exists, skip"
   	else
   		zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASS $ZABBIX_DB
