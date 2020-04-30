@@ -41,7 +41,7 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	sed -i 's/max_execution_time = 30/max_execution_time = 300/' /etc/php.ini
 	sed -i 's/max_input_time = 60/max_input_time = 300/' /etc/php.ini
 	sed -i 's/listen = 127.0.0.1:9000/listen = 0.0.0.0:'$PHP_PORT'/' /etc/php-fpm.d/www.conf
-	sed -i 's/expose_php = On/expose_php = Off/' /etc/php.ini |grep expose_php
+	sed -i 's/expose_php = On/expose_php = Off/' /etc/php.ini
 	[ ! -d /run/php-fpm ] && mkdir /run/php-fpm
 
 	#httpd
