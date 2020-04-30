@@ -41,6 +41,7 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	sed -i 's/max_execution_time = 30/max_execution_time = 300/' /etc/php.ini
 	sed -i 's/max_input_time = 60/max_input_time = 300/' /etc/php.ini
 	sed -i 's/listen = 127.0.0.1:9000/listen = 0.0.0.0:'$PHP_PORT'/' /etc/php-fpm.d/www.conf
+	sed -i 's/expose_php = On/expose_php = Off/' /etc/php.ini |grep expose_php
 	[ ! -d /run/php-fpm ] && mkdir /run/php-fpm
 
 	#httpd
@@ -49,6 +50,7 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	sed -i 's/Listen 443/Listen '$HTTPS_PORT'/g' /etc/httpd/conf.d/ssl.conf
 	sed -i 's/_default_:443/_default_:'$HTTPS_PORT'/g' /etc/httpd/conf.d/ssl.conf
 	sed -i 's/AllowOverride None/AllowOverride All/g' /etc/httpd/conf/httpd.conf
+	echo -e "ServerTokens Prod\nServerSignature Off" >>/etc/httpd/conf/httpd.conf
 
 	#gzip
 	cat >>/etc/httpd/conf/httpd.conf <<-END
