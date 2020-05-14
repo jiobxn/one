@@ -76,6 +76,18 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 		fi
 	fi
 
+	#Concurrency
+	cat >>/etc/httpd/conf.modules.d/00-mpm.conf <<-END
+	<IfModule mpm_prefork_module>
+	StartServers          50
+	MinSpareServers      10
+	MaxSpareServers      10
+	ServerLimit         1000
+	MaxClients          1000
+	MaxRequestsPerChild  0
+	</IfModule>
+	END
+
 	#status
 	if [ "$APC_USER" ]; then
 		cat >>/etc/httpd/conf/httpd.conf <<-END
