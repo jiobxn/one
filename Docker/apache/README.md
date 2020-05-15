@@ -53,7 +53,7 @@ HTTPD
 	~]# httpd -V |grep 'Server MPM'
 	~]# tail /etc/httpd/conf.modules.d/00-mpm.conf
 	<IfModule mpm_prefork_module>
-	StartServers          32
+	StartServers          50
 	MinSpareServers      10
 	MaxSpareServers      10
 	ServerLimit         1000
