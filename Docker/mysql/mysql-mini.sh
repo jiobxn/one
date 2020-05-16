@@ -146,9 +146,10 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 	fi
 	
 	#Backup Database
-	if [ "$MYSQL_BACK" ]; then
+	: ${MYSQL_BACK:=0}
+	if [ "$MYSQL_BACK" -gt "0" ]; then
 		[ -z "$MYSQL_ROOT_PASSWORD" ] && MYSQL_ROOT_PASSWORD=$(awk '{print $4}' $DATADIR/root_info)
-		sed -i 's/newpass/'$MYSQL_ROOT_PASSWORD'/' /backup.sh
+		sed -i 's/newpass/'$MYSQL_ROOT_PASSWORD'/;s/BDAY=3/BDAY='$MYSQL_BACK'/' /backup.sh
 		echo "0 4 * * * . /etc/profile;/bin/sh /backup.sh &>/dev/null" >/var/spool/cron/root
 	fi
 	
@@ -226,7 +227,7 @@ else
 				-e MYSQL_DATABASE=<zabbix> \\
 				-e MYSQL_USER=<zabbix> \\
 				-e MYSQL_PASSWORD=<zbxpass> \\
-				-e MYSQL_BACK=<Y> \\
+				-e MYSQL_BACK=[0] \\
 				-e MYSQL_PORT=[3306] \\
 				-e MYSQL_MAX_CONN=[10000] \\
 				-e SERVER_ID=<1> \\
