@@ -4,10 +4,14 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 ARG php_v="56"
 
-RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install httpd mod_ssl net-tools unzip; yum clean all
+RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install httpd mod_ssl net-tools unzip wget; yum clean all
 RUN rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 RUN if [ "${php_v}" -ge 70 ];then redis=5; fi; yum -y install --enablerepo=remi --enablerepo=remi-php${php_v} php php-fpm php-pecl-redis${redis} php-mysqlnd php-opcache php-zip php-gd php-bcmath php-mbstring php-xml php-mcrypt php-posix; yum clean all
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && php composer-setup.php && mv composer.phar /usr/local/bin/composer
+RUN cd /mnt && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && php composer-setup.php && mv composer.phar /usr/local/bin/composer \
+    && wget -c https://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz && tar zxf loaders.linux-x86_64.tar.gz \
+    && mv ixed.$(php -v |awk 'NR==1{print $2}' |awk -F. '{print $1"."$2}').lin /usr/lib64/php/modules/ \
+    && echo -e "[sourceguardian]\nzend_extension=/usr/lib64/php/modules/ixed.$(php -v |awk 'NR==1{print $2}' |awk -F. '{print $1"."$2}').lin" >>/etc/php.ini \
+    && rm -rf /mnt/*
 
 VOLUME /var/www/html
 
