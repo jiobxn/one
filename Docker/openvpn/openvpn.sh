@@ -193,7 +193,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 		
 			# add user
 			if [ "$VPN_USER" -a ! -f /key/psw-file ];then
-				PASS=$(pwgen 15 |awk '{print $NF}')
+				PASS=$(strings /dev/urandom |tr -dc A-Za-z0-9 |head -c15)
 				echo "client$i       $PASS" >> /etc/openvpn/psw-file
 			fi
 			
