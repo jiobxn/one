@@ -58,7 +58,7 @@ OpenVPN
 
 ### Windows Client:
 
-    1.下载并安装 https://openvpn.net/index.php/open-source/downloads.html
+    1.下载并安装 https://openvpn.net/community-downloads/
     2.将client.ovpn和auth.txt(如果有)拷贝到"C:\Program Files\OpenVPN\config\"
 
 ### 用户名+密码+证书 自动连接
