@@ -10,7 +10,6 @@ do
 
     if [ -z "`/sbin/iptables -vnL INPUT | grep $SCANIP`" ]; then   
         /sbin/iptables -I INPUT -s $SCANIP -j DROP
-        ADDRESS=`/usr/bin/curl -s "http://ip138.com/ips138.asp?ip=$SCANIP&action=2"| iconv -f gb2312 -t utf-8|grep '<ul class="ul1"><li>' | awk -F '[<> ]+' '{print $7,$8}' | awk -F： '{print $2}'`
-        echo "`date +%-F/%-H:%-M:%-S` $SCANIP($NUMBER) $ADDRESS" >> /var/log/scanip.log
+        echo "`date +%-F/%-H:%-M:%-S` $SCANIP($NUMBER)" >> /var/log/scanip.log
     fi 
 done
