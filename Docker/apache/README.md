@@ -44,9 +44,10 @@ HTTPD
 			-e REDIS_DB=[0] \\                redis数据库
 			--name apache apache
 
-**关于日志记录客户端真实IP(nginx proxy)**
+**关于日志记录客户端真实IP(nginx proxy)**  
+~~log_format 参数：$http_x_forwarded_for~~
 
-    log_format 参数：$http_x_forwarded_for
+    httpd.conf  197行    LogFormat "\"%{X-Real-IP}i\" %l %u %t \"%r\" %>s %b" common
 
 **最大连接数设置**
 
