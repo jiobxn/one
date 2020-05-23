@@ -89,6 +89,7 @@ Nginx
 	KP_PASS=[Newpa55]							#认证密码
 
 	#HTTP 子选项：作用于四种工作模式，与基本选项之间以"%"为分隔符，各子选项之间用","为分隔符，参数之间用"|"为分隔符，用于替换某种模式下的默认选项
+		ws=</mp4|127.0.0.1:19443>					#websocket，路径名 WS服务器
 		alias=</boy|/mp4>						#别名目录，别名/boy 容器目录/mp4，用于FCGI、JAVA_PHP和PROXY
 		root=<wordpress>						#网站根目录，html/wordpress
 		http_port=<8080>						#HTTP端口
