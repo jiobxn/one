@@ -394,6 +394,14 @@ domain_proxy() {
 
 http_other() {
 	for i in $(echo $i |awk -F% '{print $2}' |sed 's/,/\n/g'); do
+		#WebSocket
+		if [ -n "$(echo $i |grep 'ws=' |grep '|')" ]; then
+			path="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
+			ws="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $2}')"
+			
+			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass http://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\    }\n' /nginx/conf/vhost/${project_name}_$n.conf 
+		fi
+		
 		#别名目录
 		if [ -n "$(echo $i |grep 'alias=' |grep '|')" ]; then
 			alias="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
@@ -978,6 +986,7 @@ else
 				-e LIMIT_RATE=<2048k> \\
 				-e LIMIT_CONN=<50> \\
 				-e LIMIT_REQ=<2> \\
+				-e ws=</mp4|127.0.0.1:19443> \\
 				   alias=</boy|/mp4> \\
 				   root=<wordpress> \\
 				   http_port=<8080> \\
