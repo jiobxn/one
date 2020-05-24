@@ -47,3 +47,8 @@ https://apkpure.com/bifrostv/com.github.dawndiy.bifrostv
 
 **IOS**  
 Shadowrocket、Quantumult、i2Ray，类型选择Vmess
+
+****
+
+    npm install -g wscat
+    wscat -c wss://exanole.com/mp4
