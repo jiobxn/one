@@ -52,10 +52,10 @@ Redis
     SELECT 2
     DBSIZE
 
-删除当前DB所有KEY
+清空当前DB的KEY
 
     FLUSHDB
 
-删除所有DB的KEY
+清空所有DB的KEY
 
     FLUSHALL
