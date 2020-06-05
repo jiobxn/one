@@ -38,15 +38,15 @@ if [ ! -f /usr/local/bin/dnscrypt ]; then
 
 	#dnscrypt
 	DNSCRYPT() {
-		sed -i "s/'127.0.0.1/'$LISTEN_ADDR/" /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
-		sed -i "s/, '\[::1\]:53'//" /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
-		[ "$LISTEN_PORT" ] && sed -i "s/:53']/:$LISTEN_PORT']/" /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
-		sed -i 's/cache_size = 256/cache_size = '$CACHE_SIZE'/' /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
-		sed -i 's/max_clients = 250/max_clients = '$MAX_CLIENT'/' /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
+		sed -i "s/'127.0.0.1/'$LISTEN_ADDR/" /dnscrypt-proxy/dnscrypt-proxy.toml
+		sed -i "s/, '\[::1\]:53'//" /dnscrypt-proxy/dnscrypt-proxy.toml
+		[ "$LISTEN_PORT" ] && sed -i "s/:53']/:$LISTEN_PORT']/" /dnscrypt-proxy/dnscrypt-proxy.toml
+		sed -i 's/cache_size = 256/cache_size = '$CACHE_SIZE'/' /dnscrypt-proxy/dnscrypt-proxy.toml
+		sed -i 's/max_clients = 250/max_clients = '$MAX_CLIENT'/' /dnscrypt-proxy/dnscrypt-proxy.toml
 	
 		if [ "$QUERY_LOG" ]; then
-			sed -i "s@# file = 'query.log'@file = '/dnslog/query.log'@" /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
-			sed -i 's/log_files_max_size = 10/log_files_max_size = '$LOG_SIZE'/' /usr/local/dnscrypt-proxy/dnscrypt-proxy.toml
+			sed -i "s@# file = 'query.log'@file = '/dnslog/query.log'@" /dnscrypt-proxy/dnscrypt-proxy.toml
+			sed -i 's/log_files_max_size = 10/log_files_max_size = '$LOG_SIZE'/' /dnscrypt-proxy/dnscrypt-proxy.toml
 		fi
 	
 		echo "dnscrypt-proxy" >/usr/local/bin/dnscrypt
