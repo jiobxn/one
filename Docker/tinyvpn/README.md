@@ -9,6 +9,7 @@ tinyFecVPN
 
     #运行一个SERVER实例
     docker run -d --restart unless-stopped --privileged -p 8000:8000/udp --name tinyvpn jiobxn/tinyvpn
+    # openssl rand -base64 10 |tr -dc '_A-Za-z0-9';echo
 
 
 ## Run Defult Parameter
