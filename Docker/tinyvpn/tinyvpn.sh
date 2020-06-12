@@ -6,7 +6,7 @@ if [ "$1" = 'TINYVPN' ]; then
 : ${TUN_DEV:="tun10"}
 : ${IP_RANGE:="10.22.0"}
 : ${VPN_PORT:="8000"}
-: ${VPN_PASS:="$(openssl rand -base64 10 |tr -dc '_A-Za-z0-9')"}
+: ${VPN_PASS:="NFSC@202064"}
 
 if [ ! -f /usr/local/bin/TINYVPN ]; then
 	#VPN
@@ -63,7 +63,7 @@ else
 				-e VPN_PORT=[8000] \\
 				-e VPN_SERVER=<IPADDR> \\
 				-e IP_RANGE=[10.22.0] \\
-				-e VPN_PASS=[RANDOM] \\
+				-e VPN_PASS=[NFSC@202064] \\
 				-e DNAT=<2222:22,53|1.1.1.1:53> \\
 				-e SNAT=<Y> \\
 				--name tinyvpn tinyvpn
