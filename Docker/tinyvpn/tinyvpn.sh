@@ -61,6 +61,7 @@ else
 				-p 8000:8000/udp \\
 				-p TUN_DEV=[tun10] \\
 				-e VPN_PORT=[8000] \\
+				-e VPN_SERVER=<IPADDR> \\
 				-e IP_RANGE=[10.22.0] \\
 				-e VPN_PASS=[RANDOM] \\
 				-e DNAT=<2222:22,53|1.1.1.1:53> \\
