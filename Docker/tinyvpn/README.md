@@ -23,6 +23,6 @@ tinyFecVPN
 				-e VPN_SERVER=<IPADDR> \\            #服务器IP
 				-e IP_RANGE=[10.22.0] \\             #IP地址段
 				-e VPN_PASS=[$RANDOM] \\             #随机密码
-				-e DNAT=<2222|22,53|1.1.1.1:53> \\   #端口转发 本地端口|目的端口
+				-e DNAT=<2222|22,53|1.1.1.1:53> \\   #端口转发 本地端口|目的[IP和]端口
 				-e SNAT=<Y> \\                       #SNAT
 				--name tinyvpn tinyvpn
