@@ -6,15 +6,15 @@ if [ "$1" = 'TINYVPN' ]; then
 : ${TUN_DEV:="tun10"}
 : ${IP_RANGE:="10.22.0"}
 : ${VPN_PORT:="8000"}
-: ${VPN_PASS:="NFSC@202064"}
 
 if [ ! -f /usr/local/bin/TINYVPN ]; then
 	#VPN
-	if [ "$VPN_SERVER" ]; then
+	if [ "$VPN_SERVER" -a "$VPN_PASS" ]; then
 		echo "service ip: $IP_RANGE.1"
 		echo "nohup tinyvpn -c -r$VPN_SERVER:$VPN_PORT -f20:10 -k \"$VPN_PASS\" --tun-dev $TUN_DEV --sub-net $IP_RANGE.0 &" >/usr/local/bin/TINYVPN
 		ADDR="$IP_RANGE.1"
 	else
+		: ${VPN_PASS:="$(openssl rand -base64 10 |tr -dc '_A-Za-z0-9')"}
 		echo -e "service port: $VPN_PORT \npassword: $VPN_PASS"
 		echo "nohup tinyvpn -s -l0.0.0.0:$VPN_PORT -f20:10 -k \"$VPN_PASS\" --tun-dev $TUN_DEV --sub-net $IP_RANGE.0 &" >/usr/local/bin/TINYVPN
 		ADDR="$IP_RANGE.2"
@@ -63,7 +63,7 @@ else
 				-e VPN_PORT=[8000] \\
 				-e VPN_SERVER=<IPADDR> \\
 				-e IP_RANGE=[10.22.0] \\
-				-e VPN_PASS=[NFSC@202064] \\
+				-e VPN_PASS=[$RANDOM] \\
 				-e DNAT=<2222|22,53|1.1.1.1:53> \\
 				-e SNAT=<Y> \\
 				--name tinyvpn tinyvpn
