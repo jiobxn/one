@@ -64,7 +64,7 @@ else
 				-e VPN_SERVER=<IPADDR> \\
 				-e IP_RANGE=[10.22.0] \\
 				-e VPN_PASS=[NFSC@202064] \\
-				-e DNAT=<2222:22,53|1.1.1.1:53> \\
+				-e DNAT=<2222|22,53|1.1.1.1:53> \\
 				-e SNAT=<Y> \\
 				--name tinyvpn tinyvpn
 	"
