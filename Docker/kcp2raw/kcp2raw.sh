@@ -9,7 +9,7 @@ if [ "$1" = 'kcp2raw' ]; then
 
 if [ ! -f /usr/bin/kcp2raw ]; then 
     if [ "$SERVICE" ]; then
-        : ${PASS:="$(openssl passwd $RANDOM)"}
+        : ${PASS:="$(openssl rand -base64 10 |tr -dc '_A-Za-z0-9')"}
         echo -e "port: $PORT \npass: $PASS"
         echo "nohup server_linux_amd64 -t \"$SERVICE\" -l \":$RPORT\" -mode fast2 -mtu 1300 -key \"it's a secrect\" -crypt aes &" >/usr/bin/kcp2raw
         echo "udp2raw_amd64 -s -l 0.0.0.0:$PORT -r 127.0.0.1:$RPORT -k \"$PASS\" --raw-mode faketcp --cipher-mode aes128cbc" >>/usr/bin/kcp2raw
@@ -35,7 +35,7 @@ else
 				-p 20000:20000 \
 				-e POER=[20000] \\
 				-e RPORT=[4000] \\
-				-e PASS=[openssl passwd $RANDOM] \\
+				-e PASS=[$RANDOM] \\
 				-e SERVICE=<172.17.0.1:22> \\
 				-e SERVER=<12.34.56.78:20000> \\
 				--name kcp2raw kcp2raw
