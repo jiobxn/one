@@ -10,7 +10,9 @@ tinyFecVPN
     #运行一个SERVER实例
     docker run -d --restart unless-stopped --privileged -p 8000:8000/udp --name tinyvpn jiobxn/tinyvpn
     # openssl rand -base64 10 |tr -dc '_A-Za-z0-9';echo
-
+    
+    #运行一个CLIENT实例
+    docker run -d --restart unless-stopped --privileged -e VPN_SERVER=<IPADDR> --name tinyvpn jiobxn/tinyvpn
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
@@ -22,6 +24,6 @@ tinyFecVPN
 				-e VPN_SERVER=<IPADDR> \\            #服务器IP
 				-e IP_RANGE=[10.22.0] \\             #IP地址段
 				-e VPN_PASS=[NFSC@202064] \\         #默认密码
-				-e DNAT=<2222:22,53|1.1.1.1:53> \\   #DNAT 本地端口|目的端口
+				-e DNAT=<2222:22,53|1.1.1.1:53> \\   #端口转发 本地端口|目的端口
 				-e SNAT=<Y> \\                       #SNAT
 				--name tinyvpn tinyvpn
