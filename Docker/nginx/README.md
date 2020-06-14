@@ -111,6 +111,7 @@ Nginx
 		limit_conn=<50> \\						#单IP最大并发数限制
 		limit_req=<2> \\						#单IP最大请求速率限制
 		log=<N|Y>							#使用独立日志文件，或者关闭日志
+		testip=<1.1.1.1&10.0.0.10:8080> \\                              #测试地址，到指定的后端服务器
 
 	#TCP/UDP 子选项
 		stream_lb=<hash|least_conn>					#负载均衡模式
