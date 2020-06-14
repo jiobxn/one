@@ -276,6 +276,7 @@ proxy_server() {
 	    #alias#
 		
 	    location / {
+	        #PASS#
 	        proxy_pass http://proxy-lb-$n;
 	        proxy_http_version 1.1;
 	        proxy_read_timeout      300;
@@ -576,6 +577,14 @@ http_other() {
 				sed -i '/#server_name#/ i \    error_log off;' /etc/nginx/conf.d/${project_name}_$n.conf
 			fi 
 		fi
+		
+                #测试地址
+                if [ -n "$(echo $i |grep 'testip=' |grep '&')" ]; then
+                        sip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $1}')"
+                        dip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $2}')"
+
+                        sed -i '/#PASS#/a \        if ($remote_addr ~ "'$sip'"){proxy_pass http://'$dip';break;}' /etc/nginx/conf.d/${project_name}_$n.conf
+                fi
 	done
 }
 
@@ -1008,6 +1017,7 @@ else
 				   limit_conn=<50> \\
 				   limit_req=<2> \\
 				   log=<N|Y> \\
+				   testip=<1.1.1.1&10.0.0.10:8080> \\
 				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
 				   stream_lb=<hash|least_conn> \\
 				   conn_timeout=[1m] \\
