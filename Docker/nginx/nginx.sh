@@ -582,7 +582,7 @@ http_other() {
                 if [ -n "$(echo $i |grep 'testip=' |grep '&')" ]; then
                         sip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $1}')"
                         dip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $2}')"
-
+		
                         sed -i '/#PASS#/a \        if ($remote_addr ~ "'$sip'"){proxy_pass http://'$dip';break;}' /etc/nginx/conf.d/${project_name}_$n.conf
                 fi
 	done
