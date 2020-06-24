@@ -29,5 +29,12 @@ if [ "$1" = 'crond' ]; then
     exec "$@"
 
 else
-    echo -e "example:\ndocker run -d --restart unless-stopped --network container:openvpn [-e LOCAL_GW=172.17.0.0.1] [-e UP_TIME=daily] <-e LOCAL_ROUTE=192.168.0.0/24,10.10.0.0/24> --name chnroute jiobxn/chnroute"
+	echo -e "
+	Example:
+				docker run -d --restart unless-stopped \\
+				--network container:ovpn \\
+				-e LOCAL_GW=[172.17.0.0.1] \\
+				-e LOCAL_ROUTE=<192.168.0.0/24,10.10.0.0/16> \\
+				-e UP_TIME=[daily] \\
+				--name chnroute jiobxn/chnroute
 fi
