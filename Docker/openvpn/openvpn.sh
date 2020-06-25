@@ -19,7 +19,7 @@ if [ "$1" = 'openvpn' ]; then
 
 if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	# Get ip address
-	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
+	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)
 	if [ -z "$SERVER_IP" ]; then
 		SERVER_IP=$(curl -s http://ip.sb/)
 	fi
