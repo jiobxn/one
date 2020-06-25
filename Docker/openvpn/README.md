@@ -22,7 +22,7 @@ OpenVPN
 			-p 1194:1194 \\
 			-p <8080:8080> \\
 			-e TCP_UDP=[tcp] \\    默认使用TCP
-			-e TAP_TUN=[tun] \\    默认使用tun(IP/三层)；tap是以太网/二层(windows 7)
+			-e TAP_TUN=[tun] \\    默认使用tun(IP/三层)；tap是以太网/二层，server能ping通client
 			-e VPN_PORT=[1194] \\  默认端口
 			-e VPN_USER=<jiobxn> \\  VPN用户名
 			-e VPN_PASS=<123456> \\  VPN密码，默认随机，/docker/openvpn/openvpn.log
@@ -31,7 +31,7 @@ OpenVPN
 			-e GATEWAY_VPN=[Y] \\    默认VPN做网关
 			-e PUSH_ROUTE=<"192.168.0.0/255.255.0.0,172.16.0.0/255.240.0.0,10.0.0.0/255.0.0.0">    推送路由，适用于GATEWAY_VPN=N
 			-e SERVER_IP=[SERVER_IP] \\  默认是服务器公网IP
-			-e IP_RANGE=[10.8.0] \\      分配的IP地址池
+			-e IP_RANGE=[10.8] \\        分配的IP地址池
 			-e PROXY_USER=<jiobxn> \\    http代理用户名
 			-e PROXY_PASS=<123456> \\    代理密码，默认随机
 			-e PROXY_PORT=[8080] \\      代理端口
