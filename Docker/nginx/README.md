@@ -17,17 +17,17 @@ Nginx
 	docker run -d --restart unless-stopped -p 10082:80 -p 10442:443 -v /docker/www:/usr/share/nginx/html -e TZ=Asia/Shanghai -e JAVA_PHP_SERVER="apache.redhat.xyz|172.17.0.7" --name apache jiobxn/nginx
 
 	#运行一个PROXY模式实例
-	docker run -d --restart unless-stopped -p 10083:80 -p 10443:443 -e TZ=Asia/Shanghai -e PROXY_SERVER="g.redhat.xyz|www.google.co.id%backend_https=y" --name proxy jiobxn/nginx
+	docker run -d --restart unless-stopped -p 10083:80 -p 10443:443 -e TZ=Asia/Shanghai -e PROXY_SERVER="g.redhat.xyz|www.google.co.id^backend_https=y" --name proxy jiobxn/nginx
 
 	#运行一个DOMAIN模式实例
-	docker run -d --restart unless-stopped -p 10084:80 -p 10444:443 -e TZ=Asia/Shanghai -e DOMAIN_PROXY="fqhub.com%backend_https=y" --name nginx jiobxn/nginx
+	docker run -d --restart unless-stopped -p 10084:80 -p 10444:443 -e TZ=Asia/Shanghai -e DOMAIN_PROXY="fqhub.com^backend_https=y" --name nginx jiobxn/nginx
 
 四种模式可以一起用，需要使用"root=<project_directory>"区分不同项目目录
 
 ### 四层
 
 	#运行一个TCP模式实例
-	docker run -d --restart unless-stopped -p 3306:3306 --network=mynetwork --ip=10.0.0.2 -e STREAM_SERVER="3306|10.0.0.63:3306&backup,10.0.0.62:3306,10.0.0.61:3306%stream_lb=least_conn" --name nginx-tcp jiobxn/nginx
+	docker run -d --restart unless-stopped -p 3306:3306 --network=mynetwork --ip=10.0.0.2 -e STREAM_SERVER="3306|10.0.0.63:3306&backup,10.0.0.62:3306,10.0.0.61:3306^stream_lb=least_conn" --name nginx-tcp jiobxn/nginx
 
 七层负载均衡和四层负载均衡，在一个容器中只能有一种存在
 
@@ -48,13 +48,13 @@ Nginx
 基本选项：不同工作模式，每个独立的站点以";"为分隔符
 
 	#HTTP
-	FCGI_SERVER=<php.jiobxn.com|192.17.0.5:9000[%<Other options>]>
-	JAVA_PHP_SERVER=<tomcat.jiobxn.com|192.17.0.6:8080[%<Other options>];apache.jiobxn.com|192.17.0.7[%<Other options>]>
-	PROXY_SERVER=<g.jiobxn.com|www.google.co.id.hk%backend_https=Y>
-	DOMAIN_PROXY=<fqhub.com%backend_https=Y>
+	FCGI_SERVER=<php.jiobxn.com|192.17.0.5:9000[^<Other options>]>
+	JAVA_PHP_SERVER=<tomcat.jiobxn.com|192.17.0.6:8080[^<Other options>];apache.jiobxn.com|192.17.0.7[^<Other options>]>
+	PROXY_SERVER=<g.jiobxn.com|www.google.co.id.hk^backend_https=Y>
+	DOMAIN_PROXY=<fqhub.com^backend_https=Y>
 
 	#TCP/UDP
-	STREAM_SERVER=<22|102.168.0.242:22;53|8.8.8.8:53%udp=Y>
+	STREAM_SERVER=<22|102.168.0.242:22;53|8.8.8.8:53^udp=Y>
 
 	#Keepalived
 	KP_VIP=<virtual address>    #要使用keepalived需要root权限 --cap-add=NET_ADMIN
@@ -88,7 +88,7 @@ Nginx
 	KP_VRID=[77]								#路由ID
 	KP_PASS=[Newpa55]							#认证密码
 
-	#HTTP 子选项：作用于四种工作模式，与基本选项之间以"%"为分隔符，各子选项之间用","为分隔符，参数之间用"|"为分隔符，用于替换某种模式下的默认选项
+	#HTTP 子选项：作用于四种工作模式，与基本选项之间以"^"为分隔符，各子选项之间用","为分隔符，参数之间用"|"为分隔符，用于替换某种模式下的默认选项
 		ws=</mp4|127.0.0.1:19443>					#websocket，路径名 WS服务器
 		alias=</boy|/mp4>						#别名目录，别名/boy 容器目录/mp4，用于FCGI、JAVA_PHP和PROXY
 		root=<wordpress>						#网站根目录，html/wordpress
