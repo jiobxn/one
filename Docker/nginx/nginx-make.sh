@@ -323,7 +323,7 @@ domain_proxy() {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
 	    #server_name#
-	    server_name *.$(echo $i |awk -F% '{print $1}'); #$(echo $i |awk -F% '{print $1}')
+	    server_name *.$(echo $i |awk -F^ '{print $1}'); #$(echo $i |awk -F^ '{print $1}')
 
 	    ssl_certificate      /nginx/conf/server.crt;
 	    ssl_certificate_key  /nginx/conf/server.key;
@@ -334,17 +334,17 @@ domain_proxy() {
 	    ssl_prefer_server_ciphers   on;
 		
 	    #rewrite#
-	    #if (\$host !~* ^.*.$(echo $i |awk -F% '{print $1}')$) {return 301 https://cn.bing.com;}
+	    #if (\$host !~* ^.*.$(echo $i |awk -F^ '{print $1}')$) {return 301 https://cn.bing.com;}
 	    if (\$uri = /\$host) {rewrite ^(.*)$ https://\$host/index.php;}          #t66y login jump
 
-	    set \$domain $(echo $i |awk -F% '{print $1}');
+	    set \$domain $(echo $i |awk -F^ '{print $1}');
 
 	    location / {
             resolver $NGX_DNS;
             #domains#
-            #if (\$host ~* "^(.*).$(echo $i |awk -F% '{print $1}')$") {set \$domains \$1;}
-            #if (\$host ~* "^(.*)-(.*).$(echo $i |awk -F% '{print $1}')$" ) {set \$domains \$1.\$2;}
-            if (\$host ~* "^(.*)$DOMAIN_TAG(.*).$(echo $i |awk -F% '{print $1}')$" ) {set \$domains \$1\$2;}	#host rule
+            #if (\$host ~* "^(.*).$(echo $i |awk -F^ '{print $1}')$") {set \$domains \$1;}
+            #if (\$host ~* "^(.*)-(.*).$(echo $i |awk -F^ '{print $1}')$" ) {set \$domains \$1.\$2;}
+            if (\$host ~* "^(.*)$DOMAIN_TAG(.*).$(echo $i |awk -F^ '{print $1}')$" ) {set \$domains \$1\$2;}	#host rule
             if (\$domains = "t66y.com" ) {charset gb2312;}                                    					#t66y charset
             
             proxy_pass http://\$domains;
@@ -394,7 +394,7 @@ domain_proxy() {
 
 
 http_other() {
-	for i in $(echo $i |awk -F% '{print $2}' |sed 's/,/\n/g'); do
+	for i in $(echo $i |awk -F^ '{print $2}' |sed 's/,/\n/g'); do
 		#WebSocket
 		if [ -n "$(echo $i |grep 'ws=' |grep '|')" ]; then
 			path="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
@@ -591,39 +591,39 @@ http_other() {
 
 
 http_basic() {
-	if [ -n "$(echo $i |grep '%')" ]; then
-		echo "% yes"
-		if [ -n "$(echo $i |awk -F% '{print $1}' |grep '|')" ]; then
-			for x in $(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $1}' |sed 's/,/\n/g'); do
+	if [ -n "$(echo $i |grep '^')" ]; then
+		echo "^ yes"
+		if [ -n "$(echo $i |awk -F^ '{print $1}' |grep '|')" ]; then
+			for x in $(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $1}' |sed 's/,/\n/g'); do
 				sed -i '/#server_name#/ a \    server_name '$x'; #'$x'' /nginx/conf/vhost/${project_name}_$n.conf
 			done
 
-			if [ -n "$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}' |grep ",")" ]; then
+			if [ -n "$(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}' |grep ",")" ]; then
 				sed -i '/#upstream#/ a \    upstream '$project_name'-lb-'$n' {\n\        keepalive 20;\n\    }\n' /nginx/conf/nginx.conf
 
-				for y in $(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
+				for y in $(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
 					sed -i '/upstream '$project_name'-lb-'$n'/ a \        server '$y';' /nginx/conf/nginx.conf
 				done
 			else
-				sed -i 's/'$project_name'-lb-'$n'/'$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}')'/' /nginx/conf/vhost/${project_name}_$n.conf
+				sed -i 's@'$project_name'-lb-'$n'@'$(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}')'@' /nginx/conf/vhost/${project_name}_$n.conf
 			fi
 		else
 			sed -i '/#server_name#/ a \    server_name localhost; #localhost' /nginx/conf/vhost/${project_name}_$n.conf
 
-			if [ -n "$(echo $i |awk -F% '{print $1}' |grep ",")" ]; then
+			if [ -n "$(echo $i |awk -F^ '{print $1}' |grep ",")" ]; then
 				sed -i '/#upstream#/a \    upstream '$project_name'-lb-'$n' {\n\        keepalive 20;\n\    }\n' /nginx/conf/nginx.conf
 
-				for x in $(echo $i |awk -F% '{print $1}' |sed 's/,/\n/g'); do
+				for x in $(echo $i |awk -F^ '{print $1}' |sed 's/,/\n/g'); do
 					sed -i '/upstream '$project_name'-lb-'$n'/ a \        server '$x';' /nginx/conf/nginx.conf
 				done
 			else
-				sed -i 's/'$project_name'-lb-'$n'/'$(echo $i |awk -F% '{print $1}')'/' /nginx/conf/vhost/${project_name}_$n.conf
+				sed -i 's@'$project_name'-lb-'$n'@'$(echo $i |awk -F^ '{print $1}')'@' /nginx/conf/vhost/${project_name}_$n.conf
 			fi
 		fi
 
 		http_other
 	else
-		echo "% no"
+		echo "^ no"
 		if [ -n "$(echo $i |grep '|')" ]; then
 			for x in $(echo $i |awk -F'|' '{print $1}' |sed 's/,/\n/g'); do
 				sed -i '/#server_name#/ a \    server_name '$x'; #'$x'' /nginx/conf/vhost/${project_name}_$n.conf
@@ -636,7 +636,7 @@ http_basic() {
 					sed -i '/upstream '$project_name'-lb-'$n'/ a \        server '$y';' /nginx/conf/nginx.conf
 				done
 			else
-				sed -i 's/'$project_name'-lb-'$n'/'$(echo $i |awk -F'|' '{print $2}')'/' /nginx/conf/vhost/${project_name}_$n.conf
+				sed -i 's@'$project_name'-lb-'$n'@'$(echo $i |awk -F'|' '{print $2}')'@' /nginx/conf/vhost/${project_name}_$n.conf
 			fi
 		else
 			sed -i '/#server_name#/ a \    server_name localhost; #localhost' /nginx/conf/vhost/${project_name}_$n.conf
@@ -648,7 +648,7 @@ http_basic() {
 					sed -i '/upstream '$project_name'-lb-'$n'/ a \        server '$x';' /nginx/conf/nginx.conf
 				done
 			else
-				sed -i 's/'$project_name'-lb-'$n'/'$i'/' /nginx/conf/vhost/${project_name}_$n.conf
+				sed -i 's@'$project_name'-lb-'$n'@'$i'@' /nginx/conf/vhost/${project_name}_$n.conf
 			fi
 		fi
 	fi
@@ -683,28 +683,28 @@ stream_conf() {
 
 
 stream_server() {
-	if [ -n "$(echo $i |grep '%')" ]; then
-		echo "% yes"
-		if [ -n "$(echo $i |awk -F% '{print $1}' |grep '|')" ]; then
-			PORT=$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $1}')
+	if [ -n "$(echo $i |grep '^')" ]; then
+		echo "^ yes"
+		if [ -n "$(echo $i |awk -F^ '{print $1}' |grep '|')" ]; then
+			PORT=$(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $1}')
 
-			if [ -n "$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}' |grep ",")" ]; then
+			if [ -n "$(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}' |grep ",")" ]; then
 				sed -i '/#upstream#/ a \    upstream backend-lb-'$n' {\n\    }\n' /nginx/conf/nginx.conf
 
-				for y in $(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
+				for y in $(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}' |sed 's/,/\n/g'); do
 					sed -i '/upstream backend-lb-'$n'/ a \        server '$y';' /nginx/conf/nginx.conf
 					sed -i 's/&/ /' /nginx/conf/nginx.conf
 				done
 				
 				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /nginx/conf/nginx.conf
 			else
-				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F% '{print $1}' |awk -F'|' '{print $2}')';\n\    }\n' /nginx/conf/nginx.conf
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}')';\n\    }\n' /nginx/conf/nginx.conf
 			fi
 		else
 			echo "error.." && exit 1
 		fi
 	else
-		echo "% no"
+		echo "^ no"
 		if [ -n "$(echo $i |grep '|')" ]; then
 			PORT=$(echo $i |awk -F'|' '{print $1}')
 
@@ -729,7 +729,7 @@ stream_server() {
 
 
 stream_other() {
-	for i in $(echo $i |awk -F% '{print $2}' |sed 's/,/\n/g'); do		
+	for i in $(echo $i |awk -F^ '{print $2}' |sed 's/,/\n/g'); do		
 		#负载均衡
 		if [ -n "$(echo $i |grep 'stream_lb=')" ]; then
 			stream_lb="$(echo $i |grep 'stream_lb=' |awk -F= '{print $2}')"
@@ -969,10 +969,10 @@ else
 				-p 10080:80 \\
 				-p 10443:443 \\
 				-e WORKER_PROC=[2] \\
-				-e FCGI_SERVER=<php.jiobxn.com|192.17.0.5:9000[%<Other options>]> \\
-				-e JAVA_PHP_SERVER=<tomcat.jiobxn.com|192.17.0.6:8080[%<Other options>];apache.jiobxn.com|192.17.0.7[%<Other options>]> \\
-				-e PROXY_SERVER=<g.jiobxn.com|www.google.co.id%backend_https=Y> \\
-				-e DOMAIN_PROXY=<fqhub.com%backend_https=Y> \\
+				-e FCGI_SERVER=<php.jiobxn.com|192.17.0.5:9000[^<Other options>]> \\
+				-e JAVA_PHP_SERVER=<tomcat.jiobxn.com|192.17.0.6:8080[^<Other options>];apache.jiobxn.com|192.17.0.7[^<Other options>]> \\
+				-e PROXY_SERVER=<g.jiobxn.com|www.google.co.id^backend_https=Y> \\
+				-e DOMAIN_PROXY=<fqhub.com^backend_https=Y> \\
 				-e DEFAULT_SERVER=<jiobxn.com> \\
 				-e NGX_PASS=[jiobxn.com] \\
 				-e NGX_USER=<nginx> \\
@@ -1018,7 +1018,7 @@ else
 				   limit_req=<2> \\
 				   log=<N|Y> \\
 				   testip=<1.1.1.1&10.0.0.10:8080> \\
-				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[%<Other options>];53|8.8.8.8:53%udp=Y> \\
+				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[^<Other options>];53|8.8.8.8:53^udp=Y> \\
 				   stream_lb=<hash|least_conn> \\
 				   conn_timeout=[1m] \\
 				   proxy_timeout=[10m] \\
