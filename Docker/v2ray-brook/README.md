@@ -11,13 +11,27 @@ v2ray-brook
 
     #运行一个brook实例
     docker run -d --restart unless-stopped -p 19443:19443 --name brook jiobxn/v2ray-brook
+    #docker run -d --restart unless-stopped -e MODE=client -e SERVER=<ip:19443> -e PASS=<passwd> --name brook jiobxn/v2ray-brook
+
+    #运行一个brook ss实例
+    docker run -d --restart unless-stopped -p 19443:19443 -e MODE=ssserver --name brook-ss jiobxn/v2ray-brook
+    #docker run -d --restart unless-stopped -e MODE=ssclient -e SERVER=<ip:19443> -e PASS=<passwd> --name brook jiobxn/v2ray-brook
+
+    #运行一个brook ws实例
+    docker run -d --restart unless-stopped -p 19443:19443 -e MODE=wsserver --name brook-ws jiobxn/v2ray-brook
+    #docker run -d --restart unless-stopped -e MODE=wsclient -e SERVER=<ip:19443> -e PASS=<passwd> --name brook jiobxn/v2ray-brook
+
+    #运行一个brook ws tls实例
+    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -e MODE=wsserver -e DOMAIN=<brook.example.com> --name brook-wss jiobxn/v2ray-brook
+    #docker run -d --restart unless-stopped -e MODE=wsclient -e SERVER=<brook.example.com:443> -e DOMAIN=Y -e PASS=<passwd> --name brook jiobxn/v2ray-brook
+
 
     #运行一个v2ray实例
-    docker run -d --restart unless-stopped -p 19444:19443 -e MODE=v2ray --name v2ray jiobxn/v2ray-brook
+    docker run -d --restart unless-stopped -p 19443:19443 -e MODE=v2ray --name v2ray jiobxn/v2ray-brook
 
     #运行一个v2ray ws实例，可以套cloudflare
-    docker run -d --restart unless-stopped --network host -e PORT=19445 -e MODE=v2ray -e WSPATH=/mp3 --name v2ray jiobxn/v2ray-brook
-    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/key:/key -e PROXY_SERVER="ggg.example.com|www.google.co.id^backend_https=y,ws=/mp3|127.0.0.1:19445" --name google jiobxn/nginx
+    docker run -d --restart unless-stopped --network host -e PORT=19445 -e MODE=v2ray -e WSPATH=/mp3 --name v2ray-ws jiobxn/v2ray-brook
+    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/key:/key -e PROXY_SERVER="v2ray.example.com|www.google.co.id^backend_https=y,ws=/mp3|127.0.0.1:19445" --name google jiobxn/nginx
 
 
 ## Run Defult Parameter
