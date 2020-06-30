@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = 'v2ray-brook' ]; then
 
-: ${PASS:="$(openssl passwd $RANDOM)"}
+: ${PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
 : ${PORT:="19443"}
 : ${MODE:="server"}
 : ${UUID:="$(cat /proc/sys/kernel/random/uuid)"}
@@ -47,6 +47,7 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 			fi
 		else
 			if [ "$MODE" == "wsserver" ]; then
+				[ "$DOMAIN" ] && PORT=443
                         	echo -e "mode: $MODE \nport: $PORT \npassword: $PASS"
                         	echo "brook $MODE $DOMAIN -p $PASS" >/usr/bin/v2ray-brook
 			else
