@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = 'shadowsocks' ]; then
 
-: ${SS_K:="$(openssl passwd $RANDOM)"}
+: ${SS_K:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
 : ${SS_M:="aes-256-cfb"}
 : ${SS_P:="8443"}
 : ${SS_B:="127.0.0.1"}
@@ -12,81 +12,77 @@ if [ "$1" = 'shadowsocks' ]; then
 
 if [ ! -f /usr/bin/shadowsocks ]; then
 
-	init_net() {
-	if [ ! -f /key/chnroute.txt ]; then
-		grep "CN|ipv4" /etc/delegated-apnic-latest |awk -F\| '{ printf("%s/%d\n", $4, 32-log($5)/log(2)) }' >/key/chnroute.txt
-	fi
+        init_net() {
+        if [ ! -f /key/chnroute.txt ]; then
+                \cp chnroute.txt /key/chnroute.txt
+        fi
 
-	for i in `cat /key/chnroute.txt`; do
-		echo ipset -A chnroute $i >> /ipset.sh
-	done
-	chmod +x /ipset.sh
+        for i in `cat /key/chnroute.txt`; do
+                echo ipset -A chnroute $i >> /ipset.sh
+        done
+        chmod +x /ipset.sh
 
-	if [ -z "`ipset list |grep chnroute`" ]; then
-		ipset -N chnroute hash:net
-		bash /ipset.sh
-	fi
-	ipset -S > /etc/sysconfig/ipset.chnroute
+        if [ -z "`ipset list |grep chnroute`" ]; then
+                ipset -N chnroute hash:net
+                bash /ipset.sh
+        fi
+        ipset -S > /etc/sysconfig/ipset.chnroute
 
-	if [ -z "`iptables -t nat -S |grep shadowsocks`" ]; then
-		iptables -t nat -N shadowsocks
-		iptables -t nat -A shadowsocks -d 0/8 -j RETURN
-		iptables -t nat -A shadowsocks -d 127/8 -j RETURN
-		iptables -t nat -A shadowsocks -d 10/8 -j RETURN
-		iptables -t nat -A shadowsocks -d 169.254/16 -j RETURN
-		iptables -t nat -A shadowsocks -d 172.16/12 -j RETURN
-		iptables -t nat -A shadowsocks -d 192.168/16 -j RETURN
-		iptables -t nat -A shadowsocks -d 8.8.8.8 -j RETURN
-		iptables -t nat -A shadowsocks -d 224/4 -j RETURN
-		iptables -t nat -A shadowsocks -d 240/4 -j RETURN
-		iptables -t nat -A shadowsocks -d $SS_S -j RETURN
-		iptables -t nat -A shadowsocks -m set --match-set chnroute dst -j RETURN
-		iptables -t nat -A shadowsocks -p tcp -j REDIRECT --to-ports $SS_L
-		iptables -t nat -A OUTPUT -p tcp -j shadowsocks
-	fi
-	iptables-save > /etc/sysconfig/iptables.shadowsocks
-	}
+        if [ -z "`iptables -t nat -S |grep shadowsocks`" ]; then
+                iptables -t nat -N shadowsocks
+                iptables -t nat -A shadowsocks -d 0/8 -j RETURN
+                iptables -t nat -A shadowsocks -d 127/8 -j RETURN
+                iptables -t nat -A shadowsocks -d 10/8 -j RETURN
+                iptables -t nat -A shadowsocks -d 169.254/16 -j RETURN
+                iptables -t nat -A shadowsocks -d 172.16/12 -j RETURN
+                iptables -t nat -A shadowsocks -d 192.168/16 -j RETURN
+                iptables -t nat -A shadowsocks -d 8.8.8.8 -j RETURN
+                iptables -t nat -A shadowsocks -d 224/4 -j RETURN
+                iptables -t nat -A shadowsocks -d 240/4 -j RETURN
+                iptables -t nat -A shadowsocks -d $SS_S -j RETURN
+                iptables -t nat -A shadowsocks -m set --match-set chnroute dst -j RETURN
+                iptables -t nat -A shadowsocks -p tcp -j REDIRECT --to-ports $SS_L
+                iptables -t nat -A OUTPUT -p tcp -j shadowsocks
+        fi
+        iptables-save > /etc/sysconfig/iptables.shadowsocks
+        }
 
-
-	if [ "$SS_S" -a "$LOCAL" ]; then
-		echo -e "shadowsocks type: ss-local \nlocal port: $SS_L"
-		echo "/usr/bin/ss-local -s $SS_S -p $SS_P -k $SS_K -m $SS_M -b $SS_B -l $SS_L -u" >>/usr/bin/shadowsocks
-	elif [ "$SS_S" -a "$REDIR" ]; then
-		init_net
+        if [ "$SS_S" -a "$REDIR" ]; then
+                init_net
                 if [ $DNS ]; then
-                        [ "$DNS" == "mydns" ] && echo 'echo "nameserver '$(awk '$2=="mydns"{print $1}' /etc/hosts)'" >/etc/resolv.conf' >/usr/bin/shadowsocks
-                else
                         echo 'echo "nameserver '$DNS'" >/etc/resolv.conf' >/usr/bin/shadowsocks
                 fi
 
-		echo '[ -z "`ipset list |grep chnroute`" ] && ipset -R < /etc/sysconfig/ipset.chnroute' >>/usr/bin/shadowsocks
-		echo '[ -z "`iptables -t nat -S |grep shadowsocks`" ] && iptables-restore < /etc/sysconfig/iptables.shadowsocks' >>/usr/bin/shadowsocks
-		
-		echo -e "shadowsocks type: ss-redir \nlocal port: $SR_PORT"
-		echo "/usr/bin/ss-redir -s $SS_S -p $SS_P -k $SS_K -m $SS_M -b $SS_B -l $SS_L -u" >>/usr/bin/shadowsocks
-	else
-		echo -e "shadowsocks type: ss-server \npassword: $SS_K \nencryption mode: $SS_M \nservice port: $SS_P"
-		echo "/usr/bin/ss-server -p $SS_P -k $SS_K -m $SS_M -u" >>/usr/bin/shadowsocks
-	fi
-	chmod +x /usr/bin/shadowsocks 
+                echo '[ -z "`ipset list |grep chnroute`" ] && ipset -R < /etc/sysconfig/ipset.chnroute' >>/usr/bin/shadowsocks
+                echo '[ -z "`iptables -t nat -S |grep shadowsocks`" ] && iptables-restore < /etc/sysconfig/iptables.shadowsocks' >>/usr/bin/shadowsocks
+
+                echo -e "shadowsocks type: ss-redir \nlocal port: $SR_PORT"
+                echo "/usr/bin/ss-redir -s $SS_S -p $SS_P -k $SS_K -m $SS_M -b $SS_B -l $SS_L -u" >>/usr/bin/shadowsocks
+        elif [ "$SS_S" ]; then
+                echo -e "shadowsocks type: ss-local \nlocal port: $SS_L"
+                echo "/usr/bin/ss-local -s $SS_S -p $SS_P -k $SS_K -m $SS_M -b $SS_B -l $SS_L -u" >>/usr/bin/shadowsocks
+        else
+                echo -e "shadowsocks type: ss-server \npassword: $SS_K \nencryption mode: $SS_M \nservice port: $SS_P"
+                echo "/usr/bin/ss-server -p $SS_P -k $SS_K -m $SS_M -u" >>/usr/bin/shadowsocks
+        fi
+        chmod +x /usr/bin/shadowsocks 
 fi
 
-	echo "Start ****"
-	exec $@
+        echo "Start ****"
+        exec $@
 else
-	echo -e "
-	Example:
-				docker run -d --restart always --privileged \\
-				-p 8443:8443 \
-				-e SS_K=[pwmake 64] \\
-				-e SS_M=[aes-256-cfb] \\
-				-e SS_P=[8443] \\
-				-e LOCAL=<Y> \\
-				-e REDIR=<Y> \\
-				-e DNS=<mydns | dns_address> \\
-				-e SS_S=<SS_SERVER> \\
-				-e SS_B=[127.0.0.1] \\
-				-e SS_L=[1080] \\
-				--hostname shadowsocks --name shadowsocks shadowsocks
-	"
+        echo -e "
+        Example:
+                                docker run -d --restart unless-stopped --cap-add NET_ADMIN \\
+                                -p 8443:8443 \
+                                -e SS_K=[RANDOM] \\
+                                -e SS_M=[aes-256-cfb] \\
+                                -e SS_P=[8443] \\
+                                -e REDIR=<Y> \\
+                                -e DNS=<127.0.0.1> \\
+                                -e SS_S=<SS_SERVER> \\
+                                -e SS_B=[127.0.0.1] \\
+                                -e SS_L=[1080] \\
+                                --name shadowsocks shadowsocks
+        "
 fi
