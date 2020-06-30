@@ -13,7 +13,7 @@ if [ ! -f /usr/local/bin/TINYVPN ]; then
 		echo "nohup tinyvpn -c -r$VPN_SERVER:$VPN_PORT -f20:10 -k \"$VPN_PASS\" --sub-net $IP_RANGE.0 &" >/usr/local/bin/TINYVPN
 		ADDR="$IP_RANGE.1"
 	else
-		: ${VPN_PASS:="$(openssl rand -base64 10 |tr -dc '_A-Za-z0-9')"}
+		: ${VPN_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
 		echo -e "service port: $VPN_PORT \npassword: $VPN_PASS"
 		echo "nohup tinyvpn -s -l0.0.0.0:$VPN_PORT -f20:10 -k \"$VPN_PASS\" --sub-net $IP_RANGE.0 &" >/usr/local/bin/TINYVPN
 		ADDR="$IP_RANGE.2"
@@ -31,7 +31,7 @@ if [ ! -f /usr/local/bin/TINYVPN ]; then
 
 	#SNAT
 	if [ "$SNAT" ]; then
-		: ${DEV:="$(route -n |awk '$1=="0.0.0.0"{print $NF }')"}
+		: ${DEV:="$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)"}
 		
 		sysctl -w net.ipv4.ip_forward=1
 		echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
@@ -61,7 +61,7 @@ else
 				-e VPN_PORT=[8000] \\
 				-e VPN_SERVER=<IPADDR> \\
 				-e IP_RANGE=[10.22.0] \\
-				-e VPN_PASS=[$RANDOM] \\
+				-e VPN_PASS=[RANDOM] \\
 				-e DNAT=<2222|22,53|1.1.1.1:53> \\
 				-e SNAT=<Y> \\
 				--name tinyvpn tinyvpn
