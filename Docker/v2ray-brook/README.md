@@ -9,8 +9,15 @@ v2ray-brook
 
 ## Example:
 
-    #运行一个默认实例
-    docker run -d --restart unless-stopped -p 19443:19443 --name v2ray-brook v2ray-brook
+    #运行一个brook实例
+    docker run -d --restart unless-stopped -p 19443:19443 --name brook jiobxn/v2ray-brook
+
+    #运行一个v2ray实例
+    docker run -d --restart unless-stopped -p 19444:19443 -e MODE=v2ray --name v2ray jiobxn/v2ray-brook
+
+    #运行一个v2ray ws实例，可以套cloudflare
+    docker run -d --restart unless-stopped --network host -e PORT=19445 -e MODE=v2ray -e WSPATH=/mp3 --name v2ray jiobxn/v2ray-brook
+    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/key:/key -e PROXY_SERVER="ggg.example.com|www.google.co.id^backend_https=y,ws=/mp3|127.0.0.1:19445" --name google jiobxn/nginx
 
 
 ## Run Defult Parameter
@@ -46,7 +53,7 @@ https://apkpure.com/v2rayng/com.v2ray.ang
 https://apkpure.com/bifrostv/com.github.dawndiy.bifrostv
 
 **IOS**  
-Shadowrocket、Quantumult、i2Ray，类型选择Vmess
+Shadowrocket、Quantumult、i2Ray 。v2ray类型选择Vmess
 
 ****
 
