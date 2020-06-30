@@ -11,6 +11,7 @@ if [ "$1" = 'shadowsocks' ]; then
 : ${SS_B:="127.0.0.1"}
 : ${SS_L:="1080"}
 
+
 if [ ! -f /usr/bin/shadowsocks ]; then 
         if [ "$SS_S" ]; then
                 if [ "$SSR" ]; then
