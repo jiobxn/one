@@ -11,7 +11,7 @@ FreeRadius
     docker run -d --restart unless-stopped -p 1812-1813:1812-1813 -v /docker/freeradius:/key --name freeradius jiobxn/freeradius
 
     #验证信息存MySQL
-    docker run -d --restart unless-stopped --network host -e MYSQL_DATABASE=radius -e MYSQL_USER=radius -e MYSQL_PASSWORD=radpass --name mysql jiobxn/mysql:5.7
+    docker run -d --restart unless-stopped --network host -v /docker/mysql:/var/lib/mysql -e MYSQL_DATABASE=radius -e MYSQL_USER=radius -e MYSQL_PASSWORD=radpass --name mysql jiobxn/mysql:5.7
     docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key -e MYSQL_HOST=127.0.0.1 -e IPADDR_SECRET="127.0.0.1,testing123;0.0.0.0/0,newpass123" -e USER_PASS="testing,password;admin,newpass" --name freeradius jiobxn/freeradius
 
 
