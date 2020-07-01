@@ -25,3 +25,4 @@ tinyFecVPN
 				-e DNAT=<2222|22,53|1.1.1.1:53> \\   #端口转发 本地端口|目的[IP和]端口
 				-e SNAT=<Y> \\                       #SNAT
 				--name tinyvpn tinyvpn
+
