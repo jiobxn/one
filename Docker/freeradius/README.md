@@ -8,7 +8,7 @@ FreeRadius
 ## Example:
 
     #验证信息存本地
-    docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key --name freeradius jiobxn/freeradius
+    docker run -d --restart unless-stopped -p 1812-1813:1812-1813 -v /docker/freeradius:/key --name freeradius jiobxn/freeradius
 
     #验证信息存MySQL
     docker run -d --restart unless-stopped --network host -e MYSQL_DATABASE=radius -e MYSQL_USER=radius -e MYSQL_PASSWORD=radpass --name mysql jiobxn/mysql:5.7
@@ -18,18 +18,17 @@ FreeRadius
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/freeradius:/key \\
 				-p 1812:1812/udp \\
 				-p 1813:1813/udp \\
-				-e USER_PASS=[testing,password] \\
-				-e IPADDR_SECRET=[127.0.0.1,testing123] \\
-				-e MYSQL_HOST=<127.0.0.1> \\
-				-e MYSQL_PORT=[3306] \\
-				-e MYSQL_DB=[radius] \\
-				-e MYSQL_USER=[radius] \\
-				-e MYSQL_PASS=[radpass] \\
-				-e IPTABLES=<Y> \\
+				-e USER_PASS=[testing,password] \\           #用户名/密码
+				-e IPADDR_SECRET=[127.0.0.1,testing123] \\   #IP/密钥
+				-e MYSQL_HOST=<127.0.0.1> \\                 #默认的MySQL地址
+				-e MYSQL_PORT=[3306] \\                      #默认的MySQL端口
+				-e MYSQL_DB=[radius] \\                      #默认的MySQL数据库
+				-e MYSQL_USER=[radius] \\                    #默认的MySQL用户
+				-e MYSQL_PASS=[radpass] \\                   #默认的MySQL密码
 				--name freeradius freeradius
 
 ### 测试
