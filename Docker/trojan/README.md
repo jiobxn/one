@@ -6,9 +6,9 @@ trojan
 
 
 ## Example:
-
+    
     #运行一个server实例
-    docker run -d --restart unless-stopped -p 80:80 jiobxn/nginx
+    docker run -d --restart unless-stopped -p 80:80 --name mask jiobxn/nginx
     docker run -d --restart unless-stopped -p 443:443 -e REMOT_ADDR=172.17.0.1 -e REMOT_PORT=80 --name trojan jiobxn/trojan
 
     #运行一个client实例
