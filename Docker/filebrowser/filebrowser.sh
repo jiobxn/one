@@ -6,7 +6,6 @@ if [ "$1" = 'filebrowser' ]; then
 : ${FB_PORT:="8080"}
 
 if [ ! -f /key/config.json ]; then
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	if [ "$FB_AUTH" == "Y" ]; then
 		FB_AUTH=false
 	else
