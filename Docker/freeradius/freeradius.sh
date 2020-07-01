@@ -83,7 +83,6 @@ AUTHOR() {
 			fi
 		fi
 	fi
-echo author
 }
 
 
