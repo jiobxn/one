@@ -71,5 +71,7 @@ Shadowrocket、Quantumult、i2Ray 。v2ray类型选择Vmess
 
 ****
 
+test
+
     npm install -g wscat
-    wscat -c wss://exanole.com/mp4
+    wscat -c wss://v2ray.exanole.com/mp3
