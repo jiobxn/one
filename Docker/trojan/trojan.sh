@@ -8,7 +8,7 @@ SET_SERVER(){
 : ${LOCAL_PORT:="443"}
 : ${REMOT_ADDR:="127.0.0.1"}
 : ${REMOT_PORT:="80"}
-: ${PASS:="$(openssl rand -hex 8)"}
+: ${PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
 
 cat >>/etc/config.json <<-END
 {
@@ -137,7 +137,7 @@ else
 				-e REMOT_ADDR=[127.0.0.1 | trojan.example.com] \\
 				-e REMOT_PORT=[80 | 443] \\
 				-e CLIENT=<Y> \\
-				-e PASS:=[openssl rand -hex 8] \\
+				-e PASS:=[RANDOM] \\
 				--name trojan trojan
 	"
 fi
