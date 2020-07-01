@@ -12,7 +12,7 @@ set -e
 
 #MYSQL
 MYSQL() {
-	if [ $MYSQL_HOST ];then
+	if [ "$MYSQL_HOST" ];then
 		if [ "$(mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -e "use $MYSQL_DB; show tables;" |awk 'NR!=1' |wc -l)" -eq 0 ];then
 			mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT $MYSQL_DB </etc/raddb/mods-config/sql/main/mysql/schema.sql
 		fi
@@ -32,7 +32,7 @@ MYSQL() {
 
 #authentication
 AUTHEN() {
-	if [ $USER_PASS ];then
+	if [ "$USER_PASS" ];then
 		if [ -n "$(echo $USER_PASS |grep ';')" ];then
 			for i in $(echo $USER_PASS |sed 's/;/\n/g');do
 				if [ -n "$(echo $i |grep ,)" ];then
@@ -60,7 +60,7 @@ AUTHEN() {
 
 #authorization
 AUTHOR() {
-	if [ $IPADDR_SECRET ];then
+	if [ "$IPADDR_SECRET" ];then
 		if [ -n "$(echo $IPADDR_SECRET |grep ';')" ];then
 			for i in $(echo $IPADDR_SECRET |sed 's/;/\n/g');do
 				if [ -n "$(echo $i |grep ,)" ];then
@@ -112,7 +112,7 @@ if [ "$1" = 'radiusd' ]; then
 	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	if [ -z "$(grep "redhat.xyz" /etc/raddb/clients.conf)" ]; then
 		#authentication
-		if [ $MYSQL_HOST ];then
+		if [ "$MYSQL_HOST" ];then
 			MYSQL
 
 			cat >/key/add_user_mysql.sh <<-END
