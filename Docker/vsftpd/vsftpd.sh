@@ -6,7 +6,7 @@ set -e
 : ${DATA_PORT:="20"}
 : ${FTP_UID:="21000"}
 : ${FTP_USER:="vsftpd"}
-: ${FTP_PASS:="$(openssl rand -hex 10)"}
+: ${FTP_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
 : ${ANON_ROOT:="public"}
 : ${ANON_CHMOD:="4"}
 : ${MAX_CLIENT:="0"}
@@ -445,15 +445,6 @@ INIT_FTP() {
 		ssl_ciphers=HIGH
 		END
 	fi
-
-	#iptables
-	if [ "$IPTABLES" == "Y" ]; then
-		cat > /iptables.sh <<-END
-		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $FTP_PORT -m comment --comment VSFTPD -j ACCEPT
-		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PASV_PORT -m comment --comment VSFTPD -j ACCEPT
-		END
-	fi
 }
 
 
@@ -461,7 +452,7 @@ INIT_FTP() {
 HELP() {
 	echo -e "
 	Example:
-				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
+				docker run -d --restart unless-stopped \\
 				-v /docker:/home \\
 				-v /docker/ftp:/key \\
 				-p 21:21 \\
@@ -470,7 +461,7 @@ HELP() {
 				-e PASV_PORT=[25000:25100] \\
 				-e FTP_UID=[21000] \\
 				-e FTP_USER=[vsftpd] \\
-				-e FTP_PASS=[$(openssl rand -hex 10)] \\
+				-e FTP_PASS=[RANDOM] \\
 				-e ANON_ROOT=[public] \\
 				-e ANON_CHMOD=[4] \\
 				-e MAX_CLINT=[0] \\
@@ -481,7 +472,6 @@ HELP() {
 				-e PASV_DISABLE=<Y> \\
 				-e DATA_PORT=[20] \\
 				-e FTP_SSL=<Y> \\
-				-e IPTABLES=<Y> \\
 				--name vsftpd vsftpd
 	
 	chmod mask:
@@ -512,7 +502,6 @@ if [ "$1" = '/usr/sbin/init' ]; then
 		INIT_FTP
 	fi
 
-	[ -f /iptables.sh ] && [ -z "`iptables -S |grep VSFTPD`" ] && . /iptables.sh
 	vsftpd
 	exec "$@"
 else
