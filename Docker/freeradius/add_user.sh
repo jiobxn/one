@@ -6,7 +6,7 @@ MYSQL_USER=user1
 MYSQL_PASS=pass1
 MYSQL_DB=radius
 
-[ ! -f user_pass.txt ] && echo "user_pass.txt  not exist" && exit1
+[ ! -f user_pass.txt ] && echo "user_pass.txt  not exist" && exit 1
 
 N=$(grep -v ^# user_pass.txt |grep -v ^$ |wc -l)
 i=1
