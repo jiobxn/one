@@ -2,7 +2,7 @@ FROM centos:latest
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN yum clean all; yum -y update; yum -y install net-tools iptables freeradius freeradius-utils freeradius-mysql mariadb; yum clean all
+RUN yum clean all; yum -y update; yum -y install net-tools freeradius freeradius-utils freeradius-mysql mysql; yum clean all
 
 VOLUME /key
 
