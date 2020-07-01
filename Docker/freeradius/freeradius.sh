@@ -40,7 +40,7 @@ AUTHEN() {
 					PASS=$(echo $i |awk -F, '{print $2}')
 					echo "$USER $PASS" >>/key/user_pass.txt
 				else
-					PASS=$(openssl rand -hex 8)
+					PASS=$(openssl rand -base64 10 |tr -dc [:alnum:])
 					echo "$USER $PASS" >>/key/user_pass.txt
 				fi
 			done
@@ -50,7 +50,7 @@ AUTHEN() {
 				PASS=$(echo $USER_PASS |awk -F, '{print $2}')
 				echo "$USER $PASS" >>/key/user_pass.txt
 			else
-				PASS=$(openssl rand -hex 8)
+				PASS=$(openssl rand -base64 10 |tr -dc [:alnum:])
 				echo "$USER $PASS" >>/key/user_pass.txt
 			fi
 		fi
@@ -68,7 +68,7 @@ AUTHOR() {
 					SECRET=$(echo $i |awk -F, '{print $2}')
 					echo "$IPADDR $SECRET" >>/key/ipaddr_secret.txt
 				else
-					SECRET=$(openssl rand -hex 8)
+					SECRET=$(openssl rand -base64 10 |tr -dc [:alnum:])
 					echo "$IPADDR $SECRET" >>/key/ipaddr_secret.txt
 				fi
 			done
@@ -78,7 +78,7 @@ AUTHOR() {
 				SECRET=$(echo $IPADDR_SECRET |awk -F, '{print $2}')
 				echo "$IPADDR $SECRET" >>/key/ipaddr_secret.txt
 			else
-				SECRET=$(openssl rand -hex 8)
+				SECRET=$(openssl rand -base64 10 |tr -dc [:alnum:])
 				echo "$IPADDR $SECRET" >>/key/ipaddr_secret.txt
 			fi
 		fi
@@ -91,7 +91,7 @@ echo author
 HELP() {
 	echo -e "
 	Example:
-				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/freeradius:/key \\
 				-p 1812:1812/udp \\
 				-p 1813:1813/udp \\
@@ -103,7 +103,6 @@ HELP() {
 				-e MYSQL_DB=[radius] \\
 				-e MYSQL_USER=[radius] \\
 				-e MYSQL_PASS=[radpass] \\
-				-e IPTABLES=<Y> \\
 				--name freeradius freeradius
 				"
 }
@@ -126,7 +125,7 @@ if [ "$1" = 'radiusd' ]; then
 				PASS=\$(grep -v ^# user_pass.txt |grep -v ^$ |sed -n ''\$i'p' |awk '{print \$2}')
 				if [ -z "\$(mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -e "SELECT username FROM $MYSQL_DB.radcheck;" |awk 'NR!=1' |grep -w \$USER)" ];then
 					mysql -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -e "INSERT INTO $MYSQL_DB.radcheck (username, attribute, op, value) VALUES ('\$USER','Cleartext-Password',':=','\$PASS');"
-					echo "\$USER \$PASS"
+					echo "MySQL USER/PASS: \$USER \$PASS"
 				else
 					echo "user '\$USER' already exists"
 				fi
@@ -146,7 +145,7 @@ if [ "$1" = 'radiusd' ]; then
 					USER=$(grep -v ^# /key/user_pass.txt |grep -v ^$ |sed -n ''$i'p' |awk '{print $1}')
 					PASS=$(grep -v ^# /key/user_pass.txt |grep -v ^$ |sed -n ''$i'p' |awk '{print $2}')
 					echo "$USER Cleartext-Password := \"$PASS\"" >>/etc/raddb/mods-config/files/authorize
-					echo "$USER $PASS"
+					echo "USER/PASS: $USER $PASS"
 					let  i++
 				done
 				\cp /etc/raddb/mods-config/files/authorize /key/
@@ -170,7 +169,7 @@ if [ "$1" = 'radiusd' ]; then
 				IPADDR=$(grep -v ^# /key/ipaddr_secret.txt |grep -v ^$ |sed -n ''$i'p' |awk '{print $1}')
 				SECRET=$(grep -v ^# /key/ipaddr_secret.txt |grep -v ^$ |sed -n ''$i'p' |awk '{print $2}')
 				echo -e "\nclient client_$n {\n    ipaddr = $IPADDR\n    secret = $SECRET\n    require_message_authenticator = no\n}" >>/etc/raddb/clients.conf
-				echo "$IPADDR $SECRET"
+				echo "IPADDR/SECRET: $IPADDR $SECRET"
 				let  i++
 				let  n++
 			done
@@ -186,16 +185,8 @@ if [ "$1" = 'radiusd' ]; then
 			sed -i "s@1813/@$(($RADIUS_PORT+1))/@g" /etc/services
 		fi	
 
-		#iptables
-		if [ "$IPTABLES" == "Y" ]; then
-			cat > /iptables.sh <<-END
-			iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-			iptables -I INPUT -p udp -m state --state NEW -m udp --dport $RADIUS_PORT:$(($RADIUS_PORT+1)) -m comment --comment RADIUS -j ACCEPT
-			END
-		fi
 	fi
 
-	[ -f /iptables.sh ] && [ -z "`iptables -S |grep RADIUS`" ] && . /iptables.sh
 	exec "$@"
 else
 	HELP
