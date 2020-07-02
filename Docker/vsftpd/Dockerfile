@@ -16,5 +16,5 @@ EXPOSE 21 25000:25100
 CMD ["/usr/sbin/init"]
 
 # docker build -t vsftpd .
-# docker run -d --restart unless-stopped --network host --cap-add NET_ADMIN -v /docker:/home -e IPTABLES=Y --name vsftp jiobxn/vsftpd
+# docker run -d --restart unless-stopped --network host --cap-add NET_ADMIN -v /docker:/home -v /docker/ftp:/key/ -e IPTABLES=Y --name vsftp jiobxn/vsftpd
 # docker logs vsftp
