@@ -7,10 +7,10 @@ if [ "$1" = 'openvpn' ]; then
 : ${VPN_PORT:=1194}
 : ${TCP_UDP:=tcp}
 : ${TAP_TUN:=tun}
-: ${VPN_PASS:=$(strings /dev/urandom |tr -dc A-Za-z0-9 |head -c15)}
+: ${VPN_PASS:=$(openssl rand -base64 10 |tr -dc [:alnum:])}
 : ${GATEWAY_VPN:=Y}
 : ${C_TO_C:=Y}
-: ${PROXY_PASS:=$(strings /dev/urandom |tr -dc A-Za-z0-9 |head -c15)}
+: ${PROXY_PASS:=$(openssl rand -base64 10 |tr -dc [:alnum:])}
 : ${PROXY_PORT:=8080}
 : ${DNS1:=9.9.9.9}
 : ${DNS2:=8.8.8.8}
@@ -409,7 +409,7 @@ else
 
 	echo -e "
 	Example
-			docker run -d --restart unless-stopped --cap-add=NET_ADMIN --device=/dev/net/tun \\
+			docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun \\
 			-v /docker/openvpn:/key \\
 			-p 1194:1194 \\
 			-p <8080:8080> \\
