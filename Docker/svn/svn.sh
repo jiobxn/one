@@ -6,15 +6,14 @@ if [ "$1" = 'httpd' ]; then
 : ${REPOS:="repos"}
 : ${ADMIN:="admin"}
 : ${USER:="user1"}
-: ${ADMIN_PASS:="$(openssl rand -hex 10)"}
-: ${USER_PASS:="$(openssl rand -hex 6)"}
+: ${ADMIN_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
+: ${USER_PASS:="$(openssl rand -base64 8 |tr -dc [:alnum:])"}
 : ${SVN_PORT:="3690"}
 : ${HTTP_PORT:="80"}
 : ${HTTPS_PORT:="443"}
 
 
 if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	echo "Initialize httpd"
 	#key
 	if [ -f /key/server.crt -a -f /key/server.key ]; then
@@ -175,8 +174,8 @@ else
 				-e ADMIN=[admin] \\
 				-e USER=[user1] \\
 				-e ANON=<Y> \\
-				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\
-				-e USER_PASS=[$(openssl rand -hex 6)] \\
+				-e ADMIN_PASS=[RANDOM] \\
+				-e USER_PASS=[RANDOM] \\
 				-e SVNADMIN=<Y> \\
 				--name svn svn
 
