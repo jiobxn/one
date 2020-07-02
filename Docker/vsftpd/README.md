@@ -76,7 +76,7 @@ VSFTPD
 
 
 	echo -e '# -- user  -- passwd  -- chmod  -- root -- # \nadmin:123456:15:admin\npublic:123456:7:admin/public\nboss:123456:15:' |tee /docker/ftp/user.txt
-	# boss用户可以创建/删除，目录列表不可见，可通过 lftp 工具
+	# boss用户可以创建/删除，目录列表不可见，可通过lftp工具
 
 **windows 使用ftp://x.x.x.x访问**  
 200 Switching to ASCII mode.  
