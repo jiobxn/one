@@ -8,10 +8,10 @@ Zabbix
 ## Example:
 
     #运行一个zabbix服务器
-    docker run -d --restart unless-stopped -v /docker/zabbix-db:/var/lib/mysql -p 11080:80 --name zabbix jiobxn/zabbix
+    docker run -d --restart unless-stopped -v /docker/zabbix-db:/var/lib/mysql -p 10080:80 -e TZ=Asia/Shanghai --name zabbix jiobxn/zabbix
 
     #运行一个zabbix客户端
-    docker run -d --restart unless-stopped --network host -e ZBX_SERVER_HOST=<zabbix-server-address> --name agent zabbix/zabbix-agent
+    docker run -d --restart unless-stopped --network host -e ZBX_SERVER_HOST=<zabbix-server-address> -e TZ=Asia/Shanghai --name agent zabbix/zabbix-agent
 
     #使用alpine镜像zabbix/zabbix-appliance添加中文支持
     docker cp /usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc zabbix:/usr/share/zabbix/assets/fonts/DejaVuSans.ttf
@@ -33,7 +33,6 @@ Zabbix
 			-e ZABBIX_DB=[zabbix] \\
 			-e SERVER_PORT=[10051] \\
 			-e AGENTD_PORT=[10050] \\
-			-e TZ=[Asia/Shanghai] \\
 			--name zabbix zabbix
 
 提示：被动模式是 server --> agent(10050端口) 。主动模式是 agent --> server(10050端口)。
