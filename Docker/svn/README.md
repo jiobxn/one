@@ -7,10 +7,10 @@ SVN
 
 ## Example:
 
-    docker run -d --restart unless-stopped -p 10080:80 -p 10443:443 -v /docker/svn:/home/svn --name svn jiobxn/svn
+    docker run -d --restart unless-stopped -p 10080:80 -p 10443:443 -e TZ=Asia/Shanghai -v /docker/svn:/home/svn --name svn jiobxn/svn
     docker logs svn
 
-    #访问svn示例 http://redhat.xyz:10080/svn
+    #访问svn示例 http://<svn-server-ip>:10080/svn、http://<svn-server-ip>:10080/svnadmin
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
@@ -28,8 +28,8 @@ SVN
 				-e ADMIN=[admin] \\       #管理员用户
 				-e USER=[user1] \\        #普通用户
 				-e ANON=<Y> \\            #开启匿名用户，还需在authz配置 *=r
-				-e ADMIN_PASS=[$(openssl rand -hex 10)] \\   #随机密码
-				-e USER_PASS=[$(openssl rand -hex 6)] \\     #随机密码
+				-e ADMIN_PASS=[RANDOM] \\   #随机密码
+				-e USER_PASS=[RANDOM] \\    #随机密码
 				-e SVNADMIN=<Y> \\        #启用iF.SVNAdmin，图形化管理工具
 				--name svn svn
 
