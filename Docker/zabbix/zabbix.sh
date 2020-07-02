@@ -11,7 +11,6 @@ if [ "$1" = '/usr/sbin/init' ]; then
 : ${ZABBIX_DB:=zabbix}
 : ${SERVER_PORT:=10051}
 : ${AGENTD_PORT:=10050}
-: ${TZ:=Asia/Shanghai}
 
   if [ -d "/var/lib/mysql/$ZABBIX_DB" ]; then
   	if [ ! -f /sql.txt ]; then
@@ -95,7 +94,6 @@ else
 			-e ZABBIX_DB=[zabbix] \\
 			-e SERVER_PORT=[10051] \\
 			-e AGENTD_PORT=[10050] \\
-			-e TZ=[Asia/Shanghai] \\
 			--name zabbix zabbix
 		"	
 fi
