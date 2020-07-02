@@ -20,8 +20,12 @@ VSFTPD
 
 ## Example:
 
-    docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN -v /docker/ftp:/key/ -v /docker:/home -e IPTABLES=Y --name vsftp jiobxn/vsftpd
-    cat /docker/ftp/ftp.log
+    #运行一个被动模式ftp
+    echo -e '# -- user  -- passwd  -- chmod  -- root -- # \nadmin:123456:15:admin\npublic:123456:7:admin/public\nsee:123456:4:admin' |tee /docker/ftp/user.txt
+    docker run -d --restart unless-stopped --network host --cap-add NET_ADMIN -v /docker/ftp:/key/ -v /docker:/home -e IPTABLES=Y --name vsftp jiobxn/vsftpd
+    
+    #运行一个主动模式ftp
+    docker run -d --privileged --restart unless-stopped -p 21:21 -v /docker/ftp:/key/ -v /docker:/home -e PASV_DISABLE=Y --name vsftp  jiobxn/vsftpd
 
 
 ## Run Defult Parameter
@@ -33,10 +37,10 @@ VSFTPD
 				-p 21:21 \\
 				-p 25000-25100:25000-25100 \\
 				-e FTP_PORT=[21] \\       监听端口
-				-e PASV_PORT=[25000:25100]    被动模式数据端口范围
+				-e PASV_PORT=[25000:25100]    被动模式数据端口范围，默认
 				-e FTP_UID=[21000] \\     FTP用户UID
 				-e FTP_USER=[vsftpd] \\   管理员用户
-				-e FTP_PASS=[$(openssl rand -hex 10)] \\    随机密码
+				-e FTP_PASS=[RANDOM] \\   随机密码
 				-e ANON_ROOT=[public] \\  匿名用户目录
 				-e ANON_CHMOD=[4] \\      匿名用户权限(只读)
 				-e MAX_CLINT=[0] \\       最大客户端
@@ -65,13 +69,13 @@ VSFTPD
 	9 upload, delete
 	10 create, delete
 	11 upload, create, delete
-	12 download, delete
+	12 download, create, delete
 	13 upload, download, delete
 	14 download, delete
 	15 upload, create, download, delete
 
 
-	echo -e '# -- user  -- passwd  -- chmod  -- root -- # \nadmin:123456:15:admin\npublic:123456:7:admin/public\nboss:123456:4:' |tee /docker/ftp/user.txt
+	echo -e '# -- user  -- passwd  -- chmod  -- root -- # \nadmin:123456:15:admin\npublic:123456:7:admin/public\nsee:123456:4:admin' |tee /docker/ftp/user.txt
 
 
 **windows 使用ftp://x.x.x.x访问**  
