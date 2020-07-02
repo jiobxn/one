@@ -27,6 +27,6 @@ EXPOSE 80
 
 CMD ["/usr/sbin/init"]
 
-# docker build -t zabbix . 
+# docker build --build-arg zabbix_v=4.4 -t zabbix . 
 # docker run -d --restart unless-stopped -v /docker/zabbix-db:/var/lib/mysql -p 9900:80 --name zabbix zabbix
 # rpm -ivh https://repo.zabbix.com/zabbix/4.4/rhel/8/x86_64/$(curl -s https://repo.zabbix.com/zabbix/4.4/rhel/8/x86_64/ |awk -F\" '{print $2}' |grep zabbix-release |tail -1)
