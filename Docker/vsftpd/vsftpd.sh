@@ -334,7 +334,7 @@ INIT_FTP() {
 		ROOT=$(echo $i |awk -F: '{print $NF}')
 		
 		if [ -n "$USER" ]; then
-			[ -z "$PASS" ] && PASS=$(openssl rand -hex 5)
+			[ -z "$PASS" ] && PASS=$(openssl rand -base64 8 |tr -dc [:alnum:])
 			[ -z "$CHMOD" ] && CHMOD=4
 			
 			USER_CHMOD
@@ -445,6 +445,15 @@ INIT_FTP() {
 		ssl_ciphers=HIGH
 		END
 	fi
+
+	#iptables
+	if [ "$IPTABLES" == "Y" ]; then
+		cat > /iptables.sh <<-END
+		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $FTP_PORT -m comment --comment VSFTPD -j ACCEPT
+		iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport $PASV_PORT -m comment --comment VSFTPD -j ACCEPT
+		END
+	fi
 }
 
 
@@ -452,7 +461,7 @@ INIT_FTP() {
 HELP() {
 	echo -e "
 	Example:
-				docker run -d --restart unless-stopped \\
+				docker run -d --restart unless-stopped --network host --cap-add NET_ADMIN \\
 				-v /docker:/home \\
 				-v /docker/ftp:/key \\
 				-p 21:21 \\
@@ -472,6 +481,7 @@ HELP() {
 				-e PASV_DISABLE=<Y> \\
 				-e DATA_PORT=[20] \\
 				-e FTP_SSL=<Y> \\
+				-e IPTABLES=<Y> \\
 				--name vsftpd vsftpd
 	
 	chmod mask:
@@ -502,6 +512,7 @@ if [ "$1" = '/usr/sbin/init' ]; then
 		INIT_FTP
 	fi
 
+	[ -f /iptables.sh ] && [ -z "`iptables -S |grep VSFTPD`" ] && . /iptables.sh
 	vsftpd
 	exec "$@"
 else
