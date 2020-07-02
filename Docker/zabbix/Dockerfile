@@ -1,10 +1,10 @@
 FROM centos:8
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
+ARG zabbix_v="5.0"
 
 RUN yum clean all && yum -y update \
-        && zabbix_v=$(curl -s https://repo.zabbix.com/zabbix/ |awk -F\" '$1=="<a href="{print $2}' |tail -1) \
-        && zabbix_f=$(curl -s https://repo.zabbix.com/zabbix/$zabbix_v/rhel/8/x86_64/ |awk -F\" '{print $2}' |grep zabbix-release |tail -1) \
+        && zabbix_f=$(curl -s https://repo.zabbix.com/zabbix/${zabbix_v}/rhel/8/x86_64/ |awk -F\" '{print $2}' |grep zabbix-release |tail -1) \
         && rpm -ivh https://repo.zabbix.com/zabbix/$zabbix_v/rhel/8/x86_64/$zabbix_f \
         && mysql_v=$(curl -s https://repo.mysql.com/yum/ |awk -F- '$2~"^[0-9]"{print $2}' |tail -1) \
         && mysql_V=$(curl -s https://dev.mysql.com/downloads/mysql/$mysql_v.html#downloads |grep "<h1>" |awk '{print $4}') \
