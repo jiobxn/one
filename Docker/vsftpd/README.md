@@ -21,11 +21,12 @@ VSFTPD
 ## Example:
 
     #运行一个被动模式ftp
+    mkdir -p /docker/ftp
     echo -e '# -- user  -- passwd  -- chmod  -- root -- # \nadmin:123456:15:admin\npublic:123456:7:admin/public\nsee:123456:4:admin' |tee /docker/ftp/user.txt
     docker run -d --restart unless-stopped --network host --cap-add NET_ADMIN -v /docker/ftp:/key/ -v /docker:/home -e IPTABLES=Y --name vsftp jiobxn/vsftpd
     
     #运行一个主动模式ftp
-    docker run -d --privileged --restart unless-stopped -p 21:21 -v /docker/ftp:/key/ -v /docker:/home -e PASV_DISABLE=Y --name vsftp  jiobxn/vsftpd
+    docker run -d --privileged --restart unless-stopped -p 21:21 -v /docker/ftp:/key/ -v /docker:/home -e PASV_DISABLE=Y -e TZ=Asia/Shanghai --name vsftp  jiobxn/vsftpd
 
 
 ## Run Defult Parameter
