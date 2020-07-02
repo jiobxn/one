@@ -31,7 +31,7 @@ VSFTPD
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart unless-stopped --network host --cap-add=NET_ADMIN \\
+				docker run -d --restart unless-stopped --network host --cap-add NET_ADMIN \\
 				-v /docker:/home \\
 				-v /docker/ftp:/key \\
 				-p 21:21 \\
@@ -42,7 +42,7 @@ VSFTPD
 				-e FTP_USER=[vsftpd] \\   管理员用户
 				-e FTP_PASS=[RANDOM] \\   随机密码
 				-e ANON_ROOT=[public] \\  匿名用户目录
-				-e ANON_CHMOD=[4] \\      匿名用户权限(只读)
+				-e ANON_CHMOD=[4] \\      匿名用户权限(只读)，N禁用
 				-e MAX_CLINT=[0] \\       最大客户端
 				-e MAX_CONN=[0] \\        最大并发数(单IP)
 				-e ANON_MB=[0] \\         匿名用户传输速度
