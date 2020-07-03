@@ -2,7 +2,7 @@ FROM centos:latest
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN yum clean all; yum -y update; yum -y install rsyslog httpd net-tools cronie; yum clean all
+RUN yum clean all; yum -y update; yum -y install rsyslog httpd net-tools; yum clean all
 
 RUN ln -s /var/log/rsyslog /var/www/html/down \
         && curl -s https://raw.githubusercontent.com/jiobxn/one/master/Docker/rsyslog/index.html >/var/www/html/index.html \
