@@ -25,3 +25,11 @@ tinyFecVPN
 				-e DNAT=<2222|22,53|1.1.1.1:53> \\   #端口转发 本地端口|目的[IP和]端口
 				-e SNAT=<Y> \\                       #SNAT
 				--name tinyvpn tinyvpn
+
+****
+
+客户端全局代理模式示例
+
+    ip ro add <VPN SERVER> via 172.17.0.1 dev eth0
+    ip ro del default via 172.17.0.1 dev eth0
+    ip ro add 0.0.0.0/0 via 10.22.0.1
