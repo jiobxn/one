@@ -7,7 +7,7 @@ Rsyslog
 
 ## Example:
 
-    docker run -d --restart unless-stopped -p 514:514 -p 514:514/udp -p 10080:80 -v /docker/rsyslog:/var/log/rsyslog --name rsyslog jiobxn/rsyslog
+    docker run -d --restart unless-stopped -p 514:514 -p 514:514/udp -p 10080:80 -v /docker/rsyslog:/var/log/rsyslog -e TZ=Asia/Shanghai --name rsyslog jiobxn/rsyslog
 
 ### Linux Client配置
 
