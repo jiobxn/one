@@ -8,15 +8,15 @@ tinyFecVPN
 ## Example:
 
     #运行一个server实例
-    docker run -d --restart unless-stopped --privileged -p 8000:8000/udp --name tinyvpn jiobxn/tinyvpn
+    docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun -p 8000:8000/udp --name tinyvpn jiobxn/tinyvpn
     
     #运行一个client实例
-    docker run -d --restart unless-stopped --privileged -e VPN_SERVER=<IPADDR> -e VPN_PASS=<PASS> --name tinyvpn jiobxn/tinyvpn
+    docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun -e VPN_SERVER=<IPADDR> -e VPN_PASS=<PASS> --name tinyvpn jiobxn/tinyvpn
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart unless-stopped --privileged \\
+				docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun \\
 				-p 8000:8000/udp \\
 				-e VPN_PORT=[8000] \\                #服务端口
 				-e VPN_SERVER=<IPADDR> \\            #服务器IP
@@ -25,4 +25,3 @@ tinyFecVPN
 				-e DNAT=<2222|22,53|1.1.1.1:53> \\   #端口转发 本地端口|目的[IP和]端口
 				-e SNAT=<Y> \\                       #SNAT
 				--name tinyvpn tinyvpn
-
