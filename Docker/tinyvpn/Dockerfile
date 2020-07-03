@@ -2,6 +2,7 @@ FROM alpine:latest
 MAINTAINER "The Alpine Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
+RUN echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 RUN apk update && apk add git iptables make g++ linux-headers openssl mtr tzdata bash && rm -rf /var/cache/apk/* \
         && cd /mnt \
         && git clone --recursive https://github.com/wangyu-/tinyfecVPN.git \
