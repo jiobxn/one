@@ -94,7 +94,7 @@ esle
 			-e SQUID_USER=<jiobxn> \\
 			-e SQUID_PASS=[RANDOM] \\
 			-e MAX_AUTH=[5] \\
-			-e PROXY_SERVER=<"10.0.0.2,10.0.0.3" | "www.redhat.xyz|10.0.0.4;api.redhat.xyz|10.0.0.5"> \\
+			-e PROXY_SERVER=<"10.0.0.2,10.0.0.3" | "www.example.com|10.0.0.4;test.example.com|10.0.0.5"> \\
 			-e PROXY_HTTPS=<Y> \\
 			--name squid squid
 	"
