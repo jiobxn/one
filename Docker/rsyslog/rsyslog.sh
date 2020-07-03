@@ -9,8 +9,6 @@ set -e
 if [ "$1" = 'rsyslogd' ]; then
 
 if [ -z "$(grep "redhat.xyz" /etc/rsyslog.d/remote.conf)" ]; then
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-
 	cat >>/etc/rsyslog.d/remote.conf <<-END
 	#redhat.xyz	
 	\$ModLoad imudp
