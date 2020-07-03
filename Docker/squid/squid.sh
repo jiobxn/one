@@ -3,10 +3,10 @@ set -e
 
 if [ "$1" = 'squid' ]; then
 
-: ${SQUID_PASS:=$(pwmake 64)}
-: ${MAX_AUTH:=5}
-: ${HTTP_PORT=3128}
-: ${HTTPS_PORT=43128}
+: ${SQUID_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
+: ${MAX_AUTH:="5"}
+: ${HTTP_PORT="3128"}
+: ${HTTPS_PORT="43128"}
 
 
 if [ -z "$(grep "redhat.xyz" /etc/squid/squid.conf)" ]; then
@@ -43,7 +43,7 @@ if [ -z "$(grep "redhat.xyz" /etc/squid/squid.conf)" ]; then
 	sed -i 's@http_port 3128@http_port '$HTTP_PORT'\nhttps_port '$HTTPS_PORT' cert=/etc/squid/server.crt key=/etc/squid/server.key@' /etc/squid/squid.conf
 
 
-	if [ $PROXY_SERVER ]; then
+	if [ "$PROXY_SERVER" ]; then
 		if [ -z "$(echo $PROXY_SERVER |egrep '\||;')" ]; then
 			for i in $(echo $PROXY_SERVER |sed 's/,/\n/g'); do
 				if [ -n "$(echo $i |grep ':')" ]; then
@@ -88,15 +88,14 @@ fi
 esle
 	echo -e "
 	Example
-			docker run -d --restart always \\
+			docker run -d --restart unless-stopped \\
 			-p 8080:3128 \\
 			-p 8443:43128 \\
 			-e SQUID_USER=<jiobxn> \\
-			-e SQUID_PASS=<123456> \\
+			-e SQUID_PASS=[RANDOM] \\
 			-e MAX_AUTH=[5] \\
-			-e PROXY_SERVER=<"10.0.0.2,10.0.0.3" | "www.redhat.xyz|10.0.0.4;redhat.xyz|10.0.0.5"> \\
+			-e PROXY_SERVER=<"10.0.0.2,10.0.0.3" | "www.redhat.xyz|10.0.0.4;api.redhat.xyz|10.0.0.5"> \\
 			-e PROXY_HTTPS=<Y> \\
-			--hostname squid \\
 			--name squid squid
 	"
 fi
