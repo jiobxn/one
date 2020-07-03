@@ -2,7 +2,7 @@ FROM alpine:latest
 MAINTAINER "The Alpine Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN apk update && apk add git iptables make g++ linux-headers openssl tzdata bash && rm -rf /var/cache/apk/* \
+RUN apk update && apk add git iptables make g++ linux-headers openssl mtr tzdata bash && rm -rf /var/cache/apk/* \
         && cd /mnt \
         && git clone --recursive https://github.com/wangyu-/tinyfecVPN.git \
         && git clone --recursive https://github.com/wangyu-/tinyPortMapper.git \
@@ -23,4 +23,4 @@ ENTRYPOINT ["/tinyvpn.sh"]
 CMD ["TINYVPN"]
 
 # docker build -t tinyvpn .
-# docker run -d --restart unless-stopped --privileged -p 8000:8000/udp --name tinyvpn tinyvpn
+# docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun -p 8000:8000/udp --name tinyvpn tinyvpn
