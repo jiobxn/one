@@ -32,9 +32,6 @@ if [ ! -f /usr/local/bin/TINYVPN ]; then
 	#SNAT
 	if [ "$SNAT" ]; then
 		: ${DEV:="$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)"}
-		
-		sysctl -w net.ipv4.ip_forward=1
-		echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
 		cat > /iptables.sh <<-END
 		iptables -t nat -I POSTROUTING -s $ADDR -o $DEV -j MASQUERADE
@@ -56,7 +53,7 @@ fi
 else
 	echo -e "
 	Example:
-				docker run -d --restart unless-stopped --privileged \\
+				docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun \\
 				-p 8000:8000/udp \\
 				-e VPN_PORT=[8000] \\
 				-e VPN_SERVER=<IPADDR> \\
