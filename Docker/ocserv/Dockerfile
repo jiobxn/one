@@ -1,8 +1,7 @@
-FROM centos:latest
+FROM centos:7
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN yum -y install epel-release; yum -y update; yum -y install ocserv iptables radiusclient-ng net-tools; yum clean all
 
 VOLUME /key
