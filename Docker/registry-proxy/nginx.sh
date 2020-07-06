@@ -2,7 +2,7 @@
 set -e
 
 : ${DOMAIN="img.io"}
-: ${NGX_PASS:="jiobxn.com"}
+: ${NGX_PASS:="$(openssl rand -base64 8 |tr -dc [:alnum:])"}
 : ${HTTP_PORT:="80"}
 : ${HTTPS_PORT:="443"}
 
@@ -115,17 +115,16 @@ else
 
 	echo -e " 
 	Example:
-				docker run -d --restart always \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/key:/key \\
-				-p 8080:80 \\
+				-p 80:80 \\
 				-p 443:443 \\
 				-e HTTP_PORT=[80] \\
 				-e HTTPS_PORT=[443] \\
 				-e DOMAIN=[img.io] \\
 				-e REG_SERVER=[127.0.0.1:5000] \\
-				-e NGX_USER=<nginx> \\
-				-e NGX_PASS=[jiobxn.com] \\
-				--hostname nginx \\
-				--name nginx nginx
+				-e NGX_USER=<admin> \\
+				-e NGX_PASS=[RANDOM] \\
+				--name registry-proxy registry-proxy
 	" 
 fi
