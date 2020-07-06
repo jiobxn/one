@@ -18,5 +18,5 @@ EXPOSE 443
 CMD ["ocserv", "-d", "1", "-f"]
 
 # docker build -t ocserv .
-# docker run -d --restart always --privileged -v /docker/ocserv:/key -p 443:443 -e VPN_USER=jiobxn --name ocserv ocserv
+# docker run -d --restart always --cap-add NET_ADMIN --device /dev/net/tun -v /docker/ocserv:/key -p 443:443 -e VPN_USER=jiobxn --name ocserv ocserv
 # cat /docker/ocserv/ocserv.log
