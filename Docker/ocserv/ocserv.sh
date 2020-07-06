@@ -107,7 +107,8 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	sed -i "s/#dns = 192.168.1.2/dns = $DNS1\ndns = $DNS2/" /etc/ocserv/ocserv.conf
 	sed -i "s@user-profile = profile.xml@#user-profile = profile.xml@" /etc/ocserv/ocserv.conf
 
-	
+
+	#User
 	if [ "$VPN_USER" ]; then
 		sed -i 's/#auth = "plain/auth = "plain/g' /etc/ocserv/ocserv.conf
 		(echo "${VPN_PASS}"; sleep 1; echo "${VPN_PASS}") | ocpasswd -c "/etc/ocserv/ocpasswd" ${VPN_USER}
@@ -118,6 +119,7 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	fi
 
 
+	#Radius
 	if [ "$RADIUS_SERVER" ];then
 		sed -i "s/localhost/$RADIUS_SERVER/g" /etc/radiusclient-ng/radiusclient.conf
 		echo "$RADIUS_SERVER  $RADIUS_SECRET" >>/etc/radiusclient-ng/servers
@@ -134,6 +136,7 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	fi
 
 
+	#Gateway
 	if [ "$GATEWAY_VPN" = "Y" ]; then
 		sed -i "s@# 'default'.@route = default@g" /etc/ocserv/ocserv.conf
 	else
@@ -141,8 +144,20 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	fi
 
 
-	sysctl -w net.ipv4.ip_forward=1
-	echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+	#Add route
+	if [ "$PUSH_ROUTE" ]; then
+		for i in $(echo $PUSH_ROUTE |sed 's/,/\n/g'); do
+			echo -e "\nroute = $i" >>/etc/ocserv/ocserv.conf
+		done
+	fi
+
+
+	#Add exclude route
+	if [ "$NO_ROUTE" ]; then
+		for i in $(echo $NO_ROUTE |sed 's/,/\n/g'); do
+			echo -e "\nno-route = $i" >>/etc/ocserv/ocserv.conf
+		done
+	fi
 
 
 	# iptables
@@ -183,8 +198,10 @@ else
 			-e CA_CN=["OpenConnect CA"] \\
 			-e GATEWAY_VPN=[Y] \\
 			-e IP_RANGE=[10.10.0] \\
-			-e DNS1:=[9.9.9.9] \\
-			-e DNS2:=[8.8.8.8] \\
+			-e PUSH_ROUTE=<1.1.1.1/255.255.255.255,192.168.2.0/255.255.255.0>
+			-e NO_ROUTE=<5.5.5.5/255.255.255.255,192.168.3.0/255.255.255.0>
+			-e DNS1=[9.9.9.9] \\
+			-e DNS2=[8.8.8.8] \\
 			-e RADIUS_PORT=[1812] \\
 			-e RADIUS_SERVER:=<radius ip> \\
 			-e RADIUS_SECRET:=[testing123] \\
