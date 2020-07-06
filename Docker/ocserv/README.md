@@ -15,12 +15,12 @@ OCSERV
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-			docker run -d --restart unless-stopped --privileged \\
+			docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun \\
 			-v /docker/ocserv:/key \\
 			-p 443:443 \\
 			-e VPN_PORT=[443] \\       VPN端口
 			-e VPN_USER=<jiobxn> \\    VPN用户名
-			-e VPN_PASS=<123456> \\    VPN密码，默认随机
+			-e VPN_PASS=[RANDOM] \\    VPN密码，默认随机
 			-e P12_PASS=[jiobxn.com] \\  p12证书密码
 			-e MAX_CONN=[3] \\           每个客户端的最大连接数
 			-e MAX_CLIENT=[253] \\       最大客户端数
@@ -28,7 +28,9 @@ OCSERV
 			-e CLIENT_CN=["AnyConnect VPN"] \\   P12证书标识，便于在iphone上识别
 			-e CA_CN=["OpenConnect CA"] \\       CA证书标识
 			-e GATEWAY_VPN=[Y]         \\        默认VPN做网关
-			-e IP_RANGE=[10.10.0] \\        分配的IP地址池
+			-e IP_RANGE=[10.10.0] \\            分配的IP地址池
+			-e PUSH_ROUTE=<1.1.1.1/255.255.255.255,192.168.2.0/255.255.255.0> \\
+			-e NO_ROUTE=<5.5.5.5/255.255.255.255,192.168.3.0/255.255.255.0> \\
 			-e DNS1:=[9.9.9.9] \\
 			-e DNS2:=[8.8.8.8] \\
 			-e RADIUS_PORT=[1812] \\             radius 端口
@@ -44,9 +46,8 @@ OCSERV
 ### Linux Client:
 
     1. yum -y install openconnect
-    2. 使用证书登陆 openconnect -c ocserv.p12 https://Server-IP-Address:Port --key-password=$P12_PASS -q &
-    3.用户名密码登陆 echo "$VPN_PASS" | openconnect https://Server-IP-Address:Port --user=$VPN_USER --passwd-on-stdin -q &
-    #老版本需要添加：--no-cert-check
+    2. 使用证书登陆 echo yes | openconnect -c ocserv.p12 https://Server-IP-Address:Port --key-password=jiobxn.com -q
+    3. 用户名密码登陆 echo $VPN_PASS | openconnect https://Server-IP-Address:Port --user=$VPN_USER --passwd-on-stdin -q 
 
 ### Windows Client:
 
