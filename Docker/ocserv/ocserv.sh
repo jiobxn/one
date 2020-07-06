@@ -3,33 +3,33 @@ set -e
 
 if [ "$1" = 'ocserv' ]; then
 
-: ${IP_RANGE:=10.10.0}
-: ${VPN_PORT:=443}
-: ${VPN_PASS:=$(pwmake 64)}
-: ${P12_PASS:=jiobxn.com}
-: ${MAX_CONN:=3}
-: ${MAX_CLIENT:=253}
+: ${IP_RANGE:="10.10.0"}
+: ${VPN_PORT:="443"}
+: ${VPN_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
+: ${P12_PASS:="jiobxn.com"}
+: ${MAX_CONN:="3"}
+: ${MAX_CLIENT:="253"}
 : ${CA_CN:="OpenConnect CA"}
 : ${CLIENT_CN:="AnyConnect VPN"}
-: ${GATEWAY_VPN:=Y}
-: ${DNS1:=9.9.9.9}
-: ${DNS2:=8.8.8.8}
+: ${GATEWAY_VPN:="Y"}
+: ${DNS1:="9.9.9.9"}
+: ${DNS2:="8.8.8.8"}
 : ${RADIUS_PORT:="1812"}
-: ${RADIUS_SECRET:=testing123}
+: ${RADIUS_SECRET:="testing123"}
 
 
 if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	# Get ip address
-	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
-	if [ -z $SERVER_CN ]; then
+	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)
+	if [ -z "$SERVER_CN" ]; then
 		SERVER_CN=$(curl -s http://ip.sb/)
 	fi
 
-	if [ -z $SERVER_CN ]; then
+	if [ -z "$SERVER_CN" ]; then
 		SERVER_CN=$(curl -s https://showip.net/)
 	fi
 
-	if [ -z $SERVER_CN ]; then
+	if [ -z "$SERVER_CN" ]; then
 		SERVER_CN=$(ifconfig $DEV |awk '$3=="netmask"{print $2}')
 	fi
 
@@ -108,7 +108,7 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	sed -i "s@user-profile = profile.xml@#user-profile = profile.xml@" /etc/ocserv/ocserv.conf
 
 	
-	if [ $VPN_USER ]; then
+	if [ "$VPN_USER" ]; then
 		sed -i 's/#auth = "plain/auth = "plain/g' /etc/ocserv/ocserv.conf
 		(echo "${VPN_PASS}"; sleep 1; echo "${VPN_PASS}") | ocpasswd -c "/etc/ocserv/ocpasswd" ${VPN_USER}
 		INFOU="VPN USER: $VPN_USER\n	VPN PASS: $VPN_PASS"
@@ -118,7 +118,7 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	fi
 
 
-	if [ $RADIUS_SERVER ];then
+	if [ "$RADIUS_SERVER" ];then
 		sed -i "s/localhost/$RADIUS_SERVER/g" /etc/radiusclient-ng/radiusclient.conf
 		echo "$RADIUS_SERVER  $RADIUS_SECRET" >>/etc/radiusclient-ng/servers
 		sed -i 's/^auth /#auth /' /etc/ocserv/ocserv.conf
@@ -169,12 +169,12 @@ fi
 else
 	echo -e "
 	Example
-			docker run -d --restart always --privileged \\
+			docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun \\
 			-v /docker/ocserv:/key \\
 			-p 443:443 \\
 			-e VPN_PORT=[443] \\
 			-e VPN_USER=<jiobxn> \\
-			-e VPN_PASS=<123456> \\
+			-e VPN_PASS=[RANDOM] \\
 			-e P12_PASS=[jiobxn.com] \\
 			-e MAX_CONN=[3] \\
 			-e MAX_CLIENT=[253] \\
