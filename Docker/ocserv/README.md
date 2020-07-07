@@ -48,7 +48,7 @@ OCSERV
     1. yum -y install openconnect
     2. 使用证书登陆 echo yes | openconnect -c ocserv.p12 https://Server-IP-Address:Port --key-password=jiobxn.com -q
     3. 查看pin-sha256 openssl s_client -servername <Server-IP-Address> -connect <Server-IP-Address:Port> | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
-    3. 用户名密码登陆 echo $VPN_PASS | openconnect https://Server-IP-Address:Port --servercert <pin-sha256> --user=$VPN_USER --passwd-on-stdin -q 
+    4. 用户名密码登陆 echo $VPN_PASS | openconnect https://Server-IP-Address:Port --servercert <pin-sha256> --user=$VPN_USER --passwd-on-stdin -q 
 
 ### Windows Client:
 
