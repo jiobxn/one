@@ -13,7 +13,7 @@ kcp2raw
     docker run -d --restart unless-stopped --network host -e SERVICE=10.0.0.10:80 --name kcp2raw jiobxn/kcp2raw
     
     #运行一个client实例
-    docker run -d --restart unless-stopped --network host -e SERVER=<serverip:port> -e PASS=<passwd> --name kcp2raw jiobxn/kcp2raw
+    docker run -d --restart unless-stopped --network host -e SERVER=<serverip:2000> -e PASS=<passwd> --name kcp2raw jiobxn/kcp2raw
 
 
 ## Run Defult Parameter
@@ -23,7 +23,7 @@ kcp2raw
 				-p 20000:20000 \
 				-e POER=[20000] \\                    #默认服务端口 tcp
 				-e RPORT=[4000] \\                    #默认中转端口 udp
-				-e PASS=[$RANDOM] \\                  #默认随机密码
+				-e PASS=[RANDOM] \\                   #默认随机密码
 				-e SERVICE=<172.17.0.1:22> \\         #后端服务器IP和端口
 				-e SERVER=<12.34.56.78:20000> \\      #kcp2raw服务器IP和端口
 				--name kcp2raw kcp2raw
