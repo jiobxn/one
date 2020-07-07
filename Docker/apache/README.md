@@ -13,7 +13,7 @@ HTTPD
 
 ## Example:
 
-    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/www:/var/www/html -e TZ=Asia/Shanghai -e REDIS_SERVER=172.17.0.2 -e REDIS_PASS=bigpass --name httpd apache:5.6
+    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/www:/var/www/html -e TZ=Asia/Shanghai --name httpd jiobxn/apache
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
@@ -22,7 +22,7 @@ HTTPD
 			-v /docker/www:/var/www/html \\  http目录
 			-v /docker/www:/var/www \\       php目录
 			-v /docker/mp4:/boy \\           alias目录，在集群环境中通常挂载到分布式存储用于存储图片
-			-v /docker/key:/key \\           ssl证书{server.crt,server.kry}
+			-v /docker/key:/key \\           ssl证书{server.crt,server.kry,chain.crt}
 			-p 10080:80 \\   
 			-p 10443:443 \\
 			-p 9000:9000 \\
@@ -45,7 +45,6 @@ HTTPD
 			--name apache apache
 
 **关于日志记录客户端真实IP(nginx proxy)**  
-~~log_format 参数：$http_x_forwarded_for~~
 
     httpd.conf  197行    LogFormat "\"%{X-Real-IP}i\" %l %u %t \"%r\" %>s %b" common
 
