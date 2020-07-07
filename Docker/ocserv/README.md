@@ -34,11 +34,11 @@ OCSERV
 			-e IP_RANGE=[10.10.0] \\            分配的IP地址池
 			-e PUSH_ROUTE=<1.1.1.1/255.255.255.255,192.168.2.0/255.255.255.0> \\
 			-e NO_ROUTE=<5.5.5.5/255.255.255.255,192.168.3.0/255.255.255.0> \\
-			-e DNS1:=[9.9.9.9] \\
-			-e DNS2:=[8.8.8.8] \\
+			-e DNS1=[9.9.9.9] \\
+			-e DNS2=[8.8.8.8] \\
 			-e RADIUS_PORT=[1812] \\             radius 端口
-			-e RADIUS_SERVER:=<radius ip> \\     radius 服务器
-			-e RADIUS_SECRET:=[testing123] \\    radius 共享密钥
+			-e RADIUS_SERVER=<radius ip> \\     radius 服务器
+			-e RADIUS_SECRET=[testing123] \\    radius 共享密钥
 			--name ocserv ocserv
 
 ### IOS Client:
