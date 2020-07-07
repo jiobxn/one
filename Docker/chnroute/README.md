@@ -25,4 +25,4 @@ CHNRoute
 				-e SNAT=<Y> \\                                    #添加SNAT，分流上网必开
 				-e DEV=<default> \\                               #SNAT的出口网卡
 				-e RAN=<default> \\                               #SNAT的源IP段
-				--name chnroute jiobxn/chnroute
+				--name chnroute chnroute
