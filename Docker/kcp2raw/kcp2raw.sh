@@ -35,7 +35,7 @@ else
 				-p 20000:20000 \
 				-e POER=[20000] \\
 				-e RPORT=[4000] \\
-				-e PASS=[$RANDOM] \\
+				-e PASS=[RANDOM] \\
 				-e SERVICE=<172.17.0.1:22> \\
 				-e SERVER=<12.34.56.78:20000> \\
 				--name kcp2raw kcp2raw
