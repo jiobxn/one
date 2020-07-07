@@ -11,6 +11,9 @@ OCSERV
     #使用证书连接
     docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun -v /docker/ocserv:/key -p 443:443 --name ocserv jiobxn/ocserv
 
+    #使用用户连接
+    docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun -v /docker/ocserv:/key -e VPN_USER=admin -p 443:443 --name ocserv jiobxn/ocserv
+
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
