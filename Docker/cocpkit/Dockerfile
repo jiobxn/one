@@ -15,7 +15,7 @@ rm -f /lib/systemd/system/basic.target.wants/*;\
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 
 RUN systemctl enable cockpit.socket
-RUN echo -e '#!/bin/bash\n: ${PASS:=$(openssl rand -hex 10)}\n\nif [ ! -f /init.ok ]; then \n  echo "root:$PASS" | chpasswd\n  echo -e "root password: $PASS"\n  touch /init.ok\nfi\n\nexec "$@"' >/init.sh
+RUN echo -e '#!/bin/bash\n: ${PASS:=$(openssl rand -base64 10 |tr -dc [:alnum:])}\n\nif [ ! -f /init.ok ]; then \n  echo "root:$PASS" | chpasswd\n  echo -e "root password: $PASS"\n  touch /init.ok\nfi\n\nexec "$@"' >/init.sh
 RUN chmod +x /init.sh
 
 VOLUME [ "/sys/fs/cgroup" ]
@@ -23,4 +23,4 @@ ENTRYPOINT ["/init.sh"]
 CMD ["/usr/sbin/init"]
 
 # docker build -t cockpit .
-# docker run -d --restart unless-stopped --privileged -p 9090:9090 -v /sys/fs/cgroup:/sys/fs/cgroup:ro -e TZ=Asia/Shanghai --name webshell cockpit
+# docker run -d --restart unless-stopped --privileged -p 9090:9090 -v /sys/fs/cgroup:/sys/fs/cgroup:ro -e TZ=Asia/Shanghai --name cockpit cockpit
