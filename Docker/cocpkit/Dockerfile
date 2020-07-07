@@ -3,7 +3,7 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 ENV container docker
 
-RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install cockpit bash-completion vim wget openssh-server openssh-clients initscripts bind-utils net-tools; yum clean all
+RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install cockpit bash-completion wget openssh-server openssh-clients initscripts net-tools; yum clean all
 RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
 systemd-tmpfiles-setup.service ] || rm -f $i; done); \
 rm -f /lib/systemd/system/multi-user.target.wants/*;\
