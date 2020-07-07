@@ -169,10 +169,13 @@ if [ -z "$(grep "redhat.xyz" /etc/ocserv/ocserv.conf)" ]; then
 	iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 	END
 
+	HPKP="pin-sha256: $(openssl x509 -in /etc/pki/ocserv/public/server.crt -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64)"
+
 	echo -e "
 	$INFOC
 	$INFOU
-	SERVER: $SERVER_CN" |tee /key/ocserv.log
+	SERVER: $SERVER_CN
+	$HPKP" |tee /key/ocserv.log
 fi
 
 	echo
