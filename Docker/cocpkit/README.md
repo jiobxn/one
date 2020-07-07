@@ -8,7 +8,7 @@ COCPKIT
 ## Example:
 
     #运行一个默认实例
-    docker run -d --restart always --privileged -p 9090:9090 -v /sys/fs/cgroup:/sys/fs/cgroup:ro -e PASS=root@ssh@pass --name webshell cockpit
+    docker run -d --restart unless-stopped --privileged -p 9090:9090 -v /sys/fs/cgroup:/sys/fs/cgroup:ro --name cockpit jiobxn/cockpit
 
 
 ## Run Defult Parameter
@@ -17,5 +17,5 @@ COCPKIT
 				docker run -d --restart unless-stopped --privileged \\
 				-v /sys/fs/cgroup:/sys/fs/cgroup:ro \\
 				--p 9090:9090 \\
-				-e PASS=[openssl rand -hex 10] \\    #root密码
-				--name webshell cockpit
+				-e PASS=[RANDOM] \\    #root密码 默认随机
+				--name cockpit cockpit
