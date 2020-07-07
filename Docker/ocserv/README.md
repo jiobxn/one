@@ -8,8 +8,8 @@ OCSERV
 
 ## Example:
 
-    #推荐使用证书连接
-    docker run -d --restart unless-stopped --privileged -v /docker/ocserv:/key -p 443:443 --name ocserv jiobxn/ocserv
+    #使用证书连接
+    docker run -d --restart unless-stopped --cap-add NET_ADMIN --device /dev/net/tun -v /docker/ocserv:/key -p 443:443 --name ocserv jiobxn/ocserv
 
 
 ## Run Defult Parameter
