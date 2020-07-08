@@ -3,19 +3,19 @@ set -e
 
 if [ "$1" = 'pptpd' ]; then
 
-: ${IP_RANGE:=10.9.0}
-: ${VPN_USER:=jiobxn}
-: ${VPN_PASS:=$(pwmake 64)}
-: ${DNS1:=9.9.9.9}
-: ${DNS2:=8.8.8.8}
+: ${IP_RANGE:="10.9.0"}
+: ${VPN_USER:="jiobxn"}
+: ${VPN_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
+: ${DNS1:="1.1.1.1"}
+: ${DNS2:="8.8.8.8"}
 : ${RADIUS_PORT:="1812"}
-: ${RADIUS_SECRET:=testing123}
+: ${RADIUS_SECRET:="testing123"}
 
 
 if [ -z "$(grep "redhat.xyz" /etc/ppp/options.pptpd)" ]; then
 	echo "#redhat.xyz" >>/etc/ppp/options.pptpd
 	# Get ip address
-	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
+	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)
 	if [ -z $SERVER_IP ]; then
 		SERVER_IP=$(curl -s http://ip.sb)
 	fi
@@ -57,10 +57,6 @@ if [ -z "$(grep "redhat.xyz" /etc/ppp/options.pptpd)" ]; then
 		SERVER: $SERVER_IP" |tee /key/pptpd.log
 	fi
 
-	# router forward
-	sysctl -w net.ipv4.ip_forward=1
-	echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-
 	# iptables
 	cat > /iptables.sh <<-END
 	iptables -t nat -I POSTROUTING -s $IP_RANGE.0/24 -o $DEV -j MASQUERADE
@@ -85,8 +81,8 @@ else
 			-v /docker/pptpd:/key \\
 			--network host \\
 			-e VPN_USER=[jiobxn] \\
-			-e VPN_PASS=<123456> \\
-			-e DNS1:=[9.9.9.9] \\
+			-e VPN_PASS=[RANDOM] \\
+			-e DNS1:=[1.1.1.1] \\
 			-e DNS2:=[8.8.8.8] \\
 			-e RADIUS_PORT=[1812] \\
 			-e RADIUS_SERVER:=<radius ip> \\
