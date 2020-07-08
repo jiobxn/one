@@ -3,20 +3,20 @@ set -e
 
 if [ "$1" = 'strongswan' ]; then
 
-: ${IP_RANGE:=10.11.0}
-: ${VPN_USER:=jiobxn}
-: ${VPN_PASS:=$(pwmake 64)}
-: ${VPN_PSK:=jiobxn.com}
-: ${P12_PASS:=jiobxn.com}
+: ${IP_RANGE:="10.11.0"}
+: ${VPN_USER:="jiobxn"}
+: ${VPN_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
+: ${VPN_PSK:="jiobxn.com"}
+: ${P12_PASS:="jiobxn.com"}
 : ${CLIENT_CN:="strongSwan VPN"}
 : ${CA_CN:="strongSwan CA"}
 
 	
 if [ -z "$(grep "redhat.xyz" /etc/strongswan/ipsec.conf)" ]; then
 	# Get ip address
-	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }')
+	DEV=$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)
 	if [ -z $SERVER_CN ]; then
-		SERVER_CN=$(curl -s https://httpbin.org/ip |awk -F\" 'NR==2{print $4}')
+		SERVER_CN=$(curl -s http://ip.sb)
 	fi
 
 	if [ -z $SERVER_CN ]; then
@@ -75,7 +75,7 @@ if [ -z "$(grep "redhat.xyz" /etc/strongswan/ipsec.conf)" ]; then
 	#redhat.xyz
 	config setup
 	    uniqueids=never 
-	conn iOS_cert
+	conn user_pass_cert
 	    keyexchange=ikev1
 	    fragmentation=yes
 	    left=%defaultroute
@@ -85,11 +85,11 @@ if [ -z "$(grep "redhat.xyz" /etc/strongswan/ipsec.conf)" ]; then
 	    right=%any
 	    rightauth=pubkey
 	    rightauth2=xauth
-	    rightsourceip=$IP_RANGE.128/25
-	    rightdns=8.8.8.8,8.8.4.4
+	    rightsourceip=$IP_RANGE.0/25
+	    rightdns=8.8.8.8,1.1.1.1
 	    rightcert=client.crt
 	    auto=add
-	conn android_xauth_psk
+	conn user_pass_xauth_psk
 	    keyexchange=ikev1
 	    left=%defaultroute
 	    leftauth=psk
@@ -98,80 +98,8 @@ if [ -z "$(grep "redhat.xyz" /etc/strongswan/ipsec.conf)" ]; then
 	    rightauth=psk
 	    rightauth2=xauth
 	    rightsourceip=$IP_RANGE.128/25
-	    rightdns=8.8.8.8,8.8.4.4
+	    rightdns=8.8.8.8,1.1.1.1
 	    auto=add
-	conn networkmanager-strongswan
-	    keyexchange=ikev2
-	    left=%defaultroute
-	    leftauth=pubkey
-	    leftsubnet=0.0.0.0/0
-	    leftcert=server.crt
-	    right=%any
-	    rightauth=pubkey
-	    rightsourceip=$IP_RANGE.128/25
-	    rightdns=8.8.8.8,8.8.4.4
-	    rightcert=client.crt
-	    auto=add
-	conn ios_ikev2
-	    keyexchange=ikev2
-	    ike=aes256-sha256-modp2048,3des-sha1-modp2048,aes256-sha1-modp2048!
-	    esp=aes256-sha256,3des-sha1,aes256-sha1!
-	    rekey=no
-	    left=%defaultroute
-	    leftid=$SERVER_CN
-	    leftsendcert=always
-	    leftsubnet=0.0.0.0/0
-	    leftcert=server.crt
-	    right=%any
-	    rightauth=eap-mschapv2
-	    rightsourceip=$IP_RANGE.128/25
-	    rightdns=8.8.8.8,8.8.4.4
-	    rightsendcert=never
-	    eap_identity=%any
-	    dpdaction=clear
-	    fragmentation=yes
-	    auto=add
-	conn windows7
-	    keyexchange=ikev2
-	    ike=aes256-sha1-modp1024!
-	    rekey=no
-	    left=%defaultroute
-	    leftauth=pubkey
-	    leftsubnet=0.0.0.0/0
-	    leftcert=server.crt
-	    right=%any
-	    rightauth=eap-mschapv2
-	    rightsourceip=$IP_RANGE.128/25
-	    rightdns=8.8.8.8,8.8.4.4
-	    rightsendcert=never
-	    eap_identity=%any
-	    auto=add
-	conn L2TP-PSK
-	    keyexchange=ikev1
-	    authby=secret
-	    leftprotoport=17/1701
-	    leftfirewall=no
-	    rightprotoport=17/%any
-	    type=transport
-	    auto=add
-	END
-	
-	
-	# strongSwan configuration file
-	cat >/etc/strongswan/strongswan.conf <<-END
-	charon {
-		load_modular = yes
-		duplicheck.enable = no
-		compress = yes
-		plugins {
-			include strongswan.d/charon/*.conf
-		}
-		dns1 = 8.8.8.8
-		dns2 = 8.8.4.4
-		nbns1 = 8.8.8.8
-		nbns2 = 8.8.4.4
-	}
-	include strongswan.d/*.conf
 	END
 	
 	
@@ -184,59 +112,6 @@ if [ -z "$(grep "redhat.xyz" /etc/strongswan/ipsec.conf)" ]; then
 	END
 	
 	
-	# L2TP auth file
-	echo "$VPN_USER       l2tpd      $VPN_PASS          *" >> /etc/ppp/chap-secrets
-	
-	
-	# L2TP configuration file
-	cat >/etc/xl2tpd/xl2tpd.conf <<-END
-	[global]
-	listen-addr = 0.0.0.0
-	auth file = /etc/ppp/chap-secrets
-	port = 1701
-
-	[lns default]
-	ip range = $IP_RANGE.2-$IP_RANGE.126
-	local ip = $IP_RANGE.1
-	require chap = yes
-	refuse pap = yes
-	require authentication = yes
-	name = LinuxVPNserver
-	ppp debug = yes
-	pppoptfile = /etc/ppp/options.xl2tpd
-	length bit = yes
-	END
-	
-
-	# L2TP configuration file
-	cat >/etc/ppp/options.xl2tpd <<-END
-	ipcp-accept-local
-	ipcp-accept-remote
-	require-mschap-v2
-	ms-dns 8.8.8.8
-	ms-dns 8.8.4.4
-	asyncmap 0
-	noccp
-	auth
-	crtscts
-	idle 1800
-	mtu 1410
-	mru 1410
-	nodefaultroute
-	debug
-	lock
-	hide-password
-	modem
-	name l2tpd
-	proxyarp
-	lcp-echo-interval 30
-	lcp-echo-failure 4
-	connect-delay 5000
-	END
-
-	echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-	sysctl -p
-
 	# iptables
 	cat > /iptables.sh <<-END
 	iptables -t nat -I POSTROUTING -s $IP_RANGE.0/24 -o $DEV -j MASQUERADE
@@ -244,7 +119,6 @@ if [ -z "$(grep "redhat.xyz" /etc/strongswan/ipsec.conf)" ]; then
 	iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 	iptables -I INPUT -p udp -m state --state NEW -m udp --dport 500 -m comment --comment IPSEC -j ACCEPT
 	iptables -I INPUT -p udp -m state --state NEW -m udp --dport 4500 -m comment --comment IPSEC -j ACCEPT
-	iptables -I INPUT -p udp -m state --state NEW -m udp --dport 1701 -m comment --comment L2TP -j ACCEPT
 	iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 	END
 
@@ -259,42 +133,25 @@ fi
 	echo
 	echo "Start ****"
 	[ -z "`iptables -S |grep IPSEC`" ] && . /iptables.sh
-	/usr/sbin/xl2tpd
 	
-	exec "$@" &>/dev/null
+	exec "$@"
 
 else
 
 	echo -e "
 	Example
-			docker run -d --restart always --privileged \\
+			docker run -d --restart --cap-add NET_ADMIN --device /dev/net/tun \\
 			-v /docker/strongswan:/key \\
-			--network=host \\
+			-p 500:500/udp \\
+			-p 4500:4500/udp \\
 			-e VPN_USER=[jiobxn] \\
-			-e VPN_PASS=<123456> \\
+			-e VPN_PASS=[RANDOM] \\
 			-e VPN_PSK=[jiobxn.com] \\
 			-e P12_PASS=[jiobxn.com] \\
 			-e SERVER_CN=<SERVER_IP> \\
 			-e CLIENT_CN=["strongSwan VPN"] \\
 			-e CA_CN=["strongSwan CA"] \\
 			-e IP_RANGE=[10.11.0] \\
-			--hostname strongswan \\
 			--name strongswan strongswan
 	"
 fi
-
-#IOS Client:
-# L2TP: user+pass+psk
-# IPSec: user+pass+psk or user+pass+strongswan.p12, Note: Server is SERVER_CN
-# IKEv2: user+pass+ca.crt, Note: Remote ID is SERVER_CN, Local ID is user
-
-#Windows Client:
-# L2TP: user+pass+psk, --network=host
-# IKEv2: user+pass+ca.crt or user+pass+ca.crt+strongswan.p12, Note: Server is SERVER_CN. Certificate manage: certmgr.msc
-
-#Windows 10 BUG:
-# C:\Users\admin>powershell               #to PS Console
-# PS C:\Users\jiobx> get-vpnconnection    #Show IKEv2 vpn connection name
-# PS C:\Users\jiobx> set-vpnconnection "IKEv2-VPN-Name" -splittunneling $false    #Stop split tunneling
-# PS C:\Users\jiobx> get-vpnconnection    #list
-# PS C:\Users\jiobx> exit
