@@ -1,9 +1,8 @@
-FROM centos:latest
+FROM centos:7
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-RUN yum -y install epel-release; yum -y update; yum -y install strongswan xl2tpd openssl iptables cronie net-tools bash-completion vim; yum clean all
+RUN yum -y install epel-release; yum -y update; yum -y install strongswan openssl iptables net-tools; yum clean all
 
 VOLUME /key
 
@@ -14,10 +13,10 @@ WORKDIR /usr/sbin
 
 ENTRYPOINT ["/strongswan.sh"]
 
-EXPOSE 500/udp 4500/udp 1701/udp
+EXPOSE 500/udp 4500/udp
 
 CMD ["strongswan", "start", "--nofork"]
 
 # docker build -t strongswan .
-# docker run -d --restart always --privileged -v /docker/strongswan:/key --network=host -e VPN_PASS=123456 --hostname strongswan --name strongswan strongswan
+# docker run -d --restart unless-stopped -p 500:500/udp -p 4500:4500/udp --cap-add NET_ADMIN --device /dev/net/tun -v /docker/strongswan:/key --name strongswan strongswan
 # cat /docker/strongswan/strongswan.log
