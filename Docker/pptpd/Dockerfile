@@ -1,8 +1,7 @@
-FROM centos:latest
+FROM centos:7
 MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN yum -y install epel-release; yum -y update; yum -y install pptpd radiusclient-ng iptables wget net-tools; yum clean all
 RUN wget -c https://github.com/jiobxn/one/raw/master/Docker/pptpd/dictionary.microsoft -O /usr/share/radiusclient-ng/dictionary.microsoft
 
