@@ -97,7 +97,7 @@ if [ "$1" = 'catalina.sh' ]; then
 	#JVM Optimization
 	SIZE=$(($MAX_MEM/4))
 	MSIZE=$(($MAX_MEM/2))
-	sed -i '/# OS/ i JAVA_OPTS="-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms'$MAX_MEM'm -Xmx'$MAX_MEM'm -Xss256k -XX:NewSize='$SIZE'm -XX:MaxNewSize='$MSIZE'm -XX:PermSize=128m -XX:MaxPermSize=128m -XX:SurvivorRatio=1 -XX:ParallelGCThreads=8 -XX:-DisableExplicitGC -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:-UseGCOverheadLimit -Duser.timezone=Asia/Shanghai"\n' /tomcat/bin/catalina.sh   
+	sed -i '/# OS/ i JAVA_OPTS="-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms'$MAX_MEM'm -Xmx'$MAX_MEM'm -Xss256k -XX:NewSize='$SIZE'm -XX:MaxNewSize='$MSIZE'm -XX:SurvivorRatio=1 -XX:ParallelGCThreads=8 -XX:-DisableExplicitGC -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:-UseGCOverheadLimit -Duser.timezone=Asia/Shanghai"\n' /tomcat/bin/catalina.sh   
 
 	#JMX PORT
 	if [ $JMX_PORT ]; then
