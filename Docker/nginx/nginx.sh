@@ -15,7 +15,7 @@ set -e
 : ${CACHE_TIME:="10h"}
 : ${CACHE_SIZE:="2g"}
 : ${CACHE_MEM:="$(($(free -m |grep Mem |awk '{print $2}')*10/100))m"}
-: ${KP_ETH:="$(route -n |awk '$1=="0.0.0.0"{print $NF }')"}
+: ${KP_ETH:="$(route -n |awk '$1=="0.0.0.0"{print $NF}')"}
 : ${KP_VRID:="77"}
 : ${KP_PASS:="Newpa55"}
 : ${WORKER_PROC:="2"}
@@ -962,7 +962,7 @@ else
 
 	echo -e " 
 	Example:
-				docker run -d --restart unless-stopped [--privileged] \\
+				docker run -d --restart unless-stopped [--cap-add NET_ADMIN] \\
 				-v /docker/www:/usr/share/nginx/html \\
 				-v /docker/upload:/mp4 \\
 				-v /docker/key:/key \\
