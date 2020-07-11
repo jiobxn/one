@@ -81,7 +81,7 @@ if [ "$1" = 'mysqld' ]; then
 		
 		#Generate a random string
 		if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
-			MYSQL_ROOT_PASSWORD="$(pwmake 128)"
+			MYSQL_ROOT_PASSWORD="$(openssl rand -base64 12 |tr -dc [:alnum:])"
 		fi
 		
 		#Set the root password and remote database access
@@ -120,7 +120,7 @@ if [ "$1" = 'mysqld' ]; then
 		#Repl user
 		if [ "$REPL_IPR" ]; then
 			[ -z "$REPL_USER" ] && REPL_USER=repl
-			[ -z "$REPL_PASSWORD" ] && REPL_PASSWORD="$(pwmake 64)"
+			[ -z "$REPL_PASSWORD" ] && REPL_PASSWORD="$(openssl rand -base64 10 |tr -dc [:alnum:])"
 			echo -e "MYSQL REPL USER AND PASSWORD: $REPL_USER\t$REPL_PASSWORD" |tee $DATADIR/repl_info
 			echo "GRANT REPLICATION SLAVE ON *.*  TO '"$REPL_USER"'@'"$REPL_IPR"' IDENTIFIED BY '"$REPL_PASSWORD"' ;" | "${mysql[@]}"
 		fi
@@ -223,7 +223,7 @@ else
 				-v /docker/mysql-mini:/var/lib/mysql \\
 				-v /docker/sql:/docker-entrypoint-initdb.d \\
 				-p 3306:3306 \\
-				-e MYSQL_ROOT_PASSWORD=<newpass> \\
+				-e MYSQL_ROOT_PASSWORD=[RANDOM] \\
 				-e MYSQL_DATABASE=<zabbix> \\
 				-e MYSQL_USER=<zabbix> \\
 				-e MYSQL_PASSWORD=<zbxpass> \\
@@ -237,7 +237,7 @@ else
 				-e MASTER_HOST=<10.0.0.50> \\
 				-e MASTER_PORT=[3306] \\
 				-e MYSQL_MODE=<NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION> \\
-				-e MYSQL_GENERAL_LOG=Y \\
+				-e MYSQL_GENERAL_LOG=<Y> \\
 				--name mysql-mini mysql-mini
 	"
 fi
