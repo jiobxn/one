@@ -104,7 +104,7 @@ if [ "$1" = 'redis-server' ]; then
 else
 	echo -e "
 	Example
-					docker run -d --restart unless-stopped [--privileged] \\
+					docker run -d --restart unless-stopped [--cap-add NET_ADMIN] \\
 					-v /docker/redis:/redis/data \\
 					-p 16379:6379 \\
 					-e REDIS_PORT=[6379] \\
