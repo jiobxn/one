@@ -10,31 +10,31 @@ MongoDB
 
 **运行一个单机版MongoDB**
 
-    docker run -d --restart unless-stopped -p 27017:27017 -v /docker/mongodb:/mongo/data -e MONGO_ROOT_PASS=NewP@ss -e MONGO_BACK=Y --name mongodb mongodb
+    docker run -d --restart unless-stopped -p 27017:27017 -v /docker/mongodb:/mongo/data -e MONGO_ROOT_PASS=NewP@ss -e MONGO_BACK=Y --name mongodb jiobxn/mongodb
     docker logs mongodb
 
 **运行一个MongoDB副本集**
 
-    docker run -d --restart unless-stopped --network mynetwork --ip=10.0.0.81 -v /docker/mongodb1:/mongo/data -e REPL_NAME=rs0 --name mongodb1 mongodb 
-    docker run -d --restart unless-stopped --cap-add net_admin --network mynetwork --ip=10.0.0.82 -v /docker/mongodb2:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb2 mongodb  
-    docker run -d --restart unless-stopped --cap-add net_admin --network mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb3 -e MONGO_SERVER="10.0.0.82:27017,10.0.0.83:27017" -e ARB_SERVER="10.0.0.81:27017" mongodb
+    docker run -d --restart unless-stopped --network mynetwork --ip=10.0.0.81 -v /docker/mongodb1:/mongo/data -e REPL_NAME=rs0 --name mongodb1 jiobxn/mongodb 
+    docker run -d --restart unless-stopped --cap-add net_admin --network mynetwork --ip=10.0.0.82 -v /docker/mongodb2:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb2 jiobxn/mongodb  
+    docker run -d --restart unless-stopped --cap-add net_admin --network mynetwork --ip=10.0.0.83 -v /docker/mongodb3:/mongo/data -e VIP=10.0.0.80 -e REPL_NAME=rs0 --name mongodb3 -e MONGO_SERVER="10.0.0.82:27017,10.0.0.83:27017" -e ARB_SERVER="10.0.0.81:27017" jiobxn/mongodb
     #注意：顺序不能错，要先运行SECONDARY节点，最后运行PRIMARY节点。
 
 **运行一个MongoDB分片集群**
 
     #配置节点
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.81 -e REPL_NAME=config0 -e CLUSTER=CONFIG --name mongodb1 mongodb
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.82 -e REPL_NAME=config0 -e CLUSTER=CONFIG --name mongodb2 mongodb
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.83 -e REPL_NAME=config0 -e CLUSTER=CONFIG --name mongodb3 -e MONGO_SERVER="10.0.0.81:27017,10.0.0.82:27017,10.0.0.83:27017" mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.81 -e REPL_NAME=config0 -e CLUSTER=CONFIG --name mongodb1 jiobxn/mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.82 -e REPL_NAME=config0 -e CLUSTER=CONFIG --name mongodb2 jiobxn/mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.83 -e REPL_NAME=config0 -e CLUSTER=CONFIG --name mongodb3 -e MONGO_SERVER="10.0.0.81:27017,10.0.0.82:27017,10.0.0.83:27017" jiobxn/mongodb
 
     #分片节点
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.84 -e REPL_NAME=shard0 -e CLUSTER=SHARD --name mongodb4 mongodb
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.85 -e REPL_NAME=shard0 -e CLUSTER=SHARD --name mongodb5 mongodb
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.86 -e REPL_NAME=shard0 -e CLUSTER=SHARD --name mongodb6 -e MONGO_SERVER="10.0.0.85:27017,10.0.0.86:27017" -e ARB_SERVER="10.0.0.84:27017" mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.84 -e REPL_NAME=shard0 -e CLUSTER=SHARD --name mongodb4 jiobxn/mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.85 -e REPL_NAME=shard0 -e CLUSTER=SHARD --name mongodb5 jiobxn/mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.86 -e REPL_NAME=shard0 -e CLUSTER=SHARD --name mongodb6 -e MONGO_SERVER="10.0.0.85:27017,10.0.0.86:27017" -e ARB_SERVER="10.0.0.84:27017" jiobxn/mongodb
 
     #路由节点
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.87 -e CLUSTER=ROUTER --name mongodb7 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.85:27017,10.0.0.86:27017" mongodb
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.88 -e CLUSTER=ROUTER --name mongodb8 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.85:27017,10.0.0.86:27017" mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.87 -e CLUSTER=ROUTER --name mongodb7 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.85:27017,10.0.0.86:27017" jiobxn/mongodb
+    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.88 -e CLUSTER=ROUTER --name mongodb8 -e CONFIG_SERVER="config0/10.0.0.82:27017,10.0.0.83:27017" -e SHARD_SERVER="shard0/10.0.0.85:27017,10.0.0.86:27017" jiobxn/mongodb
 
 
 ## Run Defult Parameter
