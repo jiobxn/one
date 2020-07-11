@@ -86,7 +86,6 @@ mongo_gluster() {
 ##Start Configuration
 	if [ -d "/mongo/data/diagnostic.data" -a ! -f /usr/local/bin/MONGOD ]; then
 		echo "/mongo/data/diagnostic.data already exists, skip"
-		\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 		sed -i 's/127.0.0.1/0.0.0.0/' /etc/mongod.conf
 		sed -i 's/fork: true/#fork: true/' /etc/mongod.conf
 
@@ -102,7 +101,6 @@ mongo_gluster() {
 		
 	elif [ ! -f /usr/local/bin/MONGOD ]; then
 		echo "Initializing MongoDB"
-		\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 		if [ "$REPL_NAME" ]; then
 			sed -i 's/#replication:/replication:/;/replication:/ a \  replSetName: '$REPL_NAME'' /etc/mongod.conf
 			[ "$CLUSTER" == "CONFIG" ] && sed -i 's/#sharding:/sharding:/;/sharding:/ a \  clusterRole: configsvr' /etc/mongod.conf && OPTION="configsvr: true,"
