@@ -109,7 +109,6 @@ HELP() {
 
 #init
 if [ "$1" = 'radiusd' ]; then
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	if [ -z "$(grep "redhat.xyz" /etc/raddb/clients.conf)" ]; then
 		#authentication
 		if [ "$MYSQL_HOST" ];then
