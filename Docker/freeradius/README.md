@@ -12,7 +12,8 @@ FreeRadius
 
     #验证信息存MySQL
     docker run -d --restart unless-stopped --network host -v /docker/mysql:/var/lib/mysql -e MYSQL_DATABASE=radius -e MYSQL_USER=radius -e MYSQL_PASSWORD=radpass --name mysql jiobxn/mysql:5.7
-    docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key -e MYSQL_HOST=127.0.0.1 -e IPADDR_SECRET="127.0.0.1,testing123;0.0.0.0/0,newpass123" -e USER_PASS="testing,password;admin,newpass" --name freeradius jiobxn/freeradius
+    docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key -e MYSQL_HOST=127.0.0.1 -e IPADDR_SECRET="127.0.0.1,testing123;0.0.0.0/0,newpass123" --name freeradius jiobxn/freeradius
+    # 根据 /docker/freeradius/add_user_mysql.sh 添加账号
 
 
 ## Run Defult Parameter
@@ -22,8 +23,8 @@ FreeRadius
 				-v /docker/freeradius:/key \\
 				-p 1812:1812/udp \\
 				-p 1813:1813/udp \\
-				-e USER_PASS=[testing,password] \\           #用户名/密码
-				-e IPADDR_SECRET=[127.0.0.1,testing123] \\   #IP/密钥
+				-e USER_PASS=[testing,password] \\           #用户名/密码 ;分隔
+				-e IPADDR_SECRET=[127.0.0.1,testing123] \\   #IP/密钥 ;分隔
 				-e MYSQL_HOST=<127.0.0.1> \\                 #默认的MySQL地址
 				-e MYSQL_PORT=[3306] \\                      #默认的MySQL端口
 				-e MYSQL_DB=[radius] \\                      #默认的MySQL数据库
@@ -51,6 +52,7 @@ FreeRadius
 
     #给用户表添加字段
     alter table `radcheck` add column `realname` varchar(64) NOT NULL DEFAULT '';
+    alter table `radcheck` add column `zones` varchar(64) NOT NULL DEFAULT '';
     #删除字段
     alter table radcheck drop column realname;
     #清空用户表，还原主键ID
