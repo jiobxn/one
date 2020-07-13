@@ -56,6 +56,8 @@ FreeRadius
     #给用户表添加字段
     alter table `radcheck` add column `realname` varchar(64) NOT NULL DEFAULT '';
     alter table `radcheck` add column `zones` varchar(64) NOT NULL DEFAULT '';
+    #修改字符集
+    alter table radcheck convert to CHARACTER SET utf8 COLLATE utf8_general_ci;
     #删除字段
     alter table radcheck drop column realname;
     #清空用户表，还原主键ID
