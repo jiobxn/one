@@ -13,7 +13,10 @@ FreeRadius
     #验证信息存MySQL
     docker run -d --restart unless-stopped --network host -v /docker/mysql:/var/lib/mysql -e MYSQL_DATABASE=radius -e MYSQL_USER=radius -e MYSQL_PASSWORD=radpass --name mysql jiobxn/mysql:5.7
     docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key -e MYSQL_HOST=127.0.0.1 -e IPADDR_SECRET="127.0.0.1,testing123;0.0.0.0/0,newpass123" --name freeradius jiobxn/freeradius
-    # 根据 /docker/freeradius/add_user_mysql.sh 添加账号
+    # 添加账号
+    cd /docker/freeradius/
+    for i in {1..100};do echo "user$i    $(openssl rand -base64 10 |tr -dc [:alnum:])" >>user_pass.txt;done
+    sh add_user_mysql.sh
 
 
 ## Run Defult Parameter
