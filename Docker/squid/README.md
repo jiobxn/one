@@ -30,3 +30,5 @@ Squid
 			-e PROXY_SERVER=<"10.0.0.2,10.0.0.3" | "www.example.com|10.0.0.4;test.example.com|10.0.0.5"> \\  反向代理，以";"分割为一组
 			-e PROXY_HTTPS=<Y> \\      后端是否启用了HTTPS
 			--name squid squid
+
+https://www.powershelladmin.com/wiki/Linux_squid_proxy_url_rewriting_or_redirection
