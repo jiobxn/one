@@ -10,14 +10,14 @@ ZooKeeprt
     docker run -d --restart unless-stopped -p 2181:2181 -v /docker/zookeeper:/zookeeper/data --name zookeeper zookeeper
 
     #运行一个ZK集群
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.71 -v /docker/zookeeper1:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --name zookeeper1 zookeeper
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.72 -v /docker/zookeeper2:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --name zookeeper2 zookeeper
-    docker run -d --restart unless-stopped --privileged --network=mynetwork --ip=10.0.0.73 -v /docker/zookeeper3:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 -e VIP=10.0.0.70 --name zookeeper3 zookeeper
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.71 -v /docker/zookeeper1:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper1 zookeeper
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.72 -v /docker/zookeeper2:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper2 zookeeper
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.73 -v /docker/zookeeper3:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper3 zookeeper
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart unless-stopped [--privileged] \\
+				docker run -d --restart unless-stopped \\
 				-v /docker/zookeeper:/zookeeper/data \\
 				-p 2181:2181 \\
 				-e ZK_MEM=[1G] \\                                     默认内存大小1G
@@ -25,7 +25,6 @@ ZooKeeprt
 				-e ZK_PORT=[2181] \\                                  zookeeper client端口(提供服务)
 				-e ZK_SPORT=[2888] \\                                 zookeeper 集群端口(选举)
 				-e ZK_SERVER=<"10.0.0.71,10.0.0.72,10.0.0.73"> \\     集群节点数建议大于或等于3
-				-e VIP=<10.0.0.70> \\                                 leader IP Addr，需要 --privileged
 				--name zookeeper zookeeper
 
 ## 补充
