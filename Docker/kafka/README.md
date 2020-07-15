@@ -9,17 +9,17 @@ Kafka
 ## Example:
 
     #运行一个单机版Kafka
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.100 -p 9092:9092 -v /docker/kafka:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_TOPIC=test:1:1 --name kafka kafka
+    docker run -d --restart unless-stopped -p 9092:9092 -v /docker/kafka:/kafka/data -e ZK_SERVER=172.17.0.1:2181 -e KK_TOPIC=test:1:1 --name kafka jiobxn/kafka
     
     #运行一个Kafka集群
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.101 -v /docker/kafka1:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=0 --name kafka1 kafka
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.102 -v /docker/kafka2:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=1 --name kafka2 kafka
-    docker run -d --restart unless-stopped --network=mynetwork --ip=10.0.0.103 -v /docker/kafka3:/kafka/data -e ZK_SERVER=10.0.0.70:2181 -e KK_ID=2 -e KK_TOPIC=test1:3:1,test2:3:3 --name kafka3 kafka
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.101 -v /docker/kafka1:/kafka/data -e ZK_SERVER=10.0.0.71:2181 -e KK_ID=0 --name kafka1 jiobxn/kafka
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.102 -v /docker/kafka2:/kafka/data -e ZK_SERVER=10.0.0.71:2181 -e KK_ID=1 --name kafka2 jiobxn/kafka
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.103 -v /docker/kafka3:/kafka/data -e ZK_SERVER=10.0.0.71:2181 -e KK_ID=2 -e KK_TOPIC=test1:3:1,test2:3:3 --name kafka3 jiobxn/kafka
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
 
-				docker run -d --restart always [--privileged] \\
+				docker run -d --restart always \\
 				-v /docker/kafka:/var/lib/kafka-logs \\
 				-p 9092:9092 \\
 				-e KK_MEM=[1G] \\                                  默认内存大小1G
