@@ -6,7 +6,6 @@ set -e
 if [ "$1" = 'bin/kafka-server-start.sh' ]; then
   if [ -z "$(grep "redhat.xyz" /kafka/config/server.properties)" ]; then
 	echo "Initialize kafka"
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	sed -i '1 i #redhat.xyz' /kafka/config/server.properties
 	sed -i 's#log.dirs=/tmp/kafka-logs#log.dirs=/kafka/data#' /kafka/config/server.properties
 
