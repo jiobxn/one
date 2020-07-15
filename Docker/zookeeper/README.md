@@ -7,12 +7,12 @@ ZooKeeprt
 ## Example:
 
     #运行一个单机版ZK
-    docker run -d --restart unless-stopped -p 2181:2181 -v /docker/zookeeper:/zookeeper/data --name zookeeper zookeeper
+    docker run -d --restart unless-stopped -p 2181:2181 -v /docker/zookeeper:/zookeeper/data --name zookeeper jiobxn/zookeeper
 
     #运行一个ZK集群
-    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.71 -v /docker/zookeeper1:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper1 zookeeper
-    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.72 -v /docker/zookeeper2:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper2 zookeeper
-    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.73 -v /docker/zookeeper3:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper3 zookeeper
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.71 -v /docker/zookeeper1:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper1 jiobxn/zookeeper
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.72 -v /docker/zookeeper2:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper2 jiobxn/zookeeper
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.73 -v /docker/zookeeper3:/zookeeper/data -e ZK_SERVER=10.0.0.71,10.0.0.72,10.0.0.73 --name zookeeper3 jiobxn/zookeeper
 
 ## Run Defult Parameter
 **协定：** []是默参数，<>是自定义参数
