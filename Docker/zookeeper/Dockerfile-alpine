@@ -5,7 +5,7 @@ ARG LATEST="0"
 RUN apk update --no-cache && apk add openjdk8 nmap-ncat at curl tzdata bash --no-cache
 
 RUN cd /mnt \
-        && wget -c https://apache.org/dist/zookeeper/stable/$(curl -s https://apache.org/dist/zookeeper/stable/ |grep tar.gz |awk -F\" 'NR==1{print $6}') \
+        && wget -c https://downloads.apache.org/zookeeper/stable/$(curl -s https://downloads.apache.org/zookeeper/stable/ |grep bin.tar.gz |awk -F\" 'NR==1{print $6}') \
         && tar zxf apache-zookeeper-*.tar.gz \
         && \rm apache-zookeeper-*.tar.gz \
         && mv apache-zookeeper-* /zookeeper
