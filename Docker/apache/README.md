@@ -48,6 +48,8 @@ HTTPD
 
     httpd.conf  197行    LogFormat "\"%{X-Real-IP}i\" %l %u %t \"%r\" %>s %b" common
 
+[redis验证](https://raw.githubusercontent.com/jiobxn/one/master/Script/hello.php)
+
 **最大连接数设置**
 
 	~]# httpd -V |grep 'Server MPM'
