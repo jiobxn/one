@@ -9,7 +9,6 @@ set -e
 if [ "$1" = 'bin/zkServer.sh' ]; then
   if [ -z "$(grep "redhat.xyz" /zookeeper/conf/zoo.cfg 2>/dev/null)" ]; then
 	echo "Initialize zookeeper"
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	cp /zookeeper/conf/zoo_sample.cfg /zookeeper/conf/zoo.cfg
 	sed -i '1 i #redhat.xyz' /zookeeper/conf/zoo.cfg
 	sed -i 's#/tmp/zookeeper#/zookeeper/data#' /zookeeper/conf/zoo.cfg
