@@ -15,7 +15,7 @@ FreeRadius
     docker run -d --restart unless-stopped --network host -v /docker/freeradius:/key -e MYSQL_HOST=127.0.0.1 -e IPADDR_SECRET="127.0.0.1,testing123;0.0.0.0/0,newpass123" --name freeradius jiobxn/freeradius
     # 添加账号
     cd /docker/freeradius/
-    for i in {1..100};do echo "user$i    $(openssl rand -base64 10 |tr -dc [:alnum:])" >>user_pass.txt;done
+    for i in {1..100};do echo "client$i    $(openssl rand -base64 10 |tr -dc [:alnum:])" >>user_pass.txt;done
     sh add_user_mysql.sh
 
 
