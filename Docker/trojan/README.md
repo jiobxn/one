@@ -33,7 +33,7 @@ trojan
 				-e REMOT_ADDR=[127.0.0.1 | trojan.example.com] \\  #远端地址，server | client
 				-e REMOT_PORT=[80 | 443] \\                        #远端端口，server | client
 				-e SNICN=[local ip] \\                             #域名或公网IP，直接暴露公网需要设置正确
-				-e WSPATH=</mp3> \\                                #WS路径。Trojan协议不加密，避免被不可信的CDN识别和审查
+				-e WSPATH=</mp3> \\                                #WS路径，path应当选择较长的字符串。Trojan协议不加密，避免被不可信的CDN识别和审查
 				-e CLIENT=<Y> \\                                   #客户端模式
 				-e PASS:=[RANDOM] \\                               #随机密码
 				--name trojan trojan
