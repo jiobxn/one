@@ -17,8 +17,8 @@ trojan
     #docker run -d --restart unless-stopped -e REMOT_ADDR=<trojan.example.com> -e REMOT_PORT=443 -e WSPATH=/mp3 -e PASS=<passwd> -e CLIENT=Y --name trojan jiobxn/trojan
 
     #运行一个nginx WS实例
-    docker run -d --restart unless-stopped --network host -e LOCAL_PORT=20717 -e WSPATH=/mp3 -e SNICN=172.17.0.1 -e REMOT_ADDR=jiobxn.com --name trojan jiobxn/trojan
-    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/key:/key -e PROXY_SERVER="trojan.example.com|www.google.co.id^backend_https=y,ws=/mp3|172.17.0.1:20717" --name google jiobxn/nginx
+    docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.199 -e WSPATH=/mp3 -e REMOT_ADDR=jiobxn.com --name trojan jiobxn/trojan
+    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/key:/key -e PROXY_SERVER="trojan.example.com|www.google.co.id^backend_https=y,wss=/mp3|10.0.0.199:443" --name google jiobxn/nginx
 
 
 ## Run Defult Parameter
