@@ -403,6 +403,14 @@ http_other() {
 			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass http://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\    }\n' /etc/nginx/conf.d/${project_name}_$n.conf 
 		fi
 		
+		#WebSocket s
+		if [ -n "$(echo $i |grep 'wss=' |grep '|')" ]; then
+			path="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
+			ws="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $2}')"
+			
+			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass https://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\    }\n' /etc/nginx/conf.d/${project_name}_$n.conf 
+		fi
+		
 		#别名目录
 		if [ -n "$(echo $i |grep 'alias=' |grep '|')" ]; then
 			alias="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
@@ -996,6 +1004,7 @@ else
 				-e LIMIT_CONN=<50> \\
 				-e LIMIT_REQ=<2> \\
 				-e ws=</mp4|127.0.0.1:19443> \\
+				   wss=</mp4|127.0.0.1:19444> \\
 				   alias=</boy|/mp4> \\
 				   root=<wordpress> \\
 				   http_port=<8080> \\
