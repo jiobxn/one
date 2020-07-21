@@ -8,9 +8,10 @@ SET_SERVER(){
 : ${LOCAL_PORT:="443"}
 : ${REMOT_ADDR:="127.0.0.1"}
 : ${REMOT_PORT:="80"}
-: ${PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
+: ${PASS:="$(openssl rand -base64 12 |tr -dc [:alnum:])"}
+: ${SNICN:="$(ifconfig $(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1) |awk '$3=="netmask"{print $2}')"}
 
-cat >>/etc/config.json <<-END
+cat >>/key/config.json <<-END
 {
     "run_type": "server",
     "local_addr": "$LOCAL_ADDR",
@@ -22,8 +23,8 @@ cat >>/etc/config.json <<-END
     ],
     "log_level": 1,
     "ssl": {
-        "cert": "/etc/server.crt",
-        "key": "/etc/server.key",
+        "cert": "/key/server.crt",
+        "key": "/key/server.key",
         "key_password": "",
         "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384",
         "cipher_tls13": "TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384",
@@ -66,7 +67,7 @@ SET_CLIENT(){
 : ${LOCAL_PORT:="1080"}
 : ${REMOT_PORT:="443"}
 
-cat >>/etc/config.json <<-END
+cat >>/key/config.json <<-END
 {
     "run_type": "client",
     "local_addr": "$LOCAL_ADDR",
@@ -104,15 +105,13 @@ END
 }
 
 
-  if [ ! -f /etc/config.json ]; then
+  if [ ! -f /key/config.json ]; then
 	echo "Initialize trojan"
-	if [ -f /key/server.crt -a -f /key/server.key ]; then
-		\cp /key/*.{crt,key} /etc/
-	else
-		openssl genrsa -out /etc/server.key 4096 2>/dev/null
-		openssl req -new -key /etc/server.key -out /etc/server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=trojan-docker" 2>/dev/null
-		openssl x509 -req -days 3650 -in /etc/server.csr -signkey /etc/server.key -out /etc/server.crt 2>/dev/null
-		\cp /etc/server.{crt,key} /key/
+	if [ ! -f /key/server.crt -o ! -f /key/server.key ]; then
+		openssl genrsa -out /key/server.key 4096 2>/dev/null
+		openssl req -new -key /key/server.key -out /key/server.csr -subj "/C=CN/L=London/O=Company Ltd/CN=$SNICN" 2>/dev/null
+		openssl x509 -req -days 3650 -in /key/server.csr -signkey /key/server.key -out /key/server.crt 2>/dev/null
+		echo "SNICN: $SNICN"
 	fi
 
 
@@ -121,10 +120,17 @@ END
 	else
 		SET_SERVER
 	fi
+
+        if [ "$WSPATH" ];then
+                sed -i '/"tcp":/i \    "websocket": {\n\        "enabled": true,\n\        "path": "'$WSPATH'",\n\        "host": ""\n\    },' /key/config.json
+		\mv /usr/local/bin/trojan-go /usr/local/bin/trojan
+		echo "WSPATH: $WSPATH"
+        fi
   fi
   
   echo "Start ****"
   exec "$@"
+
 else
 
 	echo -e " 
@@ -136,6 +142,8 @@ else
 				-e LOCAL_PORT=[443 | 1080] \\
 				-e REMOT_ADDR=[127.0.0.1 | trojan.example.com] \\
 				-e REMOT_PORT=[80 | 443] \\
+				-e SNICN=[local ip] \\
+				-e WSPATH=</mp3> \\
 				-e CLIENT=<Y> \\
 				-e PASS:=[RANDOM] \\
 				--name trojan trojan
