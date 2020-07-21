@@ -25,7 +25,7 @@ WORKDIR /key
 
 ENTRYPOINT ["/trojan.sh"]
 
-CMD ["trojan", "/etc/config.json"]
+CMD ["trojan", "/key/config.json"]
 
 # docker build -t trojan .
 # docker run -d --restart unless-stopped -p 443:443 --name trojan trojan
