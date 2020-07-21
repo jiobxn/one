@@ -31,7 +31,7 @@ v2ray-brook
 
     #运行一个v2ray ws实例，可以套cloudflare
     docker run -d --restart unless-stopped --network host -e PORT=19445 -e MODE=v2ray -e WSPATH=/mp3 --name v2ray-ws jiobxn/v2ray-brook
-    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/key:/key -e PROXY_SERVER="v2ray.example.com|www.google.co.id^backend_https=y,ws=/mp3|127.0.0.1:19445" --name google jiobxn/nginx
+    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -v /docker/key:/key -e PROXY_SERVER="v2ray.example.com|www.google.co.id^backend_https=y,ws=/mp3|172.17.0.1:19445" --name google jiobxn/nginx
 
 
 ## Run Defult Parameter
