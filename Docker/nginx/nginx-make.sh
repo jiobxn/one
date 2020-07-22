@@ -361,13 +361,17 @@ domain_proxy() {
             sub_filter_types   * ;
 			
             #sub_filter#
-            sub_filter https:// http://;
+            sub_filter https:// \$scheme://;
             sub_filter .ytimg.com .yt${DOMAIN_TAG}img.com.\$domain;
             sub_filter .googlevideo.com .goog${DOMAIN_TAG}levideo.com.\$domain;
             sub_filter .ggpht.com .gg${DOMAIN_TAG}pht.com.\$domain;
             sub_filter .twimg.com .tw${DOMAIN_TAG}img.com.\$domain;
             sub_filter .fbcdn.net .fb${DOMAIN_TAG}cdn.net.\$domain;
             sub_filter .tumblr.com .tu${DOMAIN_TAG}mblr.com.\$domain;
+	    sub_filter .youtube.com .you${DOMAIN_TAG}tube.com.\$domain;
+	    sub_filter .google.com .go${DOMAIN_TAG}ogle.com.\$domain;
+	    sub_filter .doubleclick.net .dou${DOMAIN_TAG}bleclick.net.\$domain;
+	    sub_filter .amazonaws.com .amaz${DOMAIN_TAG}onaws.com.\$domain;
             sub_filter \$proxy_host \$host;
 			
 	##cache        proxy_cache cache1;
