@@ -60,3 +60,4 @@ Zookeeper中角色：
 	zk_followers	2                                       追随者的数量
 	zk_synced_followers	2                               同步的追随者
 	zk_pending_syncs	0                               等待同步，大于10报警
+
