@@ -10,7 +10,6 @@ if [ "$1" = 'ETCD' ]; then
 
   if [ ! -f /usr/local/bin/ETCD ]; then
 	echo "Initialize redis"
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 	# nodes
 	if [ "$CLUSTER" ]; then
