@@ -7,7 +7,7 @@ WireGuard
 
 ****
 
-## 宿主机升级内核
+## 宿主机升级内核(WireGuard 已经并入 Linux 5.6)
 
     rpm -ivh http://www.elrepo.org/elrepo-release-7.0-5.el7.elrepo.noarch.rpm
     sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/elrepo.repo
@@ -16,7 +16,7 @@ WireGuard
     grub2-editenv - set saved_entry='CentOS Linux (5.7.11-1.el7.elrepo.x86_64) 7 (Core)'                  #指定默认内核
     grub2-editenv list
     
-    #安装wireguard内核支持
+    #安装wireguard内核支持(宿主机kernel小于5.6才需要)
     curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/
     yum install epel-release -y
     yum install wireguard-dkms wireguard-tools -y
@@ -52,7 +52,7 @@ WireGuard
 
 					docker run -d --restart unless-stopped --cap-add net_admin \\
 					-p 20000:20000/udp \\
-					-e ETCD=[http://etcd.redhat.xyz:12379] \\    etcd服务器
+					-e ETCD=[http://etcd.redhat.xyz:2379] \\    etcd服务器
 					-e WG_TOKEN=[TEST] \\                        定义token前缀的key，相同的token才能连接
 					-e LOCAL_ID=[openssl rand -hex 5] \\         id
 					-e WGVETH_IP=[10.0.0] \\                     ip前缀
