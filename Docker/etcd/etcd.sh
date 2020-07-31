@@ -40,7 +40,7 @@ if [ "$1" = 'ETCD' ]; then
 
 	# 
     if [ ! -d /data/etcd ]; then
-		echo "etcd --data-dir=/data/etcd --name=${THIS_NAME} --initial-advertise-peer-urls=http://${THIS_IP}:${THIS_PORT} --listen-peer-urls=http://${THIS_IP}:${THIS_PORT} --advertise-client-urls=http://${THIS_IP}:${ETCD_PORT} --listen-client-urls=http://127.0.0.1:${ETCD_PORT},http://${THIS_IP}:${ETCD_PORT} --initial-cluster=${CLUSTER} --initial-cluster-state=${CLUSTER_STATE} --initial-cluster-token=${TOKEN} --snapshot-count=${ETCD_COUNT}" > /usr/local/bin/ETCD
+		echo "etcd --data-dir=/data/etcd --name=${THIS_NAME} --initial-advertise-peer-urls=http://${THIS_IP}:${THIS_PORT} --listen-peer-urls=http://${THIS_IP}:${THIS_PORT} --advertise-client-urls=http://${THIS_IP}:${ETCD_PORT} --listen-client-urls=http://127.0.0.1:${ETCD_PORT},http://${THIS_IP}:${ETCD_PORT} --initial-cluster=${CLUSTER} --initial-cluster-state=${CLUSTER_STATE} --initial-cluster-token=${ETCD_TOKEN} --snapshot-count=${ETCD_COUNT}" > /usr/local/bin/ETCD
 		chmod +x /usr/local/bin/ETCD
 	else
 		echo "/data/etcd exists, skip.."
