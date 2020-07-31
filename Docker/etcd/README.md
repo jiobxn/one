@@ -108,6 +108,3 @@ ETCD API 只支持Base64格式编码
     
     # 使用令牌来读取数据
     curl -sL http://localhost:2379/$v3/kv/range -H 'Authorization : uYkPWfLCnjmidGhI.9' -X POST -d '{"key": "Zm9v"}'
-
-
-    
