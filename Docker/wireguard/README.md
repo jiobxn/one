@@ -30,20 +30,17 @@ WireGuard
 运行一个P2P WG
 
     # host1
-    docker run -itd --cap-add net_admin -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
     # host2
-    docker run -itd --cap-add net_admin -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
 
 运行一个VPN WG
 
     # server
-    docker run -itd --cap-add net_admin -p 2000:20000/udp -e ETCD=http://10.10.0.246:2379 -e WG_VPN=SERVER --name wg-server jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://10.10.0.246:2379 -e WG_VPN=SERVER --name wg-server jiobxn/wireguard
     # client
-    docker run -itd --cap-add net_admin -e ETCD=http://10.10.0.246:2379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -e ETCD=http://10.10.0.246:2379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
 
-    # 宿主机上需要开启路由转发
-    sysctl -w net.ipv4.ip_forward=1
-    iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited
 
 ****
 
