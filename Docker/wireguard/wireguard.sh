@@ -10,7 +10,6 @@ if [ "$1" = 'WG' ]; then
 
   if [ ! -f /usr/local/bin/WG ]; then
 	echo "Initialize wireguard"
-	\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 	export ETCDCTL_API=3
 
 	# clean key
