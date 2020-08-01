@@ -30,16 +30,16 @@ WireGuard
 运行一个P2P WG
 
     # host1
-    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://etcd.redhat.xyz:12379 --name wg jiobxn/wireguard
     # host2
-    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://10.10.0.246:2379 --name wg jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://etcd.redhat.xyz:12379 --name wg jiobxn/wireguard
 
 运行一个VPN WG
 
     # server
-    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://10.10.0.246:2379 -e WG_VPN=SERVER --name wg-server jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://etcd.redhat.xyz:12379 -e WG_VPN=SERVER --name wg-server jiobxn/wireguard
     # client
-    docker run -itd --restart unless-stopped --cap-add net_admin -e ETCD=http://10.10.0.246:2379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
+    docker run -itd --restart unless-stopped --cap-add net_admin -e ETCD=http://etcd.redhat.xyz:12379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
 
 
 ****
@@ -49,7 +49,7 @@ WireGuard
 
 					docker run -d --restart unless-stopped --cap-add net_admin \\
 					-p 20000:20000/udp \\
-					-e ETCD=[http://etcd.redhat.xyz:2379] \\    etcd服务器
+					-e ETCD=[http://etcd.redhat.xyz:12379] \\    etcd服务器
 					-e WG_TOKEN=[TEST] \\                        定义token前缀的key，相同的token才能连接
 					-e LOCAL_ID=[openssl rand -hex 5] \\         id
 					-e WGVETH_IP=[10.0.0] \\                     ip前缀
