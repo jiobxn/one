@@ -64,3 +64,11 @@ WireGuard
 					-e PEER_PUBLIC_KEY=[ETCD] \\                 对端公钥，来自etcd
 					-e WG_VPN=<SERVER | CLIENT> \\               vpn模式，server或client
 					--name wireguard wireguard
+
+****
+
+客户端全局代理模式示例
+
+    ip ro add <VPN SERVER> via 172.17.0.1 dev eth0
+    ip ro del default via 172.17.0.1 dev eth0
+    ip ro add 0.0.0.0/0 via 10.0.0.1
