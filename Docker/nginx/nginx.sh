@@ -77,6 +77,7 @@ http_conf() {
 		
 	##default_server    server {
 	##default_server            listen       $HTTP_PORT  default_server;
+	##default_server            listen       [::]:$HTTP_PORT  default_server;
 	##default_server            server_name  _;
 	##default_server            rewrite ^(.*) http://$DEFAULT_SERVER:$HTTP_PORT permanent;
 	##default_server    }
@@ -90,6 +91,8 @@ http_conf() {
 	server {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
+	    listen       [::]:$HTTP_PORT;#
+	    listen       [::]:$HTTPS_PORT ssl;
 	    server_name localhost;
 	    #LIMIT#
 		
@@ -143,6 +146,8 @@ fcgi_server() {
 	server {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
+	    listen       [::]:$HTTP_PORT;#
+	    listen       [::]:$HTTPS_PORT ssl;
 	    #server_name#
 		
 	##full_https    if (\$scheme = http) { return 301 https://\$host\$request_uri;}
@@ -201,6 +206,8 @@ java_php_server() {
 	server {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
+	    listen       [::]:$HTTP_PORT;#
+	    listen       [::]:$HTTPS_PORT ssl;
 	    #server_name#
 		
 	##full_https    if (\$scheme = http) { return 301 https://\$host\$request_uri;}
@@ -261,6 +268,8 @@ proxy_server() {
 	server {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
+	    listen       [::]:$HTTP_PORT;#
+	    listen       [::]:$HTTPS_PORT ssl;
 	    #server_name#
 		
 	    ##full_https    if (\$scheme = http) { return 301 https://\$host\$request_uri;}
@@ -322,6 +331,8 @@ domain_proxy() {
 	server {
 	    listen       $HTTP_PORT;#
 	    listen       $HTTPS_PORT ssl;
+	    listen       [::]:$HTTP_PORT;#
+	    listen       [::]:$HTTPS_PORT ssl;
 	    #server_name#
 	    server_name *.$(echo $i |awk -F^ '{print $1}'); #$(echo $i |awk -F^ '{print $1}')
 	    
@@ -708,9 +719,9 @@ stream_server() {
 					sed -i 's/&/ /' /etc/nginx/nginx.conf
 				done
 				
-				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /etc/nginx/nginx.conf
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';\n\        listen [::]:'$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /etc/nginx/nginx.conf
 			else
-				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}')';\n\    }\n' /etc/nginx/nginx.conf
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';\n\        listen [::]:'$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F^ '{print $1}' |awk -F'|' '{print $2}')';\n\    }\n' /etc/nginx/nginx.conf
 			fi
 		else
 			echo "error.." && exit 1
@@ -728,9 +739,9 @@ stream_server() {
 					sed -i 's/&/ /' /etc/nginx/nginx.conf
 				done
 				
-				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /etc/nginx/nginx.conf
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';\n\        listen [::]:'$PORT';#'$n'\n\        proxy_pass backend-lb-'$n';\n\    }\n' /etc/nginx/nginx.conf
 			else
-				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F'|' '{print $2}')';\n\    }\n' /etc/nginx/nginx.conf
+				sed -i '/#server#/ a \    server {\n\        #backend-lb-'$n'#\n\        listen '$PORT';\n\        listen [::]:'$PORT';#'$n'\n\        proxy_pass '$(echo $i |awk -F'|' '{print $2}')';\n\    }\n' /etc/nginx/nginx.conf
 			fi
 		else
 			echo "error.." && exit 1
