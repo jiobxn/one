@@ -6,7 +6,7 @@ RUN yum clean all; yum -y update; yum -y install net-tools iproute wget autoreco
 
 RUN cd /mnt \
         && pcre_down="https://sourceforge.net/projects/pcre/files/pcre/" && pcre_v=$(curl -s $pcre_down |grep "tr title" |awk -F\" 'NR==1{print $2}') && wget -c "$pcre_down$pcre_v/pcre-$pcre_v.tar.gz" \
-        && wget -c https://www.openssl.org/source/$(curl -s https://www.openssl.org/source/ |grep tar.gz |awk -F\" 'NR==3{print $2}') \
+        && wget -c https://www.openssl.org/source/$(curl -s https://www.openssl.org/source/ |grep openssl-1 |awk -F\" '{print $2}') \
         && wget -c http://zlib.net/$(curl -s http://zlib.net/ |grep "\.tar.gz" |awk -F\" 'NR==1{print $2}') \
         && wget -c $(curl -s http://www.cpan.org/src/ |grep wget |awk -F\" '{print $2}') \
         && wget -c https://github.com$(curl -s https://github.com/acassen/keepalived/releases |grep tar.gz |awk -F\" 'NR==1{print $4}') \
