@@ -31,6 +31,7 @@ http_conf() {
 	cat >/nginx/conf/nginx.conf <<-END
 	#redhat.xyz
 	worker_processes  $WORKER_PROC;
+	load_module modules/ngx_http_geoip2_module.so;
 
 	events {
 	    worker_connections  $(($WORKER_PROC*10240));
@@ -685,6 +686,7 @@ stream_conf() {
 	cat >/nginx/conf/nginx.conf <<-END
 	#redhat.xyz
 	worker_processes  $WORKER_PROC;
+	load_module modules/ngx_stream_geoip2_module.so;
 
 	events {
 	    worker_connections  $(($WORKER_PROC*10240));
