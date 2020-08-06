@@ -19,6 +19,7 @@ set -e
 : ${KP_VRID:="77"}
 : ${KP_PASS:="Newpa55"}
 : ${WORKER_PROC:="2"}
+: ${REMOTE_ADDR:="remote_addr"}
 
 
 ##-----------------HTTP----------------
@@ -43,7 +44,7 @@ http_conf() {
 	    include       mime.types;
 	    default_type  application/octet-stream;
 		
-	    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+	    log_format  main  '\$$REMOTE_ADDR - \$remote_user [\$time_local] "\$request" '
 	        '\$status \$body_bytes_sent "\$http_referer" '
 	        '"\$http_user_agent" "\$http_x_forwarded_for"';
 	    access_log  /var/log/nginx/access.log  main;
@@ -606,7 +607,7 @@ http_other() {
                         sip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $1}')"
                         dip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $2}')"
 		
-                        sed -i '/#PASS#/a \        if ($remote_addr ~ "'$sip'"){proxy_pass http://'$dip';break;}' /etc/nginx/conf.d/${project_name}_$n.conf
+                        sed -i '/#PASS#/a \        if ($'$REMOTE_ADDR' ~ "'$sip'"){proxy_pass http://'$dip';break;}' /etc/nginx/conf.d/${project_name}_$n.conf
                 fi
 	done
 }
@@ -1018,6 +1019,7 @@ else
 				-e LIMIT_RATE=<2048k> \\
 				-e LIMIT_CONN=<50> \\
 				-e LIMIT_REQ=<2> \\
+				-e REMOTE_ADDR=[remote_addr] \\
 				-e ws=</mp4|127.0.0.1:19443> \\
 				   wss=</mp4|127.0.0.1:19444> \\
 				   alias=</boy|/mp4> \\
