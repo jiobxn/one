@@ -19,6 +19,9 @@ set -e
 : ${KP_VRID:="77"}
 : ${KP_PASS:="Newpa55"}
 : ${WORKER_PROC:="2"}
+: ${REMOTE_ADDR:="remote_addr"}
+: ${COUNTRY_CODE:="CN"}
+
 
 
 ##-----------------HTTP----------------
@@ -43,7 +46,7 @@ http_conf() {
 	    include       mime.types;
 	    default_type  application/octet-stream;
 
-	    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+	    log_format  main  '\$$REMOTE_ADDR - \$remote_user [\$time_local] "\$request" '
 	        '\$status \$body_bytes_sent "\$http_referer" '
 	        '"\$http_user_agent" "\$http_x_forwarded_for"';
 	    access_log  logs/access.log  main;
@@ -72,6 +75,10 @@ http_conf() {
 	    gzip_types text/plain text/css text/xml text/javascript application/json application/x-javascript application/javascript application/xml application/xml+rss application/x-httpd-php image/jpeg image/gif image/png;
 	    gzip_vary on;
 		
+	$GEOIP2    geoip2 /key/GeoLite2-Country.mmdb {
+	$GEOIP2        \$geoip2_data_country_code default=$COUNTRY_CODE source=\$$REMOTE_ADDR country iso_code;
+	$GEOIP2    }
+		
 	    #upstream#
 		
 	    include /nginx/conf/vhost/*.conf;
@@ -95,6 +102,9 @@ http_conf() {
 	    listen       [::]:$HTTP_PORT;#
 	    listen       [::]:$HTTPS_PORT ssl;
 	    server_name localhost;
+		
+	$GEOIP2    add_header "country" \$geoip2_data_country_code;
+		
 	    #LIMIT#
 		
 	    ssl_certificate      /nginx/conf/server.crt;
@@ -106,6 +116,7 @@ http_conf() {
 	    ssl_prefer_server_ciphers   on;
 
 	    location / {
+	#   if (\$geoip2_data_country_code = CN) { root  /mnt; }
 	        root   html;
 	        index  index.html index.htm;
 	    }
@@ -602,13 +613,13 @@ http_other() {
 			fi 
 		fi
 		
-                #测试地址
-                if [ -n "$(echo $i |grep 'testip=' |grep '&')" ]; then
-                        sip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $1}')"
-                        dip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $2}')"
+        #测试地址
+        if [ -n "$(echo $i |grep 'testip=' |grep '&')" ]; then
+                sip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $1}')"
+                dip="$(echo $i |grep 'testip=' |awk -F= '{print $2}' |awk -F'&' '{print $2}')"
 		
-                        sed -i '/#PASS#/a \        if ($remote_addr ~ "'$sip'"){proxy_pass http://'$dip';break;}' /etc/nginx/conf.d/${project_name}_$n.conf
-                fi
+                sed -i '/#PASS#/a \        if ($'$REMOTE_ADDR' ~ "'$sip'"){proxy_pass http://'$dip';break;}' /etc/nginx/conf.d/${project_name}_$n.conf
+        fi
 	done
 }
 
@@ -696,6 +707,34 @@ stream_conf() {
 	    log_format main '\$remote_addr:\$remote_port [\$time_local] \$protocol \$status \$session_time "\$upstream_addr" \$upstream_connect_time';
 	    ##acclog_on access_log access.log main;
 	    ##errlog_off error_log off;
+
+	$GEOIP2    geoip2 /key/GeoLite2-Country.mmdb {
+	$GEOIP2        \$geoip2_data_country_code default=$COUNTRY_CODE source=\$$REMOTE_ADDR country iso_code;
+	$GEOIP2    }
+
+	#example
+	#    map $remote_addr \$best_server {
+	#        default all;
+	#        1.2.3.4 test;
+	#    }
+
+	#    map \$geoip2_data_country_code \$best_server {
+	#        default all;
+	#        CN      cn;
+	#    }
+
+	#    upstream all {
+	#        server 172.17.0.1:1808;
+	#    }
+
+	#    upstream cn {
+	#        server 172.17.0.1:1809;
+	#    }
+
+	#    server {
+	#        listen 80;
+	#        proxy_pass \$best_server;
+	#    }
 
 	    #upstream#
 
@@ -852,6 +891,14 @@ if [ "$1" = 'nginx' ]; then
                 \cp /nginx/conf/server.{crt,key} /key/
 	fi
 
+
+	if [ -f /key/GeoLite2-Country.mmdb ]; then
+		\cp /key/GeoLite2-Country.mmdb /nginx/conf/
+	else
+		GEOIP2="##"
+	fi
+
+
 	if [ "$STREAM_SERVER" ]; then
 		stream_conf
 		
@@ -883,7 +930,7 @@ if [ "$1" = 'nginx' ]; then
 				ngx_header="host"
 				http_basic
 			done
-			\rm /nginx/conf/vhost/default.conf
+			\mv /nginx/conf/vhost/default.conf /nginx/conf/vhost/default.txt
 		fi
 
 
@@ -897,7 +944,7 @@ if [ "$1" = 'nginx' ]; then
 				ngx_header="host"
 				http_basic
 			done
-			\rm /nginx/conf/vhost/default.conf 2>/dev/null |echo
+			\mv /nginx/conf/vhost/default.conf /nginx/conf/vhost/default.txt 2>/dev/null |echo
 		fi
 
 
@@ -911,7 +958,7 @@ if [ "$1" = 'nginx' ]; then
 				ngx_header="proxy_host"
 				http_basic
 			done
-			\rm /nginx/conf/vhost/default.conf 2>/dev/null |echo
+			\mv /nginx/conf/vhost/default.conf /nginx/conf/vhost/default.txt 2>/dev/null |echo
 		fi
 
 
@@ -925,7 +972,7 @@ if [ "$1" = 'nginx' ]; then
 				ngx_header="proxy_host"
 				http_other
 			done
-			\rm /nginx/conf/vhost/default.conf 2>/dev/null |echo
+			\mv /nginx/conf/vhost/default.conf /nginx/conf/vhost/default.txt 2>/dev/null |echo
 		fi
 
 
@@ -1020,6 +1067,8 @@ else
 				-e LIMIT_RATE=<2048k> \\
 				-e LIMIT_CONN=<50> \\
 				-e LIMIT_REQ=<2> \\
+				-e REMOTE_ADDR=[remote_addr] \\
+				-e COUNTRY_CODE=[CN] \\
 				-e ws=</mp4|127.0.0.1:19443> \\
 				   wss=</mp4|127.0.0.1:19444> \\
 				   alias=</boy|/mp4> \\
