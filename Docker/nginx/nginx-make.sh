@@ -713,7 +713,7 @@ stream_conf() {
 	$GEOIP2    }
 
 	#example
-	#    map $remote_addr \$best_server {
+	#    map \$$REMOTE_ADDR \$best_server {
 	#        default all;
 	#        1.2.3.4 test;
 	#    }
