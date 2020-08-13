@@ -67,11 +67,11 @@ Redis
 
 ****
 
-redis不同类型的值
+查看redis不同类型的值
 
     如果值的类型为 string -> GET <key>
-    如果值的类型为 type hash -> HGETALL <key>
-    如果值的类型为 type lists -> lrange <key> <start> <end>
+    如果值的类型为 hash -> HGETALL <key>
+    如果值的类型为 lists -> lrange <key> <start> <end>
     如果值的类型为 sets -> smembers <key>
     如果值的类型为 sorted sets -> ZRANGEBYSCORE <key> <min> <max>
     使用TYPE命令检查key值的类型：type <key>
