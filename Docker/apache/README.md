@@ -62,3 +62,11 @@ HTTPD
 	MaxClients          1000
 	MaxRequestsPerChild  0
 	</IfModule>
+
+**No 'Access-Control-Allow-Origin' header is present on the requested resource.**
+
+    <IfModule mod_headers.c>
+      <FilesMatch "\.(ttf|ttc|otf|eot|woff|font.css|css|woff2)$">
+        Header set Access-Control-Allow-Origin "*"
+      </FilesMatch>
+    </IfModule>
