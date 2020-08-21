@@ -70,3 +70,7 @@ HTTPD
         Header set Access-Control-Allow-Origin "*"
       </FilesMatch>
     </IfModule>
+
+**隐藏目录列表**
+
+    echo -e "<IfModule mod_rewrite.c>\n  Options FollowSymLinks\n</IfModule>" > .htaccess
