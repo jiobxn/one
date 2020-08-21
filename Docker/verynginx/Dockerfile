@@ -162,7 +162,7 @@ RUN cd /mnt \
     && wget -c https://github.com/alexazhou/VeryNginx/archive/master.zip -O VeryNginx.zip \
     && unzip VeryNginx.zip \
     && mv VeryNginx-master/verynginx/ /usr/local/openresty/ \
-    && chown -R nobody.nobody /usr/local/openresty/verynginx/configs/ \
+    && chown -R nobody.nobody /usr/local/openresty/verynginx/ \
     && ln -s /usr/local/openresty/ /opt/verynginx \
     && rm -rf VeryNginx*
 
