@@ -25,3 +25,4 @@ EXPOSE 80 443
 CMD ["openresty", "-g", "daemon off;"]
 
 # docker build -t openresty .
+# docker run -d --cap-add NET_ADMIN -p 9999:80 -e WAF=Y -e WAF_REQ="404,20;403,10" --name openresty jiobxn/nginx:waf
