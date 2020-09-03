@@ -61,6 +61,7 @@ http_conf() {
 		
 	    charset $NGX_CHARSET;
 	    client_max_body_size 0;
+	    client_body_buffer_size 128k;
 	    autoindex on;
 	    server_tokens off;
 		
