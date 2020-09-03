@@ -3,7 +3,7 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
 RUN curl -s https://openresty.org/package/centos/openresty.repo >/etc/yum.repos.d/openresty.repo
-RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install openresty openresty-resty openresty-resty keepalived wget net-tools iproute ipset iptables cronie; yum clean all
+RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install openresty openresty-resty openresty-opm keepalived wget net-tools iproute ipset iptables cronie; yum clean all
 
 RUN cd /mnt \
     && wget -c https://github.com/jiobxn/VeryNginx/archive/master.zip -O VeryNginx.zip \
