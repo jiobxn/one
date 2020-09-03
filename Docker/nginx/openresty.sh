@@ -650,7 +650,7 @@ http_waf(){
 	#cron
 	cat >/ipset.cron <<-END
 	#!/bin/bash
-	awk '{print \$1,\$2}' /usr/local/openresty/nginx/logs/frequency.log |sort |uniq -c >/tmp/.all
+	awk -F- '{print \$1}' /usr/local/openresty/nginx/logs/frequency.log |awk '{print \$1,\$NF}' |sed 's/,//g' |sort |uniq -c >/tmp/.all
 	
 	for i in \$(awk '{print \$2}' /tmp/.all |sort |uniq); do
 	    if [ -n "\$(ipset test blacklist \$i 2>&1 |grep -w NOT)" ]; then
