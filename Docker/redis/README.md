@@ -3,6 +3,7 @@ Redis
 ## 简介
 * Redis 是一个高性能的key-value数据库。
 > * 官方站点：https://redis.io/
+> * 命令手册：http://redisdoc.com/index.html
 
 ## Example:
 
@@ -51,6 +52,10 @@ Redis
 
     SELECT 2
     DBSIZE
+
+查看列表KEY的长度
+
+    LLEN mykey
 
 清空当前DB的KEY
 
