@@ -603,8 +603,8 @@ http_other() {
 			logfile="$(grep "server_name " /nginx/conf/vhost/${project_name}_$n.conf |awk -F# '{print $2}' |sort |head -1)"
 			
 			if [ "$log" == "Y" ]; then
-				sed -i '/#server_name#/ i \    access_log logs/'$logfile'-access.log;' /nginx/conf/vhost/${project_name}_$n.conf
-				sed -i '/#server_name#/ i \    error_log logs/'$logfile'-error.log;' /nginx/conf/vhost/${project_name}_$n.conf
+				sed -i '/#server_name#/ i \    access_log logs\/'$logfile'-access.log;' /nginx/conf/vhost/${project_name}_$n.conf
+				sed -i '/#server_name#/ i \    error_log logs\/'$logfile'-error.log;' /nginx/conf/vhost/${project_name}_$n.conf
 			fi
 			
 			if [ "$log" == "N" ]; then
@@ -855,8 +855,8 @@ stream_other() {
 			log="$(echo $i |grep 'log=' |awk -F= '{print $2}')"
 			
 			if [ "$log" == "Y" ]; then
-				sed -i '/#backend-lb-'$n'#/ a \        access_log logs/'$n'-access.log main;' /nginx/conf/nginx.conf
-				sed -i '/#backend-lb-'$n'#/ a \        error_log logs/'$n'-error.log;' /nginx/conf/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ a \        access_log logs\/'$n'-access.log main;' /nginx/conf/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ a \        error_log logs\/'$n'-error.log;' /nginx/conf/nginx.conf
 			fi
 			
 			if [ "$log" == "N" ]; then
