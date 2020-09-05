@@ -15,9 +15,9 @@ google翻译工具
 ### sod
 ddos工具
 
-    syn flood: /.sod -h 192.168.2.3
-    udp flood: /.sod -h 192.168.2.3 -m udp 
-    icmp flood: /.sod -h 192.168.2.3 -m icmp 
+    syn flood: sod -h 192.168.2.3
+    udp flood: sod -h 192.168.2.3 -m udp 
+    icmp flood: sod -h 192.168.2.3 -m icmp 
 ***
 ### ctop
 容器流量监控脚本
