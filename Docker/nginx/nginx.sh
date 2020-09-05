@@ -592,8 +592,8 @@ http_other() {
 			logfile="$(grep "server_name " /etc/nginx/conf.d/${project_name}_$n.conf |awk -F# '{print $2}' |sort |head -1)"
 			
 			if [ "$log" == "Y" ]; then
-				sed -i '/#server_name#/ i \    access_log '$logfile'-access.log;' /etc/nginx/conf.d/${project_name}_$n.conf
-				sed -i '/#server_name#/ i \    error_log '$logfile'-error.log;' /etc/nginx/conf.d/${project_name}_$n.conf
+				sed -i '/#server_name#/ i \    access_log \/var\/log\/nginx\/'$logfile'-access.log;' /etc/nginx/conf.d/${project_name}_$n.conf
+				sed -i '/#server_name#/ i \    error_log \/var\/log\/nginx\/'$logfile'-error.log;' /etc/nginx/conf.d/${project_name}_$n.conf
 			fi
 			
 			if [ "$log" == "N" ]; then
@@ -815,8 +815,8 @@ stream_other() {
 			log="$(echo $i |grep 'log=' |awk -F= '{print $2}')"
 			
 			if [ "$log" == "Y" ]; then
-				sed -i '/#backend-lb-'$n'#/ a \        access_log /var/log/nginx/'$n'-access.log main;' /etc/nginx/nginx.conf
-				sed -i '/#backend-lb-'$n'#/ a \        error_log /var/log/nginx/'$n'-error.log;' /etc/nginx/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ a \        access_log \/var\/log\/nginx\/'$n'-access.log main;' /etc/nginx/nginx.conf
+				sed -i '/#backend-lb-'$n'#/ a \        error_log \/var\/log\/nginx\/'$n'-error.log;' /etc/nginx/nginx.conf
 			fi
 			
 			if [ "$log" == "N" ]; then
