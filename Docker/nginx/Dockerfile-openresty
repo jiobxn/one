@@ -3,7 +3,7 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
 RUN curl -s https://openresty.org/package/centos/openresty.repo >/etc/yum.repos.d/openresty.repo
-RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install openresty openresty-resty openresty-opm keepalived wget net-tools iproute ipset iptables cronie; yum clean all
+RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install openresty openresty-resty openresty-opm keepalived wget net-tools gridsite-clients iproute ipset iptables cronie; yum clean all
 
 RUN cd /mnt \
     && wget -c https://github.com/jiobxn/VeryNginx/archive/master.zip -O VeryNginx.zip \
@@ -13,7 +13,7 @@ RUN cd /mnt \
     && ln -s /usr/local/openresty/ /opt/verynginx \
     && rm -rf VeryNginx*
 
-VOLUME /usr/local/openresty/nginx/html /usr/local/openresty/nginx/logs /key
+VOLUME /usr/local/openresty/nginx/html /usr/local/openresty/nginx/logs /usr/local/openresty/verynginx/configs /key
 
 COPY openresty.sh /openresty.sh
 RUN chmod +x /openresty.sh
@@ -25,5 +25,5 @@ EXPOSE 80 443
 CMD ["openresty", "-g", "daemon off;"]
 
 # docker build -t openresty .
-# docker run -d --cap-add NET_ADMIN -p 9999:80 -e WAF=Y -e WAF_REQ="404,60;403,30" -e REMOTE_ADDR=proxy_add_x_forwarded_for --name openresty jiobxn/nginx:waf
+# docker run -d -p 9999:80 -e WAF=Y -e WAF_REQ="404,60;403,30" -e REMOTE_ADDR=proxy_add_x_forwarded_for --name openresty jiobxn/nginx:waf
 # http://{{your_machine_address}}/verynginx/index.html
