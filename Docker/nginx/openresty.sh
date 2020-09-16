@@ -993,7 +993,6 @@ if [ "$1" = 'openresty' ]; then
 			chown nobody.nobody /usr/local/openresty/nginx/logs/frequency.log
 			sed -i 's/##waf//g' /usr/local/openresty/nginx/conf/nginx.conf
 			sed -i 's/##waf//g' /usr/local/openresty/nginx/conf/vhost/*
-			sed -i 's/remote_addr/'$REMOTE_ADDR'/g' /usr/local/openresty/verynginx/lua_script/module/frequency_limit.lua
 			
 			if [ "$WAF_REQ" ]; then
 			    [ -n "$(echo "$WAF_REQ" |grep ,)" ] && http_waf
