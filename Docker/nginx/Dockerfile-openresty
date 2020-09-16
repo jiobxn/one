@@ -25,5 +25,5 @@ EXPOSE 80 443
 CMD ["openresty", "-g", "daemon off;"]
 
 # docker build -t openresty .
-# docker run -d -p 9999:80 -e WAF=Y -e WAF_REQ="404,60;403,30" -e REMOTE_ADDR=proxy_add_x_forwarded_for --name openresty jiobxn/nginx:waf
+# docker run -d --cap-add NET_ADMIN -p 9999:80 -e WAF=Y -e WAF_REQ="404,60;403,30" -e REMOTE_ADDR=proxy_add_x_forwarded_for --name openresty jiobxn/nginx:waf
 # http://{{your_machine_address}}/verynginx/index.html
