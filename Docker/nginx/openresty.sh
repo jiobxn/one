@@ -201,10 +201,6 @@ fcgi_server() {
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /usr/local/openresty/nginx/conf/cert/.htpasswd;
 	##nginx_status    }
-	
-	    location ~ /\.ht {
-	        deny  all;
-	    }
 	}
 	END
 }
@@ -265,10 +261,6 @@ java_php_server() {
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /usr/local/openresty/nginx/conf/cert/.htpasswd;
 	##nginx_status    }
-	
-	    location ~ /\.ht {
-	        deny  all;
-	    }
 	}
 	END
 }
@@ -330,10 +322,6 @@ proxy_server() {
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /usr/local/openresty/nginx/conf/cert/.htpasswd;
 	##nginx_status    }
-	
-	    location ~ /\.ht {
-	        deny  all;
-	    }
 	}
 	END
 }
@@ -648,29 +636,39 @@ http_waf(){
 	done
 
 	#cron
-	cat >/ipset.cron <<-END
+	cat >/deny.sh <<-END
 	#!/bin/bash
+	s_user=verynginx
+	encrypt_seed=\$(awk -F\" 'NR==2{print \$4}' /opt/verynginx/verynginx/configs/encrypt_seed.json)
+	verynginx_session=\$(echo -n "\${encrypt_seed}\${s_user}" |md5sum |awk '{print \$1}')
 	awk -F- '{print \$1}' /usr/local/openresty/nginx/logs/frequency.log |awk '{print \$1,\$NF}' |sed 's/,//g' |sort |uniq -c >/tmp/.all
 	
 	for i in \$(awk '{print \$2}' /tmp/.all |sort |uniq); do
+	    if [ -z "\$(grep -w \$i /usr/local/openresty/verynginx/configs/*)" ]; then
+	        s_encode=\$(urlencode '{"enable": true,"ip": "'\$i'","matcher": "all_request","action": "block","code": "451","custom_response": false}')
+	        s_base64=\$(echo "\$s_encode" | base64 -w 0)
+	        #REQ1#
+	    fi
+		#
 	    if [ -n "\$(ipset test blacklist \$i 2>&1 |grep -w NOT)" ]; then
-	        #REQ#
+	        #REQ2#
 	    fi
 	done
+	curl -s http://127.0.0.1:$HTTP_PORT/verynginx/blackwhite/dump -X POST --header "Cookie:verynginx_user=\${s_user}; verynginx_session=\$verynginx_session"
 	END
 
-	#cron2
+	#add
 	for i in $(echo "$WAF_REQ" |sed 's/;/\n/g'); do
 		if [ -n "$(echo $i |grep ,)" ]; then
 			code=$(echo $i |awk -F , '{print $1}')
 			max=$(echo $i |awk -F , '{print $2}')
-			sed -i '/#REQ#/ a \        if [ -n "$(awk '"'"'$2=="'"'"'$i'"'"'" && $3=="'$code'" && \$1>'$max'{print \$2}'"'"' \/tmp\/.all)" ];then\n            ipset add blacklist $i\n            echo "add blacklist $i" >>\/key\/all.ipset\n        fi'  /ipset.cron
+			sed -i '/#REQ1#/ a \        if [ -n "$(awk '"'"'$2=="'"'"'$i'"'"'" && $3=="'$code'" && \$1>'$max'{print \$2}'"'"' \/tmp\/.all)" ];then\n            curl -s http://127.0.0.1:'$HTTP_PORT'/verynginx/blackwhite -X POST -d "config=\$s_base64" --header "Cookie:verynginx_user=\${s_user}; verynginx_session=\$verynginx_session"\n        fi'  /deny.sh
+			sed -i '/#REQ2#/ a \        if [ -n "$(awk '"'"'$2=="'"'"'$i'"'"'" && $3=="'$code'" && \$1>'$max'{print \$2}'"'"' \/tmp\/.all)" ];then\n            ipset add blacklist $i\n            echo "add blacklist $i" >>\/key\/all.ipset\n        fi'  /deny.sh
 		fi
 	done
 
-	chmod +x /ipset.sh
-	chmod +x /ipset.cron
-	echo "* * * * * . /etc/profile; /bin/sh /ipset.cron" >/var/spool/cron/root
+	chmod +x /*.sh
+	echo "* * * * * . /etc/profile; /bin/sh /deny.sh" >/var/spool/cron/root
 }
 
 
