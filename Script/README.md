@@ -57,5 +57,5 @@ MySQL导出导入
 ### httpflood、wrk
 http压力测试
 
-    httpflood http://127.0.0.1 10 get 30 nil
+    httpflood http://127.0.0.1 16 get 30 nil
     wrk -d 30 -c 16 http://127.0.0.1
