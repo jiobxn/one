@@ -46,7 +46,7 @@ HTTPD
 
 **关于日志记录客户端真实IP(nginx proxy)**  
 
-    httpd.conf  197行    LogFormat "\"%{X-Real-IP}i\" %l %u %t \"%r\" %>s %b" common
+    httpd.conf  197行    LogFormat "%{X-Real-IP}i %l %u %t \"%r\" %>s %b" common
 
 [redis验证](https://raw.githubusercontent.com/jiobxn/one/master/Script/hello.php)
 
