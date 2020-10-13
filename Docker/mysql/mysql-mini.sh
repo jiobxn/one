@@ -17,7 +17,7 @@ if [ "$1" = 'mysqld' ]; then
 
 		#Server ID
 		if [ -n "$SERVER_ID" -a -z "$(grep ^server-id /etc/my.cnf)" ]; then
-			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
+			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nbinlog-format=ROW\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
 		fi
 	  fi
 	else
@@ -26,7 +26,7 @@ if [ "$1" = 'mysqld' ]; then
 		[ "$mysql_V" -ge "80" ] && echo "default_authentication_plugin=mysql_native_password" >>/etc/my.cnf
 		#Server ID
 		if [ "$SERVER_ID" ]; then
-			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
+			sed -i '/\[mysqld\]/a log-bin=mysql-bin\nbinlog-format=ROW\nserver-id='$SERVER_ID'\ninnodb_flush_log_at_trx_commit=1\nsync_binlog=1\nlower_case_table_names=1' /etc/my.cnf
 		fi
 
 		#Initialize MYSQL
