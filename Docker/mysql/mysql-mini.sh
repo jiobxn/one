@@ -162,9 +162,16 @@ DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME"
 	if [ "$MYSQL_GENERAL_LOG" ]; then
 		sed -i '/\[mysqld\]/a general-log = 1' /etc/my.cnf
 	fi
+	
 	#Mysql mode
 	if [ "$MYSQL_MODE" ]; then
 		sed -i '/\[mysqld\]/a sql-mode = '$MYSQL_MODE'' /etc/my.cnf
+	fi
+	
+	: ${MYSQL_CHARACTER:=utf8}
+	#Mysql character
+	if [ "$MYSQL_CHARACTER" ]; then
+		sed -i '/\[mysqld\]/a character-set-server = '$MYSQL_CHARACTER'' /etc/my.cnf
 	fi
 	
 	#Mysql modify the default port
