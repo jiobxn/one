@@ -180,3 +180,19 @@ Nginx
     systemctl restart docker.service
 
 注意：worker_processes数越大占用内存越多
+
+
+****
+
+### waf
+
+    docker run -d --restart unless-stopped --cap-add NET_ADMIN  -p 80:80 -p 443:443 -e TZ=Asia/Shanghai -v /docker/key:/key -v /docker/www:/usr/local/openresty/nginx/html -v /docker/verynginx:/usr/local/openresty/verynginx/configs -v /docker/logs:/usr/local/openresty/nginx/logs -e WAF=Y -e WAF_REQ="404,50;403,20" --name nginx jiobxn/nginx:waf
+    chown 65534.65534 /docker/verynginx
+    # 超过50次404错误 或 超过20次403错误，会被iptables拒绝(需要禁用"浏览器校验")
+    
+    控制台：http://192.168.1.37:80/verynginx/index_zh.html
+    
+    压测：wrk -d 30 -c 16  http://192.168.1.37:80/
+    4C4G 
+    开启"频率限制" 50000/s 拒绝请求数
+    关闭"所有限制" 32500/s 访问请求数
