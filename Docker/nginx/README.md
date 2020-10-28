@@ -129,7 +129,8 @@ Nginx
 
 关于日志记录客户端真实IP(nginx proxy)
 
-    sed -i 's/$remote_addr/$proxy_add_x_forwarded_for/' /etc/nginx/nginx.conf
+    sed -i 's/$remote_addr/$http_x_forwarded_for/' /etc/nginx/nginx.conf
+    #sed -i 's/$remote_addr/$proxy_add_x_forwarded_for/' /etc/nginx/nginx.conf
 
 ****
 
