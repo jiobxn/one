@@ -596,7 +596,7 @@ http_other() {
 			logfile="$(grep "server_name " /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf |awk -F# '{print $2}' |sort |head -1)"
 			
 			if [ "$log" == "Y" ]; then
-				sed -i '/#server_name#/ i \    access_log logs\/'$logfile'-access.log;' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf
+				sed -i '/#server_name#/ i \    access_log logs\/'$logfile'-access.log main;' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf
 				sed -i '/#server_name#/ i \    error_log logs\/'$logfile'-error.log;' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf
 			fi
 			
