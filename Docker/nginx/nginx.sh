@@ -592,7 +592,7 @@ http_other() {
 			logfile="$(grep "server_name " /etc/nginx/conf.d/${project_name}_$n.conf |awk -F# '{print $2}' |sort |head -1)"
 			
 			if [ "$log" == "Y" ]; then
-				sed -i '/#server_name#/ i \    access_log \/var\/log\/nginx\/'$logfile'-access.log;' /etc/nginx/conf.d/${project_name}_$n.conf
+				sed -i '/#server_name#/ i \    access_log \/var\/log\/nginx\/'$logfile'-access.log main;' /etc/nginx/conf.d/${project_name}_$n.conf
 				sed -i '/#server_name#/ i \    error_log \/var\/log\/nginx\/'$logfile'-error.log;' /etc/nginx/conf.d/${project_name}_$n.conf
 			fi
 			
