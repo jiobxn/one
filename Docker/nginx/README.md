@@ -81,7 +81,7 @@ Nginx
 	ACCLOG_OFF=<Y>								#关闭访问日志记录
 	ERRLOG_OFF=<Y>								#关闭错误日志记录
 	ACCLOG_ON=<Y>								#开启stream访问日志
-	LIMIT_RATE=<2048k>							#单IP下周速率限制
+	LIMIT_RATE=<2048k>							#单IP下载速率限制
 	LIMIT_CONN=<50>								#单IP最大并发数限制
 	LIMIT_REQ=<2>								#单IP最大请求速率限制
 	KP_ETH=[default interface]						#用于组播的网络接口
@@ -108,7 +108,7 @@ Nginx
 		error=<https://www.bing.com>					#错误跳转，用于DOMAIN模式
 		auth=<admin|passwd>						#用户认证，用于PROXY和DOMAIN模式
 		filter=<.google.com|.fqhub.com&.twitter.com|.fqhubcom>		#字符替换，用于PROXY和DOMAIN模式
-		limit_rate=<2048k> \\						#单IP下周速率限制
+		limit_rate=<2048k> \\						#单IP下载速率限制
 		limit_conn=<50> \\						#单IP最大并发数限制
 		limit_req=<2> \\						#单IP最大请求速率限制
 		log=<N|Y>							#使用独立日志文件，或者关闭日志
@@ -194,6 +194,5 @@ Nginx
     控制台：http://192.168.1.37:80/verynginx/index_zh.html
     
     压测：wrk -d 30 -c 16  http://192.168.1.37:80/
-    4核4G 4worker
-    开启"频率限制" 50000/s 拒绝请求数
-    关闭"所有限制" 32500/s 访问请求数
+    4核 4worker   30000
+    8核 8worker   50000
