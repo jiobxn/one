@@ -52,8 +52,9 @@ else
 	echo -e "
 	Example:
 				docker run -d --restart unless-stopped \\
-				-v /docker/filebrowser:/srv
-				-p 8080:8080 \
+				-v /docker/filebrowser:/srv \\
+				-v /docker/fbconfig:/key \\
+				-p 8080:8080 \\
 				-e PORT=[8080] \\
 				-e USER=[admin] \\
 				-e PASS=[admin] \\
