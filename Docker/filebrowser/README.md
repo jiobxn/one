@@ -16,7 +16,14 @@ FileBrowser
 
 				docker run -d --restart unless-stopped \\
 				-v /docker/filebrowser:/srv
+				-v /docker/fbconfig:/key
 				-p 8080:8080 \
-				-e FB_PORT=[8080] \\
-				-e FB_AUTH=<Y> \\    #开启用户认证
-				--name filemanager filemanager
+				-e PORT=[8080] \\
+				-e USER=[admin] \\
+				-e PASS=[admin] \\
+				-e ADDR=[0.0.0.0] \\
+				-e DB=[filebrowser.db] \\
+				-e LOG=<filebrowser.log> \\
+				-e ROOT=[/srv] \\
+				-e SSL=<Y> \\
+				--name filebrowser filebrowser
