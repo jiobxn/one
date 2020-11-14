@@ -622,8 +622,8 @@ http_waf(){
 	#ipset
 	cat >/ipset.sh <<-END
 	#!/bin/bash
-	[ -z "\`echo "\$(ipset list blacklist 2>/dev/null)" |grep -w blacklist\`" ] && ipset create blacklist hash:net maxelem 1000000
-	[ -z "\`echo "\$(ipset list whitelist 2>/dev/null)" |grep -w whitelist\`" ] && ipset create whitelist hash:net maxelem 1000000
+	[ -z "\`ipset list blacklist 2>/dev/null |grep -w blacklist\`" ] && ipset create blacklist hash:net maxelem 1000000
+	[ -z "\`ipset list whitelist 2>/dev/null |grep -w whitelist\`" ] && ipset create whitelist hash:net maxelem 1000000
 	if [ -f /key/all.ipset ]; then
 		[ "\$(ipset list |egrep ^[0-9] |wc -l)" -lt "\$(wc -l /key/all.ipset |awk '{print \$1}')" ] && ipset -R < /key/all.ipset
 	fi
