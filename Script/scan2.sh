@@ -1,4 +1,6 @@
 #!/bin/bash
+# 0 0 * * * cp /var/log/secure /var/log/secure.$(date -d "-1 day" +%F) ; > /var/log/secure
+
 # ipset init
 ipset_lock() {
 	[ -z "`ipset list blacklist 2>/dev/null |grep -w blacklist`" ] && ipset create blacklist hash:net maxelem 1000000
