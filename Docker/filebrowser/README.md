@@ -3,6 +3,8 @@ FileBrowser
 ## 简介
 * **File Browser** 是简单好用的跨平台文件管理工具，支持英、法、日、中等语言。
 > * 项目地址：https://github.com/filebrowser/filebrowser
+> * OwnCloud：https://doc.owncloud.org/server/10.5/admin_manual/installation/docker/
+> * Cloudreve：https://github.com/cloudreve/Cloudreve
 
 
 ## Example:
