@@ -1,4 +1,5 @@
 #!/bin/bash
+# * * * * * . /etc/profile; bash /usr/local/sbin/scan2.sh
 # 0 0 * * * cp /var/log/secure /var/log/secure.$(date -d "-1 day" +\%F) ; > /var/log/secure
 # echo "\rm /tmp/.ipset.lock" >> /etc/rc.local
 
