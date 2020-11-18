@@ -21,7 +21,7 @@ chmod u+x /usr/local/sbin/scan.sh
 cat >/var/spool/cron/root <<-EOF
 MAILTO=' '
 58 23 * * * yum update -y
-* * * * * bash /usr/local/sbin/scan.sh
+* * * * * . /etc/profile; bash /usr/local/sbin/scan.sh
 * * * * * echo 3 > /proc/sys/vm/drop_caches
 EOF
 
