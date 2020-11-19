@@ -51,6 +51,7 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	sed -i 's/_default_:443/_default_:'$HTTPS_PORT'/g' /etc/httpd/conf.d/ssl.conf
 	sed -i 's/AllowOverride None/AllowOverride All/g' /etc/httpd/conf/httpd.conf
 	echo -e "ServerTokens Prod\nServerSignature Off" >>/etc/httpd/conf/httpd.conf
+	sed -i '197s/"%h/"%{X-Real-IP}i %h/' /etc/httpd/conf/httpd.conf
 
 	#gzip
 	cat >>/etc/httpd/conf/httpd.conf <<-END
