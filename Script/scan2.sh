@@ -7,8 +7,9 @@
 ipset_lock() {
 	[ -z "`ipset list blacklist 2>/dev/null |grep -w blacklist`" ] && ipset create blacklist hash:net maxelem 1000000
 	[ -z "`ipset list whitelist 2>/dev/null |grep -w whitelist`" ] && ipset create whitelist hash:net maxelem 1000000
-	[ -z "`iptables -S |grep -w blacklist`" ] && iptables -I INPUT -m set --match-set blacklist src -j DROP
-	[ -z "`iptables -S |grep -w whitelist`" ] && iptables -I INPUT -m set --match-set whitelist src -j ACCEPT
+	# -p tcp --destination-port 22
+	[ -z "`iptables -S |grep -w blacklist`" ] && iptables -I INPUT -m set --match-set blacklist src -p tcp --destination-port 22 -j DROP
+	[ -z "`iptables -S |grep -w whitelist`" ] && iptables -I INPUT -m set --match-set whitelist src -p tcp --destination-port 22 -j ACCEPT
 	[ -z "`iptables -S |grep -w SSH-SYN`" ] && iptables -I INPUT -p tcp --dport 22 --syn -m state --state NEW -m recent --name SSH-SYN --update --seconds 60 --hitcount 5 -j DROP
   
 	touch /tmp/.ipset.lock
