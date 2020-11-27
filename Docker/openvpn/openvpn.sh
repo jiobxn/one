@@ -3,7 +3,8 @@ set -e
 
 if [ "$1" = 'openvpn' ]; then
 
-: ${DEV:=$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)}
+: ${GW_DEV:=$(route -n |awk '$1=="0.0.0.0"{print $NF }' |head -1)}
+: ${LOCAL_DEV:=$GW_DEV}
 : ${IP_RANGE:=10.8}
 : ${VPN_PORT:=1194}
 : ${TCP_UDP:=tcp}
@@ -29,7 +30,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	fi
 
 	if [ -z "$SERVER_IP" ]; then
-		SERVER_IP=$(ifconfig $DEV |awk '$3=="netmask"{print $2}')
+		SERVER_IP=$(ifconfig $GW_DEV |awk '$3=="netmask"{print $2}')
 	fi
 
 	echo "Initialize openvpn"
@@ -160,7 +161,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 			! Configuration File for keepalived
 			vrrp_instance VPN_IP {
 				state BACKUP
-				interface $DEV
+				interface $LOCAL_DEV
 				virtual_router_id 81
 				priority 100
 				advert_int 1
@@ -211,7 +212,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 				y3=$(($y3+$y4/256))
 				[ $y4 -eq 256 ] && y4=$(($y4-256))
 				sed -i "/virtual_ipaddress/a \        $y1.$y3.$y4" /etc/keepalived/keepalived.conf
-				echo "iptables -t nat -A POSTROUTING -s $IP_RANGE.$x.$n/32 -o $DEV -m comment --comment user$i -j SNAT --to-source $y1.$y3.$y4" >>/iptables.sh
+				echo "iptables -t nat -A POSTROUTING -s $IP_RANGE.$x.$n/32 -o $GW_DEV -m comment --comment user$i -j SNAT --to-source $y1.$y3.$y4" >>/iptables.sh
 				y4=`expr $y4 + 1`  #Using "let y4++" will have an error
 			fi
 		
@@ -382,7 +383,7 @@ if [ -z "$(grep "redhat.xyz" /etc/openvpn/server.conf)" ]; then
 	else
 		cat >> /iptables.sh <<-END
 		iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-		iptables -t nat -I POSTROUTING -s $IP_RANGE.0/16 -o $DEV -j MASQUERADE
+		iptables -t nat -I POSTROUTING -s $IP_RANGE.0/16 -o $GW_DEV -j MASQUERADE
 		iptables -I FORWARD -s $IP_RANGE.0.0/16 -j ACCEPT
 		iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 		END
@@ -413,6 +414,8 @@ else
 			-v /docker/openvpn:/key \\
 			-p 1194:1194 \\
 			-p <8080:8080> \\
+			-e GW_DEV=[route -n] \\
+			-e LOCAL_DEV=[$GW_DEV] \\
 			-e TCP_UDP=[tcp] \\
 			-e TAP_TUN=[tun] \\
 			-e VPN_PORT=[1194] \\
