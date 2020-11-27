@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e
 
-: ${LOCAL_GW:="$(ip route |awk '$1=="default"{print $3}')"}
 : ${UP_TIME:="daily"}
+: ${LOCAL_GW:="$(ip route |awk '$1=="default"{print $3}')"}
 : ${GW_DEV:="$(ip route |awk '$1=="0.0.0.0/1"{print $NF}' |head -1)"}
+: ${RAN:="$(iptables -t nat -S |awk '$NF=="MASQUERADE"{print $4}')"}
+: ${LOCAL_DEV:="$(iptables -t nat -S |awk '$NF=="MASQUERADE"{print $6}')"}
 
 
 if [ "$1" = 'crond' ]; then
@@ -23,6 +25,9 @@ if [ "$1" = 'crond' ]; then
         chmod +x /etc/periodic/$UP_TIME/route.sh
 
         echo "awk '{print \"ip route add\",\$1,\"via $LOCAL_GW\"}' /chnroute.txt |sh 2>/dev/null || echo" >/usr/local/bin/chnroute
+	[ "$SNAT" ] && echo "iptables -t nat -S |grep MASQUERADE |awk '{print \"iptables -t nat -D\",\$2,\$3,\$4,\$5,\$6,\$7,\$8}' |sh 2>/dev/null || echo" >>/usr/local/bin/chnroute
+	[ "$SNAT" ] && echo "iptables -t nat -I POSTROUTING -s $RAN -o $GW_DEV -j MASQUERADE" >>/usr/local/bin/chnroute
+	[ "$SNAT" ] && echo "awk '{print \"iptables -t nat -I POSTROUTING -s $RAN -d\",\$1,\"-o $LOCAL_DEV -j MASQUERADE\"}' /chnroute.txt |sh 2>/dev/null || echo" >>/usr/local/bin/chnroute
         chmod +x /usr/local/bin/chnroute
     fi
 
@@ -34,12 +39,14 @@ else
 	echo -e "
 	Example:
 				docker run -d --restart unless-stopped \\
-				--network container:ovpn \\
-				-e LOCAL_GW=[ip route] \\
+				--network container:openvpn \\
+				-e LOCAL_GW=[default] \\
 				-e LOCAL_ROUTE=<192.168.0.0/24,10.10.0.0/16> \\
+				-e LOCAL_DEV=<default> \\
 				-e UP_TIME=[daily] \\
+				-e GW_DEV=<default> \\
+				-e RAN=<default> \\
 				-e SNAT=<Y> \\
-				-e GW_DEV=[ip route] \\
 				--name chnroute jiobxn/chnroute
 	"
 fi
