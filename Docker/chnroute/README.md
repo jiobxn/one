@@ -7,7 +7,7 @@ CHNRoute
 ## Example:
 
     #运行一个openvpn server，提供服务
-    docker run -d --restart unless-stopped --cap-add NET_ADMIN --device=/dev/net/tun -v /docker/openvpn:/key -e IP_RANGE=10.5 --name openvpn jiobxn/openvpn
+    docker run -d --restart unless-stopped --cap-add NET_ADMIN --device=/dev/net/tun -v /docker/openvpn:/key -p 1194:1194 -e IP_RANGE=10.5 --name openvpn jiobxn/openvpn
     #运行一个openvpn client，连接世界(to freedom)
     docker run -d --restart unless-stopped --cap-add NET_ADMIN --device=/dev/net/tun -v /docker/tw:/key --network container:openvpn --name ovpn jiobxn/openvpn:client
     #添加CHN路由
