@@ -4,7 +4,7 @@ MAINTAINER "The CentOS Project" <admin@jiobxn.com>
 ARG LATEST="0"
 ARG php_v="56"
 
-RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install httpd mod_ssl net-tools unzip wget; yum clean all
+RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install httpd mod_ssl net-tools unzip wget cronie; yum clean all
 RUN rpm -ivh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 RUN if [ "${php_v}" -ge 70 ];then redis=5; fi; yum -y install --enablerepo=remi --enablerepo=remi-php${php_v} php php-fpm php-pecl-redis${redis} php-mysqlnd php-opcache php-zip php-gd php-bcmath php-mbstring php-xml php-mcrypt php-posix; yum clean all
 RUN cd /mnt && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && php composer-setup.php && mv composer.phar /usr/local/bin/composer \
