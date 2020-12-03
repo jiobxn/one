@@ -42,6 +42,7 @@ HTTPD
 			-e REDIS_PORT=[6379] \\           redis服务端口
 			-e REDIS_PASS=<bigpass> \\        redis密码
 			-e REDIS_DB=[0] \\                redis数据库
+			-e ZEND=<SourceGuardian|ionCube> \\
 			--name apache apache
 
 **关于日志记录客户端真实IP(nginx proxy)**  
