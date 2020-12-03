@@ -8,9 +8,9 @@ RUN yum clean all; yum -y install epel-release; yum -y update; yum -y install ht
 RUN rpm -ivh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 RUN if [ "${php_v}" -ge 70 ];then redis=5; fi; yum -y install --enablerepo=remi --enablerepo=remi-php${php_v} php php-fpm php-pecl-redis${redis} php-mysqlnd php-opcache php-zip php-gd php-bcmath php-mbstring php-xml php-mcrypt php-posix; yum clean all
 RUN cd /mnt && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && php composer-setup.php && mv composer.phar /usr/local/bin/composer \
+    && wget -c https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz && tar zxf ioncube_loaders_lin_x86-64.tar.gz && mv ioncube /usr/local/ioncube \
     && wget -c https://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz && tar zxf loaders.linux-x86_64.tar.gz \
     && mv ixed.$(php -v |awk 'NR==1{print $2}' |awk -F. '{print $1"."$2}').lin /usr/lib64/php/modules/ \
-    && echo -e "[sourceguardian]\nzend_extension=/usr/lib64/php/modules/ixed.$(php -v |awk 'NR==1{print $2}' |awk -F. '{print $1"."$2}').lin" >>/etc/php.ini \
     && rm -rf /mnt/*
 
 VOLUME /var/www/html
