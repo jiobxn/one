@@ -8,7 +8,7 @@ MySQL
 ## Example:
 
     #为zabbix运行一个mysql实例
-    docker run -d --restart unless-stopped -p 3306:3306 -v /docker/mysql-mini:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=newpass -e MYSQL_DATABASE=zabbix -e MYSQL_USER=zabbix -e MYSQL_PASSWORD=newpass -e MYSQL_BACK=Y --name mysql jiobxn/mysql
+    docker run -d --restart unless-stopped -p 3306:3306 -v /docker/mysql-mini:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=newpass -e MYSQL_DATABASE=zabbix -e MYSQL_USER=zabbix -e MYSQL_PASSWORD=newpass -e MYSQL_BACK=15 --name mysql jiobxn/mysql
 
     #运行一个master实例
     docker run -d --restart unless-stopped --network mynetwork --ip 10.0.0.50 -v /docker/mysql-master:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=newpass -e SERVER_ID=1 -e REPL_IPR=10.0.0.% -e REPL_USER=repl -e REPL_PASSWORD=123456 --hostname mysql-master --name mysql-msater jiobxn/mysql
