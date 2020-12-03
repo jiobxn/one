@@ -29,9 +29,12 @@ yum -y install python36-setuptools
 easy_install-3.6 pip
 pip install --upgrade youtube-dl you-get
 
+[ -f /usr/bin/dnf ] && OS8="--nobest"
+
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
-yum -y install docker-ce docker-ce-cli containerd.io docker-compose podman buildah skopeo
+yum -y install docker-ce docker-ce-cli containerd.io docker-compose podman buildah skopeo $OS8
 systemctl enable docker
+systemctl start docker
 
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
     swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/485" |bc`
