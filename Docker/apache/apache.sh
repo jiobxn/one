@@ -43,6 +43,8 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 	sed -i 's/listen = 127.0.0.1:9000/listen = 0.0.0.0:'$PHP_PORT'/' /etc/php-fpm.d/www.conf
 	sed -i 's/expose_php = On/expose_php = Off/' /etc/php.ini
 	[ ! -d /run/php-fpm ] && mkdir /run/php-fpm
+	[ "$ZEND" == "SourceGuardian" ] && echo -e "[sourceguardian]\nzend_extension=/usr/lib64/php/modules/ixed.$(php -v |awk 'NR==1{print $2}' |awk -F. '{print $1"."$2}').lin" >>/etc/php.ini
+	[ "$ZEND" == "ionCube" ] && echo -e "[sourceguardian]\nzend_extension=/usr/local/ioncube/ioncube_loader_lin_$(php -v |awk 'NR==1{print $2}' |awk -F. '{print $1"."$2}').so" >>/etc/php.ini
 
 	#httpd
 	sed -i 's/index.html/index.php index.html/' /etc/httpd/conf/httpd.conf
@@ -144,6 +146,7 @@ else
 			-e REDIS_PORT=[6379] \\
 			-e REDIS_PASS=<bigpass> \\
 			-e REDIS_DB=[0] \\
+			-e ZEND=<SourceGuardian|ionCube> \\
 			--name apache apache
 	"
 fi
