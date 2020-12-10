@@ -120,6 +120,7 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 fi
 
 	echo "Start ****"
+	\rm /run/httpd/httpd.pid &>/dev/null || echo
 	crond
 	exec "$@"
 else
