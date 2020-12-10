@@ -78,6 +78,7 @@ if [ "$1" = '/usr/sbin/init' ]; then
   
 	echo -e "\nDatabase type: MySQL\nDatabase host: $MYSQL_HOST\nDatabase port: $MYSQL_PORT\nDatabase name: $ZABBIX_DB\nUser: $MYSQL_USER\nPassword: $MYSQL_PASS\nDashboard: Admin/zabbix"
 	echo "Start ****"
+	\rm /run/httpd/httpd.pid &>/dev/null || echo
 	exec "$@"
 else
   echo -e "
