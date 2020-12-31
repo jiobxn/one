@@ -17,10 +17,13 @@ sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config
 
 wget https://github.com/jiobxn/one/raw/master/Script/scan2.sh -O /usr/local/sbin/scan.sh
 chmod u+x /usr/local/sbin/scan.sh
+echo \rm /tmp/.ipset.lock >>/etc/rc.local
+chmod +x /etc/rc.local
 
 cat >/var/spool/cron/root <<-EOF
 MAILTO=' '
 58 23 * * * yum update -y
+0 0 * * * \cp /var/log/secure /var/log/secure.\$(date -d "-1 day" +\%F) ; > /var/log/secure
 * * * * * . /etc/profile; bash /usr/local/sbin/scan.sh
 * * * * * echo 3 > /proc/sys/vm/drop_caches
 EOF
@@ -39,10 +42,9 @@ systemctl start docker
 if [ $(free |awk '$1=="Swap:"{print $2}') -eq 0 ]; then
     swap=`echo "$(free -m |awk '$1=="Mem:"{print $2}')/485" |bc`
     dd if=/dev/zero of=/swapfile bs="$swap"M count=1024
-    uuid=$(mkswap /swapfile |awk 'END{print $3}')
     chmod 0600 /swapfile
     swapon /swapfile
-    echo "$uuid    swap    defaults        0 0" >>/etc/fstab
+    echo swapon /swapfile >>/etc/rc.local
 fi
 
 if [ `ulimit -n` -eq 1024 ]; then
