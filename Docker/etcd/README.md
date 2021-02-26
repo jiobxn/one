@@ -2,8 +2,8 @@ ETCD
 ===
 ## 简介
 * **etcd** 是一个分布式，可靠的键值存储，用于存储分布式系统的最关键数据。
-> * 快速入门：https://github.com/etcd-io/etcd/blob/master/Documentation/demo.md
-> * API使用：https://github.com/etcd-io/etcd/blob/master/Documentation/dev-guide/api_grpc_gateway.md
+> * 快速入门：https://etcd.io/docs/current/demo/
+> * API使用：https://etcd.io/docs/current/learning/api/
 
 ****
 
@@ -50,6 +50,7 @@ ETCD
     ENDPOINTS=$HOST_1:2379,$HOST_2:2379,$HOST_3:2379
 
     etcdctl --endpoints=$ENDPOINTS member list  #列出节点
+    etcdctl --endpoints=$ENDPOINTS endpoint status --write-out=table  #查看集群状态
     etcdctl --endpoints=$ENDPOINTS put foo 'Hello World!'  #写入
     etcdctl --endpoints=$ENDPOINTS get foo  #读取
 
