@@ -56,7 +56,7 @@ if [ "$1" = 'ETCD' ]; then
 		sed -i 's/http:/https:/g' /usr/local/bin/ETCD
 		echo "https://$THIS_IP:$ETCD_PORT"
 	elif [ -f /key/ca.crt -a -f /key/peer.crt -a -f /key/peer.key ]; then
-		sed -i 's#$# --peer-client-cert-auth --peer-trusted-ca-file=/key/ca.crt --peer-cert-file=/key/server.crt --peer-key-file=/key/server.key#' /usr/local/bin/ETCD
+		sed -i 's#$# --peer-client-cert-auth --peer-trusted-ca-file=/key/ca.crt --peer-cert-file=/key/peer.crt --peer-key-file=/key/peer.key#' /usr/local/bin/ETCD
 		sed -i 's/http:/https:/g' /usr/local/bin/ETCD
 		echo "https://$THIS_IP:$ETCD_PORT"
 	elif [ -f /key/ca.crt -a -f /key/server.crt -a -f /key/server.key ]; then
