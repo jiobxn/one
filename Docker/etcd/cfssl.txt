@@ -1,0 +1,92 @@
+## 下载CFSSL工具
+
+curl -s https://github.com/cloudflare/cfssl/releases |awk -F\" '$2~"1.5.0_linux_amd64"{print "https://github.com/"$2}' |xargs wget -c
+for i in $(ls *_linux_amd64);do chmod +x $i; mv $i /usr/local/bin/$(echo $i |awk -F_ '{print $1}') ;done
+
+
+
+## 配置CA
+
+mkdir /root/ssl
+cd /root/ssl
+cat >  ca-config.json <<-EOF
+{
+"signing": {
+"default": {
+  "expiry": "87600h"
+},
+"profiles": {
+  "kubernetes-Soulmate": {
+    "usages": [
+        "signing",
+        "key encipherment",
+        "server auth",
+        "client auth"
+    ],
+    "expiry": "87600h"
+  }
+}
+}
+}
+EOF
+
+cat >  ca-csr.json <<-EOF
+{
+"CN": "kubernetes-Soulmate",
+"key": {
+"algo": "rsa",
+"size": 4096
+},
+"names": [
+{
+  "C": "CN",
+  "ST": "guangdong",
+  "L": "guangzhou",
+  "O": "k8s Inc.",
+  "OU": "System"
+}
+]
+}
+EOF
+
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+
+## 配置证书
+
+KUBEM1_IP=10.0.0.101
+KUBEM2_IP=10.0.0.102
+KUBEM3_IP=10.0.0.103
+
+cat > etcd-csr.json <<-EOF
+{
+  "CN": "etcd",
+  "hosts": [
+    "127.0.0.1",
+    "${KUBEM1_IP}",
+    "${KUBEM2_IP}",
+    "${KUBEM3_IP}"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "guangdong",
+      "L": "guangzhou",
+      "O": "k8s Inc.",
+      "OU": "System"
+    }
+  ]
+}
+EOF
+
+cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes-Soulmate etcd-csr.json | cfssljson -bare etcd
+  
+
+cp ca.pem /etc/kubernetes/pki/etcd/ca.crt
+cp etcd-key.pem /etc/kubernetes/pki/etcd/server.key
+cp etcd-key.pem /etc/kubernetes/pki/etcd/peer.key
+cp etcd.pem /etc/kubernetes/pki/etcd/peer.crt
+cp etcd.pem /etc/kubernetes/pki/etcd/server.crt
