@@ -35,8 +35,8 @@ ETCD
 
 * 默认会去/key/目录下找证书文件，根据证书文件数量自动启用不同方式的TLS  
 
-    客户端HTTPS：server.crt,server.key           。 客户端连接：--cacert /key/ca.crt  (or curl -k)
-    客户端证书认证：ca.crt,server.crt,server.key  。 客户端连接：--cacert /key/ca.crt --cert /key/client.crt --key /key/client.key  (or server.crt server.key)
+    客户端HTTPS：server.crt,server.key           。 客户端连接：--cacert /key/ca.crt  (or curl -k)  
+    客户端证书认证：ca.crt,server.crt,server.key  。 客户端连接：--cacert /key/ca.crt --cert /key/client.crt --key /key/client.key  (or server.crt server.key)  
     集群证书认证：ca.crt,server.crt,server.key,peer.crt,peer.key  。 客户端连接：--cacert /key/ca.crt --cert /key/server.crt --key /key/server.key
 
 
