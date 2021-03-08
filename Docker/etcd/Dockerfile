@@ -6,7 +6,7 @@ RUN apk update --no-cache && apk add curl openssl tzdata bash --no-cache
 
 RUN cd /tmp \
         && wget -c $(curl -s https://github.com/etcd-io/etcd/releases |awk -F\" '$2~"linux-amd64.tar$"{print "https://github.com"$2}' |egrep -v 'rc|beta|alpha' |head -1) \
-        && tar zxf etcd-*-linux-amd64.tar.gz \
+        && tar xf etcd-*-linux-amd64.tar \
         && mv etcd-*-linux-amd64/etcd* /usr/local/bin/ \
         && rm -rf /tmp/*
 
