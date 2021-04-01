@@ -33,7 +33,7 @@ else
 	Example:
 				docker run -d --restart unless-stopped \\
 				-p 20000:20000 \
-				-e POER=[20000] \\
+				-e PORT=[20000] \\
 				-e RPORT=[4000] \\
 				-e PASS=[RANDOM] \\
 				-e SERVICE=<172.17.0.1:22> \\
