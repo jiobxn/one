@@ -126,10 +126,10 @@ if [ "$1" = 'mysqld' ]; then
 		fi
 		
 		#Import Database
-		for f in /sql.d/*; do
+		for f in /initdb.d/*; do
 			case "$f" in
 				*.sh)  echo "$0: running $f"; . "$f" ;;
-				*.sql)    echo "$0: running $f"; DB_NAME=$(echo "$f" |awk -F'.sql' '{print $1}' |awk -F'_' '{print $1}' |awk -F'/' '{print $NF}'); echo "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" "$DB_NAME" < "$f"; echo "GRANT ALL ON \`"$DB_NAME"\`.* TO '"$MYSQL_USER"'@'%' ;" | "${mysql[@]}"; echo ;;
+				*.sql)    echo "$0: running $f"; DB_NAME=$(echo "$f" |awk -F'.sql' '{print $1}' |awk -F'_' '{print $1}' |awk -F'/' '{print $NF}'); echo "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` ;" | "${mysql[@]}"; "${mysql[@]}" < "$f"; echo "GRANT ALL ON \`"$DB_NAME"\`.* TO '"$MYSQL_USER"'@'%' ;" | "${mysql[@]}"; echo ;;
 				*)        echo "$0: ignoring $f" ;;
 			esac
 		done
@@ -227,7 +227,7 @@ else
     Example:
 				docker run -d --restart unless-stopped \\
 				-v /docker/mysql-mini:/var/lib/mysql \\
-				-v /docker/sql:/sql.d \\
+				-v /docker/sql:/initdb.d \\
 				-p 3306:3306 \\
 				-e MYSQL_ROOT_PASSWORD=[RANDOM] \\
 				-e MYSQL_DATABASE=<zabbix> \\
