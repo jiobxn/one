@@ -25,6 +25,7 @@ ipset_lock() {
 # ssh log
 SSH=$(egrep "Failed" /var/log/secure |awk '{print $(NF-3)}' |grep ^[1-9] |sort |uniq -c |awk '$1>10' |awk '{print $1"="$2}')  
 #SSH=$(lastb |awk '$3~"^[1-9]"{print $3}' |sort |uniq -c |awk '$1>10' |awk '{print $1"="$2}')
+#SSH=$(egrep "Failed" /var/log/auth.log |awk '{print $(NF-3)}' |grep ^[1-9] |sort |uniq -c |awk '$1>10' |awk '{print $1"="$2}') 
 
 
 # drop
