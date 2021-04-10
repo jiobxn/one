@@ -825,6 +825,20 @@ stream_other() {
 			fi
 		fi
 		
+		#上传限速,带单位
+		if [ -n "$(echo $i |grep 'upload_rate=')" ]; then
+			upload_rate="$(echo $i |grep 'upload_rate=' |awk -F= '{print $2}')"
+			
+			sed -i '/#backend-lb-'$n'#/ a \        proxy_upload_rate '$upload_rate';' /usr/local/openresty/nginx/conf/nginx.conf
+		fi
+		
+		#下载限速,带单位
+		if [ -n "$(echo $i |grep 'download_rate=')" ]; then
+			download_rate="$(echo $i |grep 'download_rate=' |awk -F= '{print $2}')"
+			
+			sed -i '/#backend-lb-'$n'#/ a \        proxy_download_rate '$download_rate';' /usr/local/openresty/nginx/conf/nginx.conf
+		fi
+		
 		#后端连接超时(1m)
 		if [ -n "$(echo $i |grep 'conn_timeout=')" ]; then
 			connect_timeout="$(echo $i |grep 'connect_timeout=' |awk -F= '{print $2}')"
@@ -883,13 +897,13 @@ stream_other() {
 			fi 
 		fi
 		
-                #访问控制
-                if [ -n "$(echo $i |grep 'allow=')" ]; then
-                        sed -i '/#backend-lb-'$n'#/ a \        deny  all;' /usr/local/openresty/nginx/conf/nginx.conf
-                        for x in $(echo $i |grep 'allow=' |gawk -F= '{print $2}' |sed 's/&/\n/g'); do
-                                sed -i '/#backend-lb-'$n'#/ a \        allow '$x';' /usr/local/openresty/nginx/conf/nginx.conf
-                        done
-                fi
+		#访问控制
+		if [ -n "$(echo $i |grep 'allow=')" ]; then
+			sed -i '/#backend-lb-'$n'#/ a \        deny  all;' /usr/local/openresty/nginx/conf/nginx.conf
+			for x in $(echo $i |grep 'allow=' |gawk -F= '{print $2}' |sed 's/&/\n/g'); do
+				sed -i '/#backend-lb-'$n'#/ a \        allow '$x';' /usr/local/openresty/nginx/conf/nginx.conf
+			done
+		fi
 	done
 }
 
@@ -1121,6 +1135,8 @@ else
 				   testip=<1.1.1.1&10.0.0.10:8080> \\
 				-e STREAM_SERVER=<3306|192.17.0.7:3306&backup,192.17.0.6:3306[^<Other options>];53|8.8.8.8:53^udp=Y> \\
 				   stream_lb=<hash|least_conn> \\
+				   upload_rate=<2048k> \\
+				   download_rate=<2048k> \\
 				   conn_timeout=[1m] \\
 				   proxy_timeout=[10m] \\
 				   limit_conn=<50> \\
