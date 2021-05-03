@@ -83,6 +83,10 @@ if [ "$1" = 'catalina.sh' ]; then
 	fi
 
 
+	#log
+	sed -i 's/pattern="%h /pattern="%{X-Forwarded-For}i %h /' /tomcat/conf/server.xml
+
+
 	#gzip
 	sed -i '/Connector port="8080"/ a \               acceptCount="'$((`nproc`*10240))'" maxThreads="'$((`nproc`*10240))'" \n\               compression="on" disableUploadTimeout="true" URIEncoding='\"$TOM_CHARSET\"'' /tomcat/conf/server.xml
 
