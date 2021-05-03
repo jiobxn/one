@@ -38,6 +38,9 @@ Tomcat
 					-e REDIS_DB=[0] \\                redis数据库
 					-e SESSION_TTL=[30] \\            session过期时间
 					-e MAX_MEM=<2048> \\              最大使用内存大小，默认自动分配
+					-e MANAGE_IP=<172.16.1.100|1.2.3.4> \\  远端管理IP
+					-e TOM_USER=[tom] \\              管理用户
+					-e TOM_PASS=[random] \\           默认随机密码
 					--name tomcat tomcat
 
 ****
