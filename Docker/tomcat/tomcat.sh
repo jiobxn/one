@@ -3,6 +3,8 @@ set -e
 
 if [ "$1" = 'catalina.sh' ]; then
 
+: ${TOM_USER:="tom"}
+: ${TOM_PASS:="$(openssl rand -base64 10 |tr -dc [:alnum:])"}
 : ${TOM_CHARSET:="UTF-8"}
 : ${WWW_ROOT:="ROOT"}
 : ${HTTP_PORT:="8080"}
@@ -34,6 +36,51 @@ if [ "$1" = 'catalina.sh' ]; then
                clientAuth="false" sslProtocol="TLS"/>
 	END
 	sed -i '/A "Connector" using the shared thread pool/ r /tomcat-ssl.txt' /tomcat/conf/server.xml
+
+
+	#manage user
+	if [ "$MANAGE_IP" ]; then
+	cat >/tomcat/conf/tomcat-users.xml <<-END
+	<?xml version="1.0" encoding="UTF-8"?>
+	<tomcat-users xmlns="http://tomcat.apache.org/xml"
+				  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				  xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
+				  version="1.0">
+		<role rolename="tomcat"/>
+		<role rolename="role1"/>
+		<role rolename="admin-gui"/>
+		<role rolename="admin-script"/>
+		<role rolename="manager-gui"/>
+		<role rolename="manager-script"/>
+		<role rolename="manager-jmx"/>
+		<role rolename="manager-status"/>
+		<user username="$TOM_USER" password="$TOM_PASS" roles="tomcat,role1,admin-gui,admin-script,manager-gui,manager-script,manager-jmx,manager-status"/>
+	</tomcat-users>
+	END
+
+	cat >/tomcat/webapps/manager/META-INF/context.xml <<-END
+	<?xml version="1.0" encoding="UTF-8"?>
+	<Context antiResourceLocking="false" privileged="true" >
+	  <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
+					   sameSiteCookies="strict" />
+	  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+			 allow="$MANAGE_IP" />
+	  <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
+	</Context>
+	END
+
+	cat >/tomcat/webapps/host-manager/META-INF/context.xml <<-END
+	<?xml version="1.0" encoding="UTF-8"?>
+	<Context antiResourceLocking="false" privileged="true" >
+	  <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
+					   sameSiteCookies="strict" />
+	  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+			 allow="$MANAGE_IP" />
+	  <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
+	</Context>
+	END
+	echo -e "\nuser: $TOM_USER\npassword: $TOM_PASS\nmanage: $MANAGE_IP\n"
+	fi
 
 
 	#gzip
@@ -128,6 +175,9 @@ else
 					-e REDIS_DB=[0] \\
 					-e SESSION_TTL=[30] \\
 					-e MAX_MEM=<2048> \\
+					-e MANAGE_IP=<172.16.1.100|1.2.3.4> \\
+					-e TOM_USER=[tom] \\
+					-e TOM_PASS=[random] \\
 					--name tomcat tomcat \\
 	"
 fi
