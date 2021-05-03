@@ -34,8 +34,6 @@ RUN cd /tomcat/lib \
         && rm -rf mysql-connector-java-* \
         && mv new-mysql-connector-java-bin.jar mysql-connector-java-bin.jar
 
-VOLUME /tomcat/webapps
-
 COPY tomcat.sh /tomcat.sh
 RUN chmod +x /tomcat.sh
 
