@@ -17,7 +17,7 @@ if [ "$1" = 'nginx' ]; then
 
 	if [ -f /key/server.crt -a -f /key/server.key ]; then
 		\cp /key/{server.crt,server.key} /etc/nginx/
-		\cp /key/ca.crt /var/lib/nginx/html/
+		[ -f /key/ca.crt ] && \cp /key/ca.crt /var/lib/nginx/html/
 	else
 		cd /etc/nginx/
 		openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 365 -out ca.crt -subj "/C=CN/L=London/O=Company Ltd/CN=nginx-docker"
