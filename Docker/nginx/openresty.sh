@@ -431,12 +431,21 @@ http_other() {
 			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass https://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\    }\n' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf 
 		fi
 		
-		#别名目录
-		if [ -n "$(echo $i |grep 'alias=' |grep '|')" ]; then
-			alias="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
-			
-			sed -i '/#alias#/ a \    location '$alias' {\n\        alias '$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $2}')';\n\    }\n' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf 
-		fi
+                #301跳转
+                if [ -n "$(echo $i |grep 'return=' |grep '|')" ]; then
+                        path="$(echo $i |awk -Freturn= '{print$2}' |awk -F'|' '{print $1}')"
+                        todo="$(echo $i |awk -Freturn= '{print$2}' |awk -F'|' '{print $2}')"
+
+                        sed -i '/#alias#/ a \    location '$path' {\n\        return 301 '$todo';\n\    }\n' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf
+                fi
+		
+                #别名目录
+                if [ -n "$(echo $i |grep 'alias=' |grep '|')" ]; then
+                        alias="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
+                        path="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $2}')"
+
+                        sed -i '/#alias#/ a \    location '$alias' {\n\        alias '$path';\n\    }\n' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf
+                fi
 		
 		#网站根目录
 		if [ -n "$(echo $i |grep 'root=')" ]; then
