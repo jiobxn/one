@@ -1120,6 +1120,7 @@ else
 				-e REMOTE_ADDR=[remote_addr] \\
 				-e ws=</mp4|127.0.0.1:19443> \\
 				   wss=</mp4|127.0.0.1:19444> \\
+				   return=</myurl|https://www.youtube.com/xxoo> \\
 				   alias=</boy|/mp4> \\
 				   root=<wordpress> \\
 				   http_port=<8080> \\
