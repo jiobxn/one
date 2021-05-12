@@ -159,7 +159,7 @@ Nginx
         openssl req -newkey rsa:4096 -nodes -sha256 -keyout $i.key -out $i.csr -subj "/C=CN/L=London/O=Company Ltd/CN=$i"
         openssl x509 -req -days 3650 -in $i.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out $i.crt
      fi
-        echo "$i|$i%backend_https=y,crt_key=$i.crt|$i.key"
+        echo "$i|$i^backend_https=y,crt_key=$i.crt|$i.key"
     done
     echo
 
