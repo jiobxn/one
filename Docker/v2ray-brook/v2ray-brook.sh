@@ -33,6 +33,7 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 		if [ "$DOMAIN" ]; then
 			DOMAIN="--domain $DOMAIN"
 			TLS=s
+			PORT=443
 		else
 			DOMAIN="-l :$PORT"
 		fi
@@ -47,7 +48,6 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 			fi
 		else
 			if [ "$MODE" == "wsserver" ]; then
-				[ "$DOMAIN" ] && PORT=443
                         	echo -e "mode: $MODE \nport: $PORT \npassword: $PASS"
                         	echo "brook $MODE $DOMAIN -p $PASS" >/usr/bin/v2ray-brook
 			else
