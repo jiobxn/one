@@ -1,3 +1,10 @@
+if [ -f /usr/bin/dnf ]; then
+    OS8="--nobest"
+    NTP=chronyd
+else
+    NTP=ntp
+fi
+
 yum clean all; yum -y install epel-release; yum -y update
 
 if [ "$(grep -o -w "Red Hat" /etc/redhat-release)" ]; then
@@ -5,7 +12,7 @@ if [ "$(grep -o -w "Red Hat" /etc/redhat-release)" ]; then
     yum-config-manager --enable rhui-REGION-rhel-server-extras
 fi
 
-yum -y install bash-completion mosh vim aria2 wget rsync lrzsz bind-utils whois iptables-services ipset iftop iotop iptraf-ng iproute net-tools ntp mtr tcping nmap tcpdump unzip bzip2 zip mailx bc at lsof expect telnet git subversion bridge-utils dos2unix certbot asciinema pciutils testdisk gdisk lvm2 nfs-utils psmisc sysstat fio jq paps enscript ghostscript ImageMagick s3fs-fuse  # openssl-devel setroubleshoot setools make gcc-c++ autoconf automake nasm
+yum -y install bash-completion mosh vim aria2 wget rsync lrzsz bind-utils whois iptables-services ipset iftop iotop iptraf-ng iproute net-tools $NTP mtr tcping nmap tcpdump unzip bzip2 zip mailx bc at lsof expect telnet git subversion bridge-utils dos2unix certbot asciinema pciutils testdisk gdisk lvm2 nfs-utils psmisc sysstat fio jq paps enscript ghostscript ImageMagick s3fs-fuse  # openssl-devel setroubleshoot setools make gcc-c++ autoconf automake nasm
 
 systemctl disable NetworkManager firewalld
 \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -20,19 +27,17 @@ chmod u+x /usr/local/sbin/scan.sh
 echo \rm /tmp/.ipset.lock >>/etc/rc.local
 chmod +x /etc/rc.local
 
-cat >/var/spool/cron/root <<-EOF
+cat >>/var/spool/cron/root <<-EOF
 MAILTO=' '
 58 23 * * * yum update -y
 0 0 * * * \cp /var/log/secure /var/log/secure.\$(date -d "-1 day" +\%F) ; > /var/log/secure
 * * * * * . /etc/profile; bash /usr/local/sbin/scan.sh
-* * * * * echo 3 > /proc/sys/vm/drop_caches
+* * * * * sync; echo 3 > /proc/sys/vm/drop_caches
 EOF
 
 yum -y install python36-setuptools
 easy_install-3.6 pip
 pip install --upgrade youtube-dl you-get
-
-[ -f /usr/bin/dnf ] && OS8="--nobest"
 
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
 yum -y install docker-ce docker-ce-cli containerd.io docker-compose podman buildah skopeo $OS8
