@@ -19,7 +19,7 @@ ipset_lock() {
 	fi
 }
 
-[ ! -f /tmp/.ipset.lock ] && ipset_lock
+[ ! -f /tmp/.ipset.lock ] && ipset_lock && touch /tmp/.ipset.lock
 
 
 # ssh log
