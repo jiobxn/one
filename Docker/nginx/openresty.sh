@@ -564,12 +564,10 @@ http_other() {
 		
 		#字符串替换
 		if [ -n "$(echo $i |grep 'filter=' |grep '|')" ]; then
-			for x in $(echo $i |grep 'filter=' |gawk -F= '{print $2}' |sed 's/&/\n/g'); do
-				sub_s="$(echo $x |awk -F'|' '{print $1}')"
-				sub_d="$(echo $x |awk -F'|' '{print $2}')"
+			sub_s="$(echo $i |grep 'filter=' |gawk -F= '{print $2}' |awk -F'|' '{print $1}')"
+			sub_d="$(echo $i |grep 'filter=' |gawk -F= '{print $2}' |awk -F'|' '{print $2}')"
 			
-				sed -i '/#sub_filter#/ a \        sub_filter '$sub_s'  '$sub_d';' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf
-			done
+			sed -i '/#sub_filter#/ a \        sub_filter '$sub_s'  '$sub_d';' /usr/local/openresty/nginx/conf/vhost/${project_name}_$n.conf
 		fi
 
 		#限速,带单位
