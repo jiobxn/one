@@ -108,7 +108,7 @@ Nginx
 		tag=<9999>							#域名混淆字符，用于DOMAIN模式
 		error=<https://www.bing.com>					#错误跳转，用于DOMAIN模式
 		auth=<admin|passwd>						#用户认证，用于PROXY和DOMAIN模式
-		filter=<.google.com|.fqhub.com&.twitter.com|.fqhubcom>		#字符替换，用于PROXY和DOMAIN模式
+		filter=<.google.com|.fqhub.com>					#字符替换，用于PROXY和DOMAIN模式
 		limit_rate=<2048k> \\						#单IP下载速率限制
 		limit_conn=<50> \\						#单IP最大并发数限制
 		limit_req=<2> \\						#单IP最大请求速率限制
