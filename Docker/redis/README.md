@@ -70,6 +70,10 @@ Redis
     ZREMRANGEBYSCORE REDIS_TASK 0 1593532800    
     ZRANGE  REDIS_TASK 0 -1
 
+基准测试
+
+    redis-benchmark -q -n 100000
+
 ****
 
 查看redis不同类型的值
