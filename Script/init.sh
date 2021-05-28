@@ -57,6 +57,7 @@ if [ `ulimit -n` -eq 1024 ]; then
     echo -e "*      -   nofile   1048576\n*      -   nproc    524288" >>/etc/security/limits.conf
     echo "kernel.pid_max=512000" >> /etc/sysctl.conf 
     echo "fs.file-max=512000" >>/etc/sysctl.conf
+    echo "net.core.somaxconn=65535" >>/etc/sysctl.conf
     ulimit -n 1048576
     sysctl -p
 fi
