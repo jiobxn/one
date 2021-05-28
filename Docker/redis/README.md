@@ -111,3 +111,5 @@ Redis
     cluster-announce-ip 10.1.1.5
     cluster-announce-port 6379
     cluster-announce-bus-port 16379
+
+http://blog.chinaunix.net/uid-20682147-id-5821629.html
