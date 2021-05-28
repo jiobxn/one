@@ -33,7 +33,7 @@ Redis
 					docker run -d --restart unless-stopped [--cap-add=NET_ADMIN] \\
 					-v /docker/redis:/redis/data \\
 					-p 6379:6379 \\
-					-p 16379:16379 \\                     官方说NAT会有问题
+					-p 16379:16379 \\
 					-e REDIS_PORT=[6379] \\
 					-e REDIS_PASS=<bigpass> \\            设置一个密码
 					-e LOCAL_STROGE=Y \\                  开启持久化
@@ -103,3 +103,11 @@ Redis
     如果值的类型为 sets -> smembers <key>
     如果值的类型为 sorted sets -> ZRANGEBYSCORE <key> <min> <max>
     使用TYPE命令检查key值的类型：type <key>
+
+****
+
+**集群的 Docker/NAT 支持**
+
+    cluster-announce-ip 10.1.1.5
+    cluster-announce-port 6379
+    cluster-announce-bus-port 16379
