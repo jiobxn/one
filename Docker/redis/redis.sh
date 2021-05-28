@@ -1,22 +1,23 @@
 #!/bin/bash
 set -e
 
-if [ "$1" = 'redis-server' ]; then
+if [ "$1" = 'REDIS' ]; then
 
 : ${REDIS_PORT:="6379"}
-: ${MASTER_NAME:="mymaster"}
 : ${SLAVE_QUORUM:="2"}
-: ${DOWN_TIME:="6000"}
+: ${NODE_TIMEOUT:="5000"}
+: ${MAX_CLIENTS:="10000"}
 
-  if [ -z "$(grep "redhat.xyz" /redis/redis.conf)" ]; then
+  if [ ! -f /usr/local/bin/REDIS ]; then
 	echo "Initialize redis"
-	sed -i '1 i #redhat.xyz' /redis/redis.conf
-
 	#bind
 	sed -i 's/^bind 127.0.0.1/bind 0.0.0.0/' /redis/redis.conf
 	
 	#port
 	sed -i 's/^port 6379/port '$REDIS_PORT'/' /redis/redis.conf
+
+	#maxclients
+	sed -i 's/# maxclients 10000/maxclients '$MAX_CLIENTS'/' /redis/redis.conf
 
 	#Ignore errors
 	sed -i 's/stop-writes-on-bgsave-error yes/stop-writes-on-bgsave-error no/' /redis/redis.conf
@@ -34,27 +35,35 @@ if [ "$1" = 'redis-server' ]; then
 		AUTH="-a $REDIS_PASS"
 	fi
 
+	echo "redis-server /redis/redis.conf" >/usr/local/bin/REDIS
+	chmod +x /usr/local/bin/REDIS
+
+	#redis cluster
+	if [ "$REDIS_CLUSTER" ]; then
+		sed -i 's/# cluster-enabled yes/cluster-enabled yes/' /redis/redis.conf
+		sed -i 's/# cluster-config-file nodes-6379.conf/cluster-config-file nodes.conf/' /redis/redis.conf
+		sed -i 's/# cluster-node-timeout 15000/cluster-node-timeout '$NODE_TIMEOUT'/' /redis/redis.conf
+		sed -i 's/# cluster-require-full-coverage yes/cluster-require-full-coverage no/' /redis/redis.conf
+		sed -i 's/^appendonly no/appendonly yes/' /redis/redis.conf
+	fi
+
 	#redis master
 	if [ "$REDIS_MASTER" ]; then
-		echo "slaveof $REDIS_MASTER $REDIS_PORT" >>/redis/redis.conf
+		if [ -z "$(ip route |grep -wo $REDIS_MASTER)" ]; then
+			echo "replicaof $REDIS_MASTER $REDIS_PORT" >>/redis/redis.conf
+		fi
 		
-		#sentinel
-		cat >/sentinel.txt<<-END
-		port $[$REDIS_PORT+10000]
-		dir /tmp
-		protected-mode no
-		sentinel monitor $MASTER_NAME $REDIS_MASTER $REDIS_PORT $SLAVE_QUORUM
-		sentinel down-after-milliseconds $MASTER_NAME $DOWN_TIME
-		sentinel parallel-syncs $MASTER_NAME 1
-		sentinel failover-timeout $MASTER_NAME 180000
-		#daemonize yes
-		END
+		sed -i 's/port 26379/port '$[$REDIS_PORT+10000]'/' /redis/sentinel.conf
+		sed -i 's/mymaster 127.0.0.1/mymaster '$REDIS_MASTER'/' /redis/sentinel.conf
+		echo "sentinel down-after-milliseconds mymaster $NODE_TIMEOUT" >>/redis/sentinel.conf
+		sed -i 's/daemonize no/daemonize yes/' /redis/redis.conf
+		echo -e "/redis/bin/redis-server /redis/redis.conf\n/redis/bin/redis-sentinel /redis/sentinel.conf" >/usr/local/bin/REDIS
 	fi
 
 	#master pass
 	if [ "$MASTER_PASS" ]; then
 		echo "masterauth $MASTER_PASS" >>/redis/redis.conf
-		echo "sentinel auth-pass $MASTER_NAME $MASTER_PASS" >>/sentinel.txt
+		echo "sentinel auth-pass mymaster $MASTER_PASS" >>/redis/sentinel.conf
 		
 		if [ -z "$(grep "^requirepass" /redis/redis.conf)" ]; then
 			echo "requirepass $MASTER_PASS" >>/redis/redis.conf
@@ -69,7 +78,6 @@ if [ "$1" = 'redis-server' ]; then
 		cat >/vip.sh<<-END
 		#!/bin/bash
 		PASS="$AUTH"
-
 		for i in {1..29}; do
 		if [ -n "\$(echo "info Replication" |/redis/bin/redis-cli \$PASS |grep "role:" |awk -F: '{print \$2}' |egrep -o master)" ]; then
 		    if [ -z "\$(ifconfig |grep $VIP)" ]; then
@@ -86,19 +94,12 @@ if [ "$1" = 'redis-server' ]; then
 		END
 		chmod +x /vip.sh
 		echo "* * * * * . /etc/profile;/bin/sh /vip.sh &>/dev/null" >>/var/spool/cron/root
-
-		if [ "$REDIS_MASTER" ]; then
-			\cp /sentinel.txt /redis/sentinel.conf
-			echo -e "/redis/bin/redis-server /redis/redis.conf\n/redis/bin/redis-server /redis/sentinel.conf --sentinel" >/sentinel.sh
-			sed -i 's/daemonize no/daemonize yes/' /redis/redis.conf
-		fi
 	fi
   fi
 
 	echo
 	echo "Start Redis ****"
 	crond
-	[ -f /sentinel.sh ] && . /sentinel.sh
 	exec "$@" 1>/dev/null
 
 else
@@ -106,16 +107,18 @@ else
 	Example
 					docker run -d --restart unless-stopped [--cap-add NET_ADMIN] \\
 					-v /docker/redis:/redis/data \\
-					-p 16379:6379 \\
+					-p 6379:6379 \\
+					-p 16379:16379 \\
 					-e REDIS_PORT=[6379] \\
 					-e REDIS_PASS=<bigpass> \\
 					-e LOCAL_STROGE=<Y> \\
 					-e REDIS_MASTER=<10.0.0.91> \\
 					-e MASTER_PASS=<bigpass> \\
 					-e VIP=<10.0.0.90> \\
-					-e MASTER_NAME=[mymaster] \\
 					-e SLAVE_QUORUM=[2] \\
-					-e DOWN_TIME=[6000] \\
+					-e NODE_TIMEOUT=[5000] \\
+					-e MAX_CLIENTS=[10000] \\
+					-e REDIS_CLUSTER=<Y> \\
 					--name redis redis
 	"
 fi
