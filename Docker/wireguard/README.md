@@ -16,7 +16,7 @@ WireGuard
     grub2-editenv - set saved_entry='CentOS Linux (5.7.11-1.el7.elrepo.x86_64) 7 (Core)'                  #指定默认内核
     grub2-editenv list
     
-    #安装wireguard内核支持(宿主机kernel小于5.6才需要)
+    #安装wireguard内核支持(宿主机kernel >= 5.6 只需要加载内核模块：modprobe wireguard && echo wireguard >/etc/modules-load.d/wireguard.conf)
     curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/
     yum install epel-release -y
     yum install wireguard-dkms wireguard-tools -y
