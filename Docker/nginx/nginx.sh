@@ -416,7 +416,7 @@ http_other() {
 			path="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
 			ws="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $2}')"
 			
-			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass http://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\    }\n' /etc/nginx/conf.d/${project_name}_$n.conf 
+			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass http://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\        proxy_read_timeout 300s;\n\        proxy_send_timeout 300s;\n\    }\n' /etc/nginx/conf.d/${project_name}_$n.conf 
 		fi
 		
 		#WebSocket s
