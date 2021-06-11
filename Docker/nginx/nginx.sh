@@ -175,7 +175,7 @@ fcgi_server() {
 	        fastcgi_param  SCRIPT_FILENAME  $FCGI_PATH\$fastcgi_script_name;
 	        include        fastcgi_params;
 	        fastcgi_read_timeout    300;
-	        fastcgi_connect_timeout 300;
+	        fastcgi_send_timeout    300;
 	        fastcgi_keep_conn on;
 			
 	##cache        fastcgi_cache cache1;
@@ -232,7 +232,7 @@ java_php_server() {
 	        proxy_pass http://java-php-lb-$n;
 	        proxy_http_version 1.1;
 	        proxy_read_timeout      300;
-	        proxy_connect_timeout   300;
+	        proxy_send_timeout      300;
 	        proxy_set_header   Connection "";
 	        proxy_set_header   Host              \$host;
 	        proxy_set_header   X-Real-IP         \$remote_addr;
@@ -290,7 +290,7 @@ proxy_server() {
 	        proxy_pass http://proxy-lb-$n;
 	        proxy_http_version 1.1;
 	        proxy_read_timeout      300;
-	        proxy_connect_timeout   300;
+	        proxy_send_timeout      300;
 	        proxy_set_header   Connection "";
 	        proxy_set_header   Host              \$proxy_host;
 	        proxy_set_header   X-Real-IP         \$remote_addr;
@@ -362,7 +362,7 @@ domain_proxy() {
             proxy_pass http://\$domains;
             proxy_http_version 1.1;
             proxy_read_timeout      300;
-            proxy_connect_timeout   300;
+            proxy_send_timeout      300;
             proxy_set_header   Connection "";
             proxy_set_header   Host              \$proxy_host;
             proxy_set_header   X-Real-IP         \$remote_addr;
@@ -424,7 +424,7 @@ http_other() {
 			path="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $1}')"
 			ws="$(echo $i |awk -F= '{print$2}' |awk -F'|' '{print $2}')"
 			
-			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass https://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\    }\n' /etc/nginx/conf.d/${project_name}_$n.conf 
+			sed -i '/#alias#/ a \    location '$path' {\n\        proxy_pass https://'$ws';\n\        proxy_http_version 1.1;\n\        proxy_set_header Upgrade \$http_upgrade;\n\        proxy_set_header Connection "upgrade";\n\        proxy_read_timeout 300s;\n\        proxy_send_timeout 300s;\n\    }\n' /etc/nginx/conf.d/${project_name}_$n.conf 
 		fi
 		
                 #301跳转
