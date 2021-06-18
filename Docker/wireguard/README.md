@@ -41,6 +41,13 @@ WireGuard
     # client
     docker run -itd --restart unless-stopped --cap-add net_admin -e ETCD=http://etcd.redhat.xyz:12379 -e WG_VPN=CLIENT --name wg-client jiobxn/wireguard
 
+运行一个分布式VPN
+
+    # 第一个节点
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://etcd.redhat.xyz:12379 -e CLUSTER=INIT --name wg jiobxn/wireguard
+    # 其他节点
+    docker run -itd --restart unless-stopped --cap-add net_admin -p 20000:20000/udp -e ETCD=http://etcd.redhat.xyz:12379 -e CLUSTER=Y --name wg jiobxn/wireguard
+
 
 ****
 
@@ -63,6 +70,7 @@ WireGuard
 					-e PEER_IP_PORT=[ETCD] \\                    对端IP端口，来自etcd
 					-e PEER_PUBLIC_KEY=[ETCD] \\                 对端公钥，来自etcd
 					-e WG_VPN=<SERVER | CLIENT> \\               vpn模式，server或client
+					-e CLUSTER=<INIT | Y> \\                     启用分布式，INIT清除旧数据
 					--name wireguard wireguard
 
 ****
