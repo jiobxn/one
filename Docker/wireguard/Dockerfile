@@ -2,7 +2,7 @@ FROM alpine:latest
 MAINTAINER "The Alpine Project" <admin@jiobxn.com>
 ARG LATEST="0"
 
-RUN apk upgrade --no-cache && apk add -U wireguard-tools curl openssl tzdata bash mtr --no-cache
+RUN apk upgrade --no-cache && apk add -U wireguard-tools curl openssl tzdata bash mtr at --no-cache
 RUN cd /tmp \
         && wget -c $(curl -s https://github.com/etcd-io/etcd/releases |awk -F\" '$2~"linux-amd64.tar.gz$"{print "https://github.com"$2}' |egrep -v 'rc|beta' |head -1) \
         && tar zxf etcd-*-linux-amd64.tar.gz \
