@@ -11,9 +11,19 @@ if [ "$1" = 'WG' ]; then
   if [ ! -f /usr/local/bin/WG ]; then
 	echo "Initialize wireguard"
 	export ETCDCTL_API=3
+	if [ -n "$CLUSTER" -a "$WG_TOKEN" == "TEST" ]; then
+		WG_TOKEN="$WG_TOKEN"G
+	fi
 
 	# clean key
-	if [ -z "$WG_VPN" -a "$(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep -c ":$WG_TOKEN$")" -ge 2 ]; then
+	if [ "$CLUSTER" == "INIT" ]; then
+		etcdctl --endpoints=$ETCD del "$WG_TOKEN/" --from-key
+		for i in $(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep ":$WG_TOKEN$"); do
+			etcdctl --endpoints=$ETCD del $i
+		done
+	fi
+
+	if [ -z "$WG_VPN" -a -z "$CLUSTER" -a "$(etcdctl --endpoints=$ETCD get "PUBNET/" --prefix --keys-only |grep -c ":$WG_TOKEN$")" -ge 2 ]; then
 		for i in $(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only); do
 			etcdctl --endpoints=$ETCD del $i
 		done
@@ -43,9 +53,7 @@ if [ "$1" = 'WG' ]; then
 	PUBLIC_PORT=$(etcdctl --endpoints=$ETCD get "" --prefix --keys-only |egrep '^PUBNET/' |awk -F: '$1=="PUBNET/'$PUBLIC_IP'"{print $2}' |sort -n |tail -1)
 	if [ -n "$PUBLIC_PORT" ]; then
 		PUBLIC_PORT=$[$PUBLIC_PORT+1]
-	fi
-
-	if [ -z "$PUBLIC_PORT" ]; then
+	else
 		PUBLIC_PORT=20000
 	fi
 
@@ -78,6 +86,7 @@ if [ "$1" = 'WG' ]; then
 		etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/public_key     $PUBLIC_KEY
 	fi
 
+	CONFIG() {
 	# perr ID
 	while [ -z "$PEER_ID" -a "$WG_VPN" != "SERVER" ]; do
 		PEER_ID=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep -v $LOCAL_ID |grep public_ip_port |awk -F/ '{print $2}')
@@ -93,6 +102,7 @@ if [ "$1" = 'WG' ]; then
 	if [ -z "$PEER_PUBLIC_KEY" ]; then
 		PEER_PUBLIC_KEY=$(etcdctl --endpoints=$ETCD get $WG_TOKEN/$PEER_ID/public_key |tail -1)
 	fi
+	}
 
 	# real veth
 	realeth=$(ip address |grep default |awk -F: '$2~"wg"{print $2}' |sed 's/ wg//g' |sort -n |tail -1)
@@ -105,6 +115,7 @@ if [ "$1" = 'WG' ]; then
 	# P2P or VPN
 	if [ "$WG_VPN" == "SERVER" ]; then
 		# VPM SERVER
+		CONFIG
 		echo '#!/bin/bash' > /usr/local/bin/WG
 		echo "ip link add $realeth type wireguard" >> /usr/local/bin/WG
 		echo "ip addr add $WGVETH_IP.1/24 dev $realeth" >> /usr/local/bin/WG
@@ -112,6 +123,7 @@ if [ "$1" = 'WG' ]; then
 		echo "wg set $realeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
 		[ "$MAX_CLIENT" -gt 1000 ] && MAX_CLIENT=253
 		i=2
+
 		while [ $i -le $MAX_CLIENT ]; do
 			umask 077
 			wg genkey > /mnt/private$i
@@ -125,6 +137,7 @@ if [ "$1" = 'WG' ]; then
 		echo "iptables -t nat -A  POSTROUTING -s $WGVETH_IP.0/24 -o $DEV -j MASQUERADE" >> /usr/local/bin/WG
 	elif [ "$WG_VPN" == "CLIENT" ]; then
 		# CLIENT
+		CONFIG
 		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
 
 		echo '#!/bin/bash' > /usr/local/bin/WG
@@ -148,16 +161,61 @@ if [ "$1" = 'WG' ]; then
 		echo "ip link set $realeth up" >> /usr/local/bin/WG
 		echo "wg set $realeth private-key /private" >> /usr/local/bin/WG
 		echo "wg set $realeth peer $PUBKEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
-	else
-		# P2P
+	elif [ "$CLUSTER" == "Y" -o "$CLUSTER" == "INIT" ]; then
+		# CLUSTER
 		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
-		
+
 		if [ -z "$WGVETH" ]; then
-			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_2 $WGVETH_IP.2/24
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_1 $WGVETH_IP.1/24
 		else
 			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_$[$WGVETH+1] $WGVETH_IP.$[$WGVETH+1]/24
 		fi
+
+		wgeth=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_" --prefix --keys-only |awk -F_ 'NR=="1"{print $2}')
+		wgip=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_$wgeth" |tail -1)
+
+		echo '#!/bin/bash' > /usr/local/bin/WG
+		echo "ip link add $realeth type wireguard" >> /usr/local/bin/WG
+		echo "ip addr add $wgip dev $realeth" >> /usr/local/bin/WG
+		echo "ip link set $realeth up" >> /usr/local/bin/WG
+		echo "wg set $realeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
+
+		# perr
+		cat >/usr/local/bin/PERR <<-END
+		#!/bin/bash
+		export ETCDCTL_API=3
+		PEER_ID=\$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep -v $LOCAL_ID |grep public_ip_port |awk -F/ '{print \$2}')
 		
+		for i in \$PEER_ID;do
+			if [ -z "\$(grep -w \$i /peer.txt)" ]; then
+				wgeth=\$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/\$i/wgveth_" --prefix --keys-only |awk -F_ 'NR=="1"{print \$2}')
+				wgip=\$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/\$i/wgveth_\$wgeth" |tail -1 |sed 's/\/24/\/32/')
+				PEER_IP_PORT=\$(etcdctl --endpoints=$ETCD get $WG_TOKEN/\$i/public_ip_port |tail -1)
+				PEER_PUBLIC_KEY=\$(etcdctl --endpoints=$ETCD get $WG_TOKEN/\$i/public_key |tail -1)
+				wg set $realeth peer \$PEER_PUBLIC_KEY allowed-ips \$wgip endpoint \$PEER_IP_PORT persistent-keepalive 25
+				sed -i '/^bash/i wg set wg0 peer '\$PEER_PUBLIC_KEY' allowed-ips '\$wgip' endpoint '\$PEER_IP_PORT' persistent-keepalive 25' /usr/local/bin/WG
+				echo \$i >>/peer.txt
+			fi
+		done
+		END
+
+		chmod +x /usr/local/bin/PERR
+		atd 2>/dev/null
+		echo -e "/usr/local/bin/PERR \nsleep 30 \n/usr/local/bin/PERR" |at now +1 minutes
+		echo -e "/usr/local/bin/PERR \nsleep 30 \n/usr/local/bin/PERR" |at now +2 minutes
+		echo "*/5 * * * * /usr/local/bin/PERR" >>/var/spool/cron/crontabs/root
+	else
+
+		# P2P
+		CONFIG
+		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
+
+		if [ -z "$WGVETH" ]; then
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_1 $WGVETH_IP.1/24
+		else
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_$[$WGVETH+1] $WGVETH_IP.$[$WGVETH+1]/24
+		fi
+
 		wgeth=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_" --prefix --keys-only |awk -F_ 'NR=="1"{print $2}')
 		wgip=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_$wgeth" |tail -1)
 
@@ -171,11 +229,11 @@ if [ "$1" = 'WG' ]; then
 	echo bash >> /usr/local/bin/WG
 	chmod +x /usr/local/bin/WG
 	echo "export ETCDCTL_API=3; etcdctl --endpoints=$ETCD get \"\" --prefix --keys-only |grep $WG_TOKEN"
-
   fi
 
 	echo
 	echo "Start wireguard ****"
+	crond 2>/dev/null
 	exec $@
 
 else
@@ -197,6 +255,7 @@ else
 					-e PEER_IP_PORT=[ETCD] \\
 					-e PEER_PUBLIC_KEY=[ETCD] \\
 					-e WG_VPN=<SERVER | CLIENT> \\
+					-e CLUSTER=<INIT | Y> \\
 					--name wireguard wireguard
 	"
 fi
