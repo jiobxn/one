@@ -5,6 +5,7 @@ if [ "$1" = 'WG' ]; then
 : ${WG_TOKEN:="TEST"}
 : ${LOCAL_ID:="$(openssl rand -hex 5)"}
 : ${WGVETH_IP:="10.0.0"}
+: ${WGVETHG_IP:="10.0"}
 : ${ETCD:="http://etcd.redhat.xyz:12379"}
 : ${MAX_CLIENT:="10"}
 
@@ -121,7 +122,7 @@ if [ "$1" = 'WG' ]; then
 		echo "ip addr add $WGVETH_IP.1/24 dev $realeth" >> /usr/local/bin/WG
 		echo "ip link set $realeth up" >> /usr/local/bin/WG
 		echo "wg set $realeth listen-port $LOCAL_PORT private-key /private" >> /usr/local/bin/WG
-		[ "$MAX_CLIENT" -gt 1000 ] && MAX_CLIENT=253
+		[ "$MAX_CLIENT" -gt 253 ] && MAX_CLIENT=253
 		i=2
 
 		while [ $i -le $MAX_CLIENT ]; do
@@ -163,12 +164,12 @@ if [ "$1" = 'WG' ]; then
 		echo "wg set $realeth peer $PUBKEY allowed-ips 0.0.0.0/0 endpoint $PEER_IP_PORT persistent-keepalive 25" >> /usr/local/bin/WG
 	elif [ "$CLUSTER" == "Y" -o "$CLUSTER" == "INIT" ]; then
 		# CLUSTER
-		WGVETH=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)
+		WGVETH=${WGVETH:-$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)}
 
 		if [ -z "$WGVETH" ]; then
-			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_1 $WGVETH_IP.1/24
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_1 $WGVETHG_IP.1.1/16
 		else
-			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_$[$WGVETH+1] $WGVETH_IP.$[$WGVETH+1]/24
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_$[$WGVETH+1] $WGVETHG_IP.$[$WGVETH+1].1/16
 		fi
 
 		wgeth=$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/$LOCAL_ID/wgveth_" --prefix --keys-only |awk -F_ 'NR=="1"{print $2}')
@@ -189,7 +190,7 @@ if [ "$1" = 'WG' ]; then
 		for i in \$PEER_ID;do
 			if [ -z "\$(grep -w \$i /peer.txt)" ]; then
 				wgeth=\$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/\$i/wgveth_" --prefix --keys-only |awk -F_ 'NR=="1"{print \$2}')
-				wgip=\$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/\$i/wgveth_\$wgeth" |tail -1 |sed 's/\/24/\/32/')
+				wgip=\$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/\$i/wgveth_\$wgeth" |tail -1 |sed 's/\/16/\/24/')
 				PEER_IP_PORT=\$(etcdctl --endpoints=$ETCD get $WG_TOKEN/\$i/public_ip_port |tail -1)
 				PEER_PUBLIC_KEY=\$(etcdctl --endpoints=$ETCD get $WG_TOKEN/\$i/public_key |tail -1)
 				wg set $realeth peer \$PEER_PUBLIC_KEY allowed-ips \$wgip endpoint \$PEER_IP_PORT persistent-keepalive 25
@@ -245,6 +246,7 @@ else
 					-e WG_TOKEN=[TEST] \\
 					-e LOCAL_ID=[openssl rand -hex 5] \\
 					-e WGVETH_IP=[10.0.0] \\
+					-e WGVETHG_IP=[10.0] \\
 					-e MAX_CLIENT=[10] \\
 					-e PUBLIC_IP=[curl -s ip.sb] \\
 					-e PUBLIC_PORT=[20000] \\
