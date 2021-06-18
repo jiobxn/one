@@ -80,3 +80,13 @@ WireGuard
     ip ro add <VPN SERVER> via 172.17.0.1 dev eth0
     ip ro del default via 172.17.0.1 dev eth0
     ip ro add 0.0.0.0/0 via 10.0.0.1
+
+****
+
+路由/ARP/IP转发/NAT
+
+	echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+	echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.conf
+	sysctl -p /etc/sysctl.conf
+	iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited
+	sed -i '/FORWARD -j REJECT --reject-with icmp-host-prohibited/d' /etc/sysconfig/iptables
