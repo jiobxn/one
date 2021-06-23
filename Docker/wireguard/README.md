@@ -9,7 +9,7 @@ WireGuard
 
 ## 宿主机升级内核(WireGuard 已经并入 Linux 5.6)
 
-    rpm -ivh http://www.elrepo.org/elrepo-release-7.0-5.el7.elrepo.noarch.rpm
+    yum install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
     sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/elrepo.repo
     yum -y install kernel-ml kernel-ml-devel kernel-ml-headers      #kernel-lt(长期支持版本)、kernel-ml(主线最新版本)
     echo "'$(grub2-mkconfig 2>/dev/null |grep "menuentry 'CentOS Linux" |awk -F\' 'NR==1{print $2}')'"    #查看新内核
