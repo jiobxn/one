@@ -167,7 +167,7 @@ if [ "$1" = 'WG' ]; then
 		WGVETH=${WGVETH:-$(etcdctl --endpoints=$ETCD get "$WG_TOKEN/" --prefix --keys-only |grep wgveth_ |awk -F_ '{print $2}' |sort -n |tail -1)}
 
 		if [ -z "$WGVETH" ]; then
-			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_1 $WGVETHG_IP.0.1/16
+			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_0 $WGVETHG_IP.0.1/16
 		else
 			etcdctl --endpoints=$ETCD put $WG_TOKEN/$LOCAL_ID/wgveth_$[$WGVETH+1] $WGVETHG_IP.$[$WGVETH+1].1/16
 		fi
