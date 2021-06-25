@@ -156,6 +156,7 @@ if [ -z "$(grep "redhat.xyz" /etc/httpd/conf/httpd.conf)" ]; then
 fi
 	echo "Start ****"
 	svnd
+	[ -f /run/httpd/httpd.pid ] && \rm /run/httpd/httpd.pid
 	exec "$@"
 else
 
