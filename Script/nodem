@@ -102,6 +102,9 @@ CHECK() {
 for i in $(cat ~/.hosts.txt); do
 	IP=$(echo "$i"|cut -f3 -d":")
 	PORT=$(echo "$i"|cut -f4 -d":")
+	USER=$(echo "$i"|cut -f2 -d":")
+	if [ -z "$USER" ]; then USER=root; fi
+	if [ -z "$PORT" ]; then PORT=22; fi
 
 	if [ "$ACMD" == "SSH" -a -f ~/.ssh/ssh_trust ]; then
 		[ -n "$(grep "\<$IP\>" ~/.ssh/ssh_trust)" ] && [ -n "$(grep "\<$IP\>" ~/.ssh/known_hosts)" ]  && sed -i '/:'$IP':/d' ~/.hosts.txt
@@ -122,6 +125,7 @@ PUSH() {
 for i in $(cat ~/.hosts.txt); do
 	IP=$(echo "$i"|cut -f3 -d":")
 	PORT=$(echo "$i"|cut -f4 -d":")
+	USER=$(echo "$i"|cut -f2 -d":")
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 	
@@ -138,6 +142,7 @@ PULL() {
 for i in $(cat ~/.hosts.txt); do
 	IP=$(echo "$i"|cut -f3 -d":")
 	PORT=$(echo "$i"|cut -f4 -d":")
+	USER=$(echo "$i"|cut -f2 -d":")
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 	
@@ -154,6 +159,7 @@ COMM() {
 for i in $(cat ~/.hosts.txt); do
 	IP=$(echo "$i"|cut -f3 -d":")
 	PORT=$(echo "$i"|cut -f4 -d":")
+	USER=$(echo "$i"|cut -f2 -d":")
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 
@@ -170,6 +176,7 @@ PKGS() {
 for i in $(cat ~/.hosts.txt); do
 	IP=$(echo "$i"|cut -f3 -d":")
 	PORT=$(echo "$i"|cut -f4 -d":")
+	USER=$(echo "$i"|cut -f2 -d":")
 	if [ -z "$USER" ]; then USER=root; fi
 	if [ -z "$PORT" ]; then PORT=22; fi
 	
