@@ -1,5 +1,5 @@
 if [ -f /usr/bin/dnf ]; then
-    OS8="--nobest"
+    OS8="--nobest --allowerasing"
     NTP=chronyd
 else
     NTP=ntp
@@ -35,8 +35,8 @@ MAILTO=' '
 * * * * * sync; echo 3 > /proc/sys/vm/drop_caches
 EOF
 
-yum -y install python36-setuptools
-easy_install-3.6 pip
+yum -y install python38-setuptools
+easy_install-3.8 pip
 pip install --upgrade youtube-dl you-get
 
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
