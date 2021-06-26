@@ -1,5 +1,5 @@
 if [ -f /usr/bin/dnf ]; then
-    OS8="--nobest --skip-broken --allowerasing"
+    OS8="--nobest --allowerasing"
     NTP=chronyd
 else
     NTP=ntp
