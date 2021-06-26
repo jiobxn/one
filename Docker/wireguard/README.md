@@ -9,11 +9,11 @@ WireGuard
 
 ## 宿主机升级内核(WireGuard 已经并入 Linux 5.6)
 
-    yum install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+    yum -y install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm    # or 8.el8
     sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/elrepo.repo
     yum -y install kernel-ml kernel-ml-devel kernel-ml-headers      #kernel-lt(长期支持版本)、kernel-ml(主线最新版本)
     echo "'$(grub2-mkconfig 2>/dev/null |grep "menuentry 'CentOS Linux" |awk -F\' 'NR==1{print $2}')'"    #查看新内核
-    grub2-editenv - set saved_entry='CentOS Linux (5.7.11-1.el7.elrepo.x86_64) 7 (Core)'                  #指定默认内核
+    grub2-editenv - set saved_entry='CentOS Linux (5.7.11-1.el7.elrepo.x86_64) 7 (Core)'                  #指定默认内核 or grub2-set-default 0
     grub2-editenv list
     
     #安装wireguard内核支持(宿主机kernel >= 5.6 只需要加载内核模块：modprobe wireguard && echo wireguard >/etc/modules-load.d/wireguard.conf)
