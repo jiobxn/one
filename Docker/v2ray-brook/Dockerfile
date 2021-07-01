@@ -6,7 +6,7 @@ RUN apk update && apk add curl git openssl tzdata bash && rm -rf /var/cache/apk/
 
 RUN cd /mnt \
         && wget -c https://github.com/$(curl -s https://github.com/txthinking/brook/releases |grep '/brook" rel' |awk -F\" 'NR==1{print $2}') \
-        && wget -c https://github.com/$(curl -s https://github.com/v2ray/v2ray-core/releases |grep v2ray-linux-64.zip |awk -F\" 'NR==1{print $2}') \
+        && wget -c https://github.com/$(curl -s https://github.com/v2fly/v2ray-core/releases |grep v2ray-linux-64.zip |awk -F\" 'NR==1{print $2}') \
         && mkdir v2ray \
         && unzip -d v2ray v2ray-linux-64.zip \
         && mv brook /usr/local/bin/ \
