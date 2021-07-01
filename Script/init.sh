@@ -1,8 +1,9 @@
 if [ -f /usr/bin/dnf ]; then
-    OS8="--nobest --allowerasing"
+    YUM="--nobest --allowerasing"
     NTP=chronyd
 else
     NTP=ntp
+    YUM="--skip-broken"
 fi
 
 yum clean all; yum -y install epel-release; yum -y update
@@ -40,7 +41,7 @@ easy_install-3.8 pip
 pip install --upgrade youtube-dl you-get
 
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
-yum -y install docker-ce docker-ce-cli containerd.io docker-compose podman buildah skopeo $OS8
+yum -y install docker-ce docker-ce-cli containerd.io docker-compose podman buildah skopeo $YUM
 systemctl enable docker
 systemctl start docker
 
