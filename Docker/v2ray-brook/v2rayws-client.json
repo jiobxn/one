@@ -1,0 +1,46 @@
+{
+    "inbounds": [
+        {
+            "port": 1080, 
+            "listen": "0.0.0.0", 
+            "protocol": "socks", 
+            "sniffing": {
+                "enabled": true, 
+                "destOverride": [
+                    "http", 
+                    "tls"
+                ]
+            }, 
+            "settings": {
+                "auth": "noauth", 
+                "udp": false
+            }
+        }
+    ], 
+    "outbounds": [
+        {
+            "protocol": "vmess", 
+            "settings": {
+                "vnext": [
+                    {
+                        "address": "mydomain.me", 
+                        "port": 443, 
+                        "users": [
+                            {
+                                "id": "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297", 
+                                "alterId": 64
+                            }
+                        ]
+                    }
+                ]
+            }, 
+            "streamSettings": {
+                "network": "ws", 
+                "security": "tls", 
+                "wsSettings": {
+                    "path": "/mp4"
+                }
+            }
+        }
+    ]
+}
