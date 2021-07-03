@@ -1,0 +1,31 @@
+{
+    "inbounds": [
+        {
+            "port": 1080, 
+            "listen": "0.0.0.0", 
+            "protocol": "socks", 
+            "settings": {
+                "udp": true
+            }
+        }
+    ], 
+    "outbounds": [
+        {
+            "protocol": "vmess", 
+            "settings": {
+                "vnext": [
+                    {
+                        "address": "mydomain.me", 
+                        "port": 10086, 
+                        "users": [
+                            {
+                                "id": "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297", 
+								"alterId": 64
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}
