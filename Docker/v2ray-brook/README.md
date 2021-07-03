@@ -22,8 +22,8 @@ v2ray-brook
     #docker run -d --restart unless-stopped -e MODE=wsclient -e SERVER=<ip:19443> -e PASS=<passwd> --name brook jiobxn/v2ray-brook
 
     #运行一个brook ws tls实例
-    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -e MODE=wsserver -e DOMAIN=<brook.example.com> --name brook-wss jiobxn/v2ray-brook
-    #docker run -d --restart unless-stopped -e MODE=wsclient -e SERVER=<brook.example.com:443> -e DOMAIN=Y -e PASS=<passwd> --name brook jiobxn/v2ray-brook
+    docker run -d --restart unless-stopped -p 80:80 -p 443:443 -e MODE=wssserver -e DOMAIN=<brook.example.com> --name brook-wss jiobxn/v2ray-brook
+    #docker run -d --restart unless-stopped -e MODE=wssclient -e SERVER=<brook.example.com:443> -e DOMAIN=Y -e PASS=<passwd> --name brook jiobxn/v2ray-brook
 
 
     #运行一个v2ray实例
@@ -44,7 +44,7 @@ v2ray-brook
 				-e MODE=[server] \\ <v2ray| [server|ssserver|wsserver|wssserver] | [client|ssclient|wsclient|wssclient]>    #运行模式：v2ray服务器、brook服务器(默认)、brook客户端
 				-e UUID=[Random] \\    #随机UUID，v2ray
 				-e WSPATH=</mp4> \\    #WS路径，v2ray  。path应当选择较长的字符串
-				-e DOMAIN=<jiobxn.com> \\    #wsserver模式填写你的域名，wsclient模式值不为空
+				-e DOMAIN=<jiobxn.com> \\    #wssserver模式填写你的域名，wssclient模式值不为空
 				-e LOG=[none] \\ <debug|info|warning|error|none>    #记录日志，v2ray
 				-e HTTP=<Y> \\         #客户端启动http代理，brook。 默认socks5
 				-e SERVER=<server_address:port> \\    #brook服务器地址和端口
