@@ -39,7 +39,7 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 		fi
 		
 		if [ "$SERVER" ]; then
-			if [ "$MODE" == "wsclient" ]; then
+			if [ "$MODE" == "wssclient" ]; then
 				echo -e "mode: $MODE \nport: $PORT \ntype: $TYPE"
 				echo "brook $MODE -l :$PORT -i 0.0.0.0 -s ws$TLS://$SERVER -p $PASS $HTTP" >/usr/bin/v2ray-brook
 			else
@@ -47,7 +47,7 @@ if [ ! -f /usr/bin/v2ray-brook ]; then
 				echo "brook $MODE -l :$PORT -i 0.0.0.0 -s $SERVER -p $PASS $HTTP" >/usr/bin/v2ray-brook
 			fi
 		else
-			if [ "$MODE" == "wsserver" ]; then
+			if [ "$MODE" == "wssserver" ]; then
                         	echo -e "mode: $MODE \nport: $PORT \npassword: $PASS"
                         	echo "brook $MODE $DOMAIN -p $PASS" >/usr/bin/v2ray-brook
 			else
