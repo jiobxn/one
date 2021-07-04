@@ -27,10 +27,10 @@ v2ray-brook
     #运行一个brook socks5tohttp实例
     docker run -d --restart unless-stopped --network container:brook -e MODE=socks5tohttp -e SERVER=127.0.0.1:1080 --name brook-http jiobxn/v2ray-brook
 
-    #运行一个brook relayoverbrook实例
+    #运行一个brook relayoverbrook实例(udp有问题)
     docker run -d --restart unless-stopped -e MODE=relayoverbrook -e SERVER=<ip:19443> -e PASS=<passwd> -e TO=172.17.0.7:3128 --name brook-squid jiobxn/v2ray-brook
 
-    #运行一个brook dns实例
+    #运行一个brook dns实例(有问题)
     docker run -d --restart unless-stopped -p 53:53/udp -e MODE=dns -e SERVER=<ip:19443> -e PASS=<passwd> --name brook-dns jiobxn/v2ray-brook
 
 
