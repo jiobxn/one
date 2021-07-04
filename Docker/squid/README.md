@@ -24,8 +24,8 @@ Squid
 			-p 8443:43128 \\
 			-e HTTP_PORT=[3128] \\
 			-e HTTPS_PORT=[43128] \\
-			-e SQUID_USER=<jiobxn> \\    用户验证访问
-			-e SQUID_PASS=[RANDOM] \\    默认随机密码
+			-e USER=<jiobxn> \\    用户验证访问
+			-e PASS=[RANDOM] \\    默认随机密码
 			-e MAX_AUTH=[5] \\           最大验证用户数
 			-e PROXY_SERVER=<"10.0.0.2,10.0.0.3" | "www.example.com|10.0.0.4;test.example.com|10.0.0.5"> \\  反向代理，以";"分割为一组
 			-e PROXY_HTTPS=<Y> \\      后端是否启用了HTTPS
