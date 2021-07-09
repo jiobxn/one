@@ -13,7 +13,7 @@ if [ "$(grep -o -w "Red Hat" /etc/redhat-release)" ]; then
     yum-config-manager --enable rhui-REGION-rhel-server-extras
 fi
 
-yum -y install bash-completion mosh vim aria2 wget rsync lrzsz bind-utils whois iptables-services ipset iftop iotop iptraf-ng iproute net-tools $NTP mtr tcping nmap tcpdump unzip bzip2 zip mailx bc at lsof expect telnet git subversion bridge-utils dos2unix certbot asciinema pciutils testdisk gdisk lvm2 nfs-utils psmisc sysstat fio jq paps enscript ghostscript ImageMagick s3fs-fuse  # openssl-devel setroubleshoot setools make gcc-c++ autoconf automake nasm
+yum -y install bash-completion mosh vim aria2 wget rsync lrzsz bind-utils whois iptables-services ipset iftop iotop iptraf-ng iproute net-tools network-scripts $NTP mtr tcping nmap tcpdump unzip bzip2 zip mailx bc at lsof expect telnet git subversion bridge-utils dos2unix certbot asciinema pciutils testdisk gdisk lvm2 nfs-utils psmisc sysstat fio jq paps enscript ghostscript ImageMagick s3fs-fuse  # openssl-devel setroubleshoot setools make gcc-c++ autoconf automake nasm
 
 systemctl disable NetworkManager firewalld
 \cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
