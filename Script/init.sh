@@ -41,7 +41,7 @@ easy_install-3.8 pip
 pip install --upgrade youtube-dl you-get
 
 curl -s https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
-yum -y install docker-ce docker-ce-cli containerd.io docker-compose podman buildah skopeo $YUM
+yum -y install docker-ce docker-ce-cli containerd.io docker-compose podman-docker podman buildah skopeo $YUM
 systemctl enable docker
 systemctl start docker
 
