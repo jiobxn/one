@@ -10,7 +10,7 @@ set -e
 : ${SSL_CACHE:="25m"}
 : ${SSL_TIMEOUT:="10m"}
 : ${DOMAIN_TAG:="888"}
-: ${EOORO_JUMP:="https://cn.bing.com"}
+: ${EOORO_JUMP:="http://127.0.0.1"}
 : ${NGX_DNS="9.9.9.9"}
 : ${CACHE_TIME:="10h"}
 : ${CACHE_SIZE:="2g"}
@@ -193,10 +193,6 @@ fcgi_server() {
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /etc/nginx/.htpasswd;
 	##nginx_status    }
-	
-	    location ~ /\.ht {
-	        deny  all;
-	    }
 	}
 	END
 }
@@ -255,10 +251,6 @@ java_php_server() {
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /etc/nginx/.htpasswd;
 	##nginx_status    }
-	
-	    location ~ /\.ht {
-	        deny  all;
-	    }
 	}
 	END
 }
@@ -318,10 +310,6 @@ proxy_server() {
 	##nginx_status        auth_basic           "Nginx Stats";
 	##nginx_status        auth_basic_user_file /etc/nginx/.htpasswd;
 	##nginx_status    }
-	
-	    location ~ /\.ht {
-	        deny  all;
-	    }
 	}
 	END
 }
@@ -1059,7 +1047,7 @@ else
 				   backend_https=<Y> \\
 				   dns=<223.5.5.5> \\
 				   tag=<9999> \\
-				   error=<https://www.bing.com> \\
+				   error=<http://127.0.0.1> \\
 				   auth=<admin|passwd> \\
 				   filter=<.google.com|.fqhub.com&.twitter.com|.fqhub.com> \\
 				   limit_rate=<2048k> \\
