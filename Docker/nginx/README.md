@@ -106,7 +106,7 @@ Nginx
 		backend_https=<Y>						#上游HTTPS，用于PROXY和DOMAIN模式
 		dns=<223.5.5.5>							#DNS，用于DOMAIN模式
 		tag=<9999>							#域名混淆字符，用于DOMAIN模式
-		error=<https://www.bing.com>					#错误跳转，用于DOMAIN模式
+		error=<http://127.0.0.1>					#错误跳转，用于DOMAIN模式
 		auth=<admin|passwd>						#用户认证，用于PROXY和DOMAIN模式
 		filter=<.google.com|.fqhub.com>					#字符替换，用于PROXY和DOMAIN模式
 		limit_rate=<2048k> \\						#单IP下载速率限制
@@ -197,3 +197,9 @@ Nginx
     压测：wrk -d 30 -c 16  http://192.168.1.37:80/
     4核 4worker   30000
     8核 8worker   50000
+
+**ipset**
+
+    for i in $(awk '$1!~"127.0.0.1"{print $1}' fqhub.com-access.log |awk -F. '{print $1"."$2"."$3".0/24"}' |sort |uniq);do echo "ipset add blacklist $i";done
+    ipset add whitelist 10.10.7.4
+    ipset del blacklist 10.10.6.4
