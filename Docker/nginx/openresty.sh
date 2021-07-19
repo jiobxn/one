@@ -630,17 +630,17 @@ http_waf(){
 	#ipset
 	cat >/ipset.sh <<-END
 	#!/bin/bash
-	[ -z "\`ipset list blacklist 2>/dev/null |grep -w blacklist\`" ] && ipset create blacklist hash:net maxelem 1000000
-	[ -z "\`ipset list whitelist 2>/dev/null |grep -w whitelist\`" ] && ipset create whitelist hash:net maxelem 1000000
+	ipset create blacklist hash:net maxelem 1000000
+	ipset create whitelist hash:net maxelem 1000000
 	if [ -f /key/all.ipset ]; then
-		[ "\$(ipset list |egrep ^[0-9] |wc -l)" -lt "\$(wc -l /key/all.ipset |awk '{print \$1}')" ] && ipset -R < /key/all.ipset
+	    [ "\$(ipset list |egrep ^[0-9] |wc -l)" -lt "\$(wc -l /key/all.ipset |awk '{print \$1}')" ] && ipset -R < /key/all.ipset
 	fi
 	END
 
 	#iptables
 	for i in $(awk '$1=="listen"{print $2}' /usr/local/openresty/nginx/conf/vhost/* |grep -v : |sort |uniq); do
-		echo '[ -z "$(iptables -S |grep -w WAFd'$i')" ] && iptables -I INPUT -m set --match-set blacklist src -p tcp --destination-port '$i' -m comment --comment WAFd'$i' -j DROP' >>/ipset.sh 
-		echo '[ -z "$(iptables -S |grep -w WAFa'$i')" ] && iptables -I INPUT -m set --match-set whitelist src -p tcp --destination-port '$i' -m comment --comment WAFa'$i' -j ACCEPT' >>/ipset.sh
+		echo 'iptables -I INPUT -m set --match-set blacklist src -p tcp --destination-port '$i' -m comment --comment WAFd'$i' -j DROP' >>/ipset.sh 
+		echo 'iptables -I INPUT -m set --match-set whitelist src -p tcp --destination-port '$i' -m comment --comment WAFa'$i' -j ACCEPT' >>/ipset.sh
 	done
 
 	#cron
